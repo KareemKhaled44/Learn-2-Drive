@@ -1,11 +1,19 @@
 import {React, useState, useEffect} from 'react'
-import { Clock, Users, Star, Settings, Zap, Venus  } from 'lucide-react' // Using Lucide icons instead
+import { Clock, Users, Star, Settings, Zap, Venus  } from 'lucide-react'
+import { useNavigate } from 'react-router-dom' // 👈 أضف هذا الاستيراد
 import api from '../exports/Axios.jsx'
 
 const Courses = () => {
   const [courses, setCourses] = useState([])
+  const navigate = useNavigate() // 👈 أضف هذا الـ hook
+  
   const isManual = (course) => course.transmission === 'manual';
   const isBestSeller = (course) => course.quantity_sold > 5;
+
+  // 👈 أضف هذه الدالة للتنقل إلى تفاصيل الكورس
+  const handleViewCourse = (courseId) => {
+    navigate(`/courses/${courseId}`)
+  }
 
   console.log(courses)
   const getCourses = () => {
@@ -176,9 +184,13 @@ const Courses = () => {
                       <span className="text-sm font-normal text-gray-400 ml-1">EGP</span>
                     </span>
                   </div>
-                  <button className="px-5 py-2 bg-[#22d3ee] text-white font-medium rounded-full 
-                    hover:bg-[#1e40af] transition-all duration-300 hover:shadow-md hover:shadow-[#22d3ee]/30">
-                    Book Now
+                  {/* 👈 تم تعديل الزر هنا */}
+                  <button 
+                    onClick={() => handleViewCourse(course.id)}
+                    className="px-5 py-2 bg-[#22d3ee] text-white font-medium rounded-full 
+                    hover:bg-[#1e40af] transition-all duration-300 hover:shadow-md hover:shadow-[#22d3ee]/30"
+                  >
+                    View Course
                   </button>
                 </div>
               </div>

@@ -53,7 +53,7 @@ const SignUp = () => {
       if (response.status === 201) {
         toast.success(response.data.message)
         // Redirect to login with the same role
-        navigate(`/login?role=${formData.role}`)
+        navigate(`/signin?role=${formData.role}`)
       }
     } catch (error) {
       if (error.response?.data) {

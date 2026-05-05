@@ -14,7 +14,7 @@ const SignIn = () => {
   const defaultRole = searchParams.get('role') || 'user'
   
   // Separate state for each field (simpler and more reliable)
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState(defaultRole)
   const [loading, setLoading] = useState(false)
@@ -22,7 +22,7 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!username || !password) {
+    if (!email || !password) {
       toast.error('Please fill in all fields')
       return
     }
@@ -31,27 +31,47 @@ const SignIn = () => {
     
     try {
       const response = await api.post('auth/login/', {
-        username: username,
+        email: email,
         password: password
       })
       
       if (response.status === 200) {
         localStorage.setItem('access', response.data.access)
         localStorage.setItem('refresh', response.data.refresh)
-        localStorage.setItem('role', role)
         
+        //  get real user info from server
+        const meResponse = await api.get('auth/me/')
+        console.log('Me response:', meResponse.data)  // ✅ add this
+        const { role, academy_id } = meResponse.data
+        const username = meResponse.data.username      // ✅ get it separately
+
+        localStorage.setItem('role', role)
+        localStorage.setItem('userName', username)
+
+
+        // fire event so header updates immediately
+        window.dispatchEvent(new Event('userLoggedIn')) 
+
         toast.success(`Welcome back!`)
         
-        // Redirect based on role
+        // redirect based on real role from server
         if (role === 'academy') {
-          navigate('/academy/dashboard')
+          navigate(`/academies/${academy_id}`)  // temporary 
         } else {
           navigate('/')
         }
       }
     } catch (error) {
+      console.log('Full error:', error)         
+      console.log('Error response:', error.response) 
       if (error.response?.status === 401) {
-        toast.error('Invalid username or password')
+        //  handle pending/rejected/suspended academies
+        const detail = error.response?.data?.detail
+        if (detail) {
+          toast.error(detail)
+        } else {
+          toast.error('Invalid email or password')
+        }
       } else {
         toast.error('Login failed. Please try again.')
       }
@@ -92,7 +112,7 @@ const SignIn = () => {
           <button
             onClick={() => {
               setRole('user')
-              setUsername('')
+              setEmail('')
               setPassword('')
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition ${
@@ -107,7 +127,7 @@ const SignIn = () => {
           <button
             onClick={() => {
               setRole('academy')
-              setUsername('')
+              setEmail('')
               setPassword('')
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition ${
@@ -124,19 +144,19 @@ const SignIn = () => {
         {/* Sign In Form */}
         <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8 shadow-lg shadow-black/30">
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Username */}
+            {/* Email */}
             <div className="space-y-2">
-              <label className="text-gray-300 text-sm font-medium">Username</label>
+              <label className="text-gray-300 text-sm font-medium">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-[#22d3ee]" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   className="w-full pl-10 pr-4 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
-                  placeholder="your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>

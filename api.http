@@ -168,8 +168,8 @@ POST http://localhost:8000/auth/login/
 Content-Type: application/json
 
 {
-    "username": "ahmed",
-    "password": "testpass123"
+    "email": "kemokingo44@gmail.com",
+    "password": "kemo&24680"
 }
 
 ###
@@ -187,8 +187,10 @@ Content-Type: application/json
 
 
 
-
-
+### Get current user info
+GET http://localhost:8000/auth/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTMyNDY1LCJpYXQiOjE3NzcxMzIxNjUsImp0aSI6IjU3NTNhNjNhOGM0ZjRjYzg5ZjUyNjY0ZWQ5NDc1N2QyIiwidXNlcl9pZCI6MTF9.Ee5Xfd9-7mqmNME1zJ5djzVym-7ybOTh58Xk6-aGXeA
 
 
 
@@ -196,18 +198,18 @@ Content-Type: application/json
 
 
 ############################################
-bookings
+##bookings
 ###########################################
 ### 1 - Create a booking (need access token from login)
 POST http://localhost:8000/bookings/create/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU3NzcwLCJpYXQiOjE3NzY0NTc0NzAsImp0aSI6IjMwOGQzNjVhNmFmOTQzNmU4ZGI2NDRhZDhjMmM1N2UzIiwidXNlcl9pZCI6MX0.QwgE-6aHvJtdJ6CaijCflbOKxR2TdnhdirJjyBWJ1OQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU4Mzk3LCJpYXQiOjE3NzcxNTgwOTcsImp0aSI6ImU2YTdkMmM5ODgzYzQyY2ZiMjRkYzNhYjc5NTFjMTA1IiwidXNlcl9pZCI6MX0.9fqlAz6P7DFPOb4Fes6sk-9i7PSdY-B77yiOom-0cpM
 
 {
-    "course": 1,
+    "course": 3,
     "trainer": 3,
-    "scheduled_date": "2026-04-25",
-    "start_time": "10:00",
+    "scheduled_date": "2026-05-2",
+    "start_time": "9:00",
     "notes": "I prefer morning sessions"
 }
 
@@ -216,15 +218,13 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ### 2 - Get all my bookings
 GET http://localhost:8000/bookings/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU3NzcwLCJpYXQiOjE3NzY0NTc0NzAsImp0aSI6IjMwOGQzNjVhNmFmOTQzNmU4ZGI2NDRhZDhjMmM1N2UzIiwidXNlcl9pZCI6MX0.QwgE-6aHvJtdJ6CaijCflbOKxR2TdnhdirJjyBWJ1OQ
-
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU3Njg0LCJpYXQiOjE3NzcxNTczODQsImp0aSI6IjM0MDdhNDc2ZjNiNTRkMmU5NzVlNDdjZGRjOTFiZjEwIiwidXNlcl9pZCI6MX0.5GN9INi6ZZc87Df2Rs0ZOa_y_Si6-9_pOMYofDiUfw0
 ###
 
 ### 3 - Get booking detail
 GET http://localhost:8000/bookings/1/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU3NzcwLCJpYXQiOjE3NzY0NTc0NzAsImp0aSI6IjMwOGQzNjVhNmFmOTQzNmU4ZGI2NDRhZDhjMmM1N2UzIiwidXNlcl9pZCI6MX0.QwgE-6aHvJtdJ6CaijCflbOKxR2TdnhdirJjyBWJ1OQ
-
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3ODQ0MDQzLCJpYXQiOjE3Nzc4NDM3NDMsImp0aSI6ImIwNWJkOGRkY2IyZDQ1OTI4NjhhMmNlNTNkN2EwY2NjIiwidXNlcl9pZCI6MX0.djYvdwARkzsWYLEan1kPqsVqBIancADpI-KTXRpM0CI
 ###
 
 ### 4 - Cancel a booking
@@ -237,12 +237,12 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ### 5 - Try to book same trainer at same date and time (should fail)
 POST http://localhost:8000/bookings/create/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU3NzcwLCJpYXQiOjE3NzY0NTc0NzAsImp0aSI6IjMwOGQzNjVhNmFmOTQzNmU4ZGI2NDRhZDhjMmM1N2UzIiwidXNlcl9pZCI6MX0.QwgE-6aHvJtdJ6CaijCflbOKxR2TdnhdirJjyBWJ1OQ
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2Nzc2LCJpYXQiOjE3NzcxNTY0NzYsImp0aSI6IjRiM2EwYjYyZDI0NTQ3ZDZiYzRkMWEwMGYyN2I2MjE4IiwidXNlcl9pZCI6MX0.PVklbw3km0mBlUuDhjMQnG4sQ5SLIep5RdxJb1kCDzI
 
 {
-    "course": 1,
-    "trainer": 3,
-    "scheduled_date": "2026-04-25",
+    "course": 3,
+    "trainer": 7,
+    "scheduled_date": "2026-04-28",
     "start_time": "10:00",
     "notes": "duplicate booking test"
 }
@@ -263,9 +263,9 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ### Additional tests for availability endpoint
 ### 1 - Get available slots for a trainer on a working day
-GET http://localhost:8000/bookings/availability/?trainer=6&course=1&date=2026-04-25
+GET http://localhost:8000/bookings/availability/?trainer=3&course=3&date=2026-05-02
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NTUwMDEzLCJpYXQiOjE3NzY1NDk3MTMsImp0aSI6IjlmNzlhNmM1M2VmZDQzN2Q5M2I5ZjI5MDhiNDE5ZDc1IiwidXNlcl9pZCI6MX0.4TNgfwhZjIpt20TcPR0HLaozq25NKMLOzXgZtmpNnlg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3NzUxOTY4LCJpYXQiOjE3Nzc3NTE2NjgsImp0aSI6ImQwNWU0OTJkYTg3MDRmZjM4NGYyZDJmNzMyNjQ0YjA1IiwidXNlcl9pZCI6MX0.sHL_HpsXluRJRYx-eR9V8hSLe_icEXklypAJ2CQKn8g
 
 ###
 
@@ -277,13 +277,196 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 
 ### 3 - Get available slots with past date (should fail)
-GET http://localhost:8000/bookings/availability/?trainer=6&course=1&date=2026-04-01
+GET http://localhost:8000/bookings/availability/?trainer=7&course=2&date=2026-04-28
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NTUwMDEzLCJpYXQiOjE3NzY1NDk3MTMsImp0aSI6IjlmNzlhNmM1M2VmZDQzN2Q5M2I5ZjI5MDhiNDE5ZDc1IiwidXNlcl9pZCI6MX0.4TNgfwhZjIpt20TcPR0HLaozq25NKMLOzXgZtmpNnlg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2MDI2LCJpYXQiOjE3NzcxNTU3MjYsImp0aSI6IjIzZTUzZDY1ZGFkOTRkYjQ5NTlkMDAzNTg4Mjc4ZDAyIiwidXNlcl9pZCI6MX0.j7irfdfMolLQr-CODKIp1YKQipr37WyHS5moEDSUKxE
 
 ###
 
 ### 4 - Get available slots with missing params (should fail)
-GET http://localhost:8000/bookings/availability/?trainer=6&course=1
+GET http://localhost:8000/bookings/availability/?trainer=7&course=2
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NTUwMDEzLCJpYXQiOjE3NzY1NDk3MTMsImp0aSI6IjlmNzlhNmM1M2VmZDQzN2Q5M2I5ZjI5MDhiNDE5ZDc1IiwidXNlcl9pZCI6MX0.4TNgfwhZjIpt20TcPR0HLaozq25NKMLOzXgZtmpNnlg
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2MDI2LCJpYXQiOjE3NzcxNTU3MjYsImp0aSI6IjIzZTUzZDY1ZGFkOTRkYjQ5NTlkMDAzNTg4Mjc4ZDAyIiwidXNlcl9pZCI6MX0.j7irfdfMolLQr-CODKIp1YKQipr37WyHS5moEDSUKxE
+
+### Get booking detail with schedule
+GET http://localhost:8000/bookings/9/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU3MTUxLCJpYXQiOjE3NzcxNTY4NTEsImp0aSI6IjcwYjhlYTNjZDFhMDQ5YmNiODdkYjEyYmQxMzE1YjdiIiwidXNlcl9pZCI6MX0.YD02g2zIknxEwSuhtS6tAP2A20Gb0LBMih3JiRKlX8k
+
+###################################################
+##academy dashboard
+###################################################
+### 1 - Get academy profile
+GET http://localhost:8000/dashboard/profile/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM3NzM4LCJpYXQiOjE3NzcxMzc0MzgsImp0aSI6IjZhYTA4MmQxZDgwNzQxNjc4NmExM2YxOWFlZTQ2MGIyIiwidXNlcl9pZCI6MTF9.DV8MzXJE4K7qs1VZKXPgzboDgm9Djhz5e7WJfAPWbkE
+
+###
+
+### 2 - Update academy profile
+PATCH http://localhost:8000/dashboard/profile/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
+Content-Type: application/json
+
+{
+    "name": "motaz academy",
+    "description": "We offer a wide range of courses in various fields including programming, design, marketing, and more. Our experienced instructors and comprehensive curriculum ensure that you gain the skills needed to succeed in your career."
+}
+
+###
+
+### 3 - Add contact
+POST http://localhost:8000/dashboard/profile/contacts/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
+Content-Type: application/json
+
+{
+    "type": "phone",
+    "value": "01012345678"
+}
+
+###
+
+### 4 - Delete contact
+DELETE http://localhost:8000/dashboard/profile/contacts/18/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
+
+###
+
+### 5 - Try accessing with regular user token (should fail)
+GET http://localhost:8000/dashboard/profile/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MjQyLCJpYXQiOjE3NzcxMzc5NDIsImp0aSI6IjRhMjRlYjQwZDhlYzRlYjM5NmE2NmNlM2E0N2M2ZjdlIiwidXNlcl9pZCI6MX0.XNfA0yTZwVGQaIp3WxbthumHdn6JY6gXaxhAw66RkNs
+
+###########
+## trainer dashboard
+###########
+## 1 - Create a trainer
+POST http://localhost:8000/dashboard/trainers/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MzQ3LCJpYXQiOjE3NzcxNDcwNDcsImp0aSI6ImUwZjgwNjZiYjEwMjRmMjFiMmZkNmVkYTNjMTcxMzI1IiwidXNlcl9pZCI6MTF9.OnPTDIzc3QoD2C6eS31yUVNoZgACDp1Slto1aEH3Aek
+
+{
+    "name": "Test Trainer",
+    "gender": "male",
+    "bio": "Test bio",
+    "car_model": "Honda Civic",
+    "experience_years": 5,
+    "working_days": ["saturday", "sunday"],
+    "session_start_time": "09:00",
+    "session_end_time": "17:00",
+    "is_active": true
+}
+
+###
+### 2 - Update trainer
+PATCH http://localhost:8000/dashboard/trainers/12/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MDA0LCJpYXQiOjE3NzcxNDY3MDQsImp0aSI6IjhhZTI5MWExNDNlNzQwMjdiOTdhMzRmY2FlNWQ2NmVmIiwidXNlcl9pZCI6MTF9.elqFk2OlwZhdZfCKBwu7a2V0nBVwsE9CXtTozk8BcjE
+Content-Type: application/json
+
+{
+    "experience_years": 7
+}
+
+### 3 - Delete trainer
+DELETE http://localhost:8000/dashboard/trainers/12/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MDA0LCJpYXQiOjE3NzcxNDY3MDQsImp0aSI6IjhhZTI5MWExNDNlNzQwMjdiOTdhMzRmY2FlNWQ2NmVmIiwidXNlcl9pZCI6MTF9.elqFk2OlwZhdZfCKBwu7a2V0nBVwsE9CXtTozk8BcjE
+
+########
+### courses dashboard
+########
+### 1 - Get all academy courses
+GET http://localhost:8000/dashboard/courses/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
+
+###
+
+### 2 - Add new course
+POST http://localhost:8000/dashboard/courses/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3NTI3LCJpYXQiOjE3NzcxNDcyMjcsImp0aSI6ImJmOTA3NWIyZTRmYzRmNzc4ZDc5OGVjYzg3YTMzNzM4IiwidXNlcl9pZCI6MTF9.H40Hap4NlTpj1W4UJqVsSgOfxPgQrecQ4hmDbKH1pK0
+Content-Type: application/json
+
+{
+    "title": "New Manual Course",
+    "description": "Learn manual driving",
+    "price": "299.00",
+    "sessions": 10,
+    "duration": 60,
+    "quantity": 20,
+    "transmission": "manual",
+    "is_active": true,
+    "trainers": [14]
+}
+
+###
+
+### 3 - Get course detail
+GET http://localhost:8000/dashboard/courses/16/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3NTI3LCJpYXQiOjE3NzcxNDcyMjcsImp0aSI6ImJmOTA3NWIyZTRmYzRmNzc4ZDc5OGVjYzg3YTMzNzM4IiwidXNlcl9pZCI6MTF9.H40Hap4NlTpj1W4UJqVsSgOfxPgQrecQ4hmDbKH1pK0
+
+###
+
+### 4 - Update course
+PATCH http://localhost:8000/dashboard/courses/16/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
+Content-Type: application/json
+
+{
+    "price": "350.00",
+    "quantity": 25
+}
+
+###
+
+### 5 - Delete course
+DELETE http://localhost:8000/dashboard/courses/16/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
+
+############
+###booking dashboard
+############
+### 1 - Get all academy bookings
+GET http://localhost:8000/dashboard/bookings/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+###
+
+### 2 - Get bookings filtered by status
+GET http://localhost:8000/dashboard/bookings/?status=confirmed
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+
+###
+
+### 3 - Get bookings filtered by trainer
+GET http://localhost:8000/dashboard/bookings/?trainer=14
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+
+###
+
+### 4 - Get bookings filtered by course
+GET http://localhost:8000/dashboard/bookings/?course=17
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+###
+
+### 5 - Get booking detail
+GET http://localhost:8000/dashboard/bookings/2/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+###
+
+### 6 - Update booking status to completed
+PATCH http://localhost:8000/dashboard/bookings/2/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+Content-Type: application/json
+
+{
+    "status": "completed"
+}
+
+###
+
+### 7 - Get academy booking stats
+GET http://localhost:8000/dashboard/bookings/stats/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+
+

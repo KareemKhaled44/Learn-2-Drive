@@ -20,9 +20,9 @@ const AcademyRegister = () => {
     password: '',
     confirm_password: '',
     academy_name: '',
-    description: '',
     phone: '',
-  })
+    description: '',
+})
 
   const handleChange = (e) => {
     setFormData({
@@ -58,9 +58,12 @@ const AcademyRegister = () => {
     } catch (error) {
       if (error.response?.data) {
         const errors = error.response.data
-        Object.keys(errors).forEach(key => {
-          toast.error(`${key}: ${errors[key][0]}`)
-        })
+        if (errors.username) toast.error(`Username: ${errors.username[0]}`)
+        if (errors.email) toast.error(`Email: ${errors.email[0]}`)
+        if (errors.password) toast.error(`Password: ${errors.password}`)
+        if (errors.academy_name) toast.error(`Academy name: ${errors.academy_name[0]}`)
+        if (errors.phone) toast.error(`Phone: ${errors.phone[0]}`)
+        if (errors.non_field_errors) toast.error(errors.non_field_errors[0])
       } else {
         toast.error('Registration failed. Please try again.')
       }

@@ -1,7 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import make_password
 from .serializers import AcademyRegisterSerializer, UserRegisterSerializer
@@ -10,6 +9,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Create your views here.
 # ================================
@@ -50,11 +51,27 @@ class AcademyRegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'email'
+
     def validate(self, attrs):
-        data = super().validate(attrs)
+        email = attrs.get('email')
+        password = attrs.get('password')
 
-        user = self.user
+        # find user by email
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise AuthenticationFailed("No account found with this email.")
 
+        # check password
+        if not user.check_password(password):
+            raise AuthenticationFailed("Invalid email or password.")
+
+        # check if active
+        if not user.is_active:
+            raise AuthenticationFailed("This account is disabled.")
+
+        # check academy status
         if user.role == 'academy':
             try:
                 academy = user.academy_profile
@@ -70,9 +87,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     raise AuthenticationFailed(
                         "Your academy has been suspended. Please contact support."
                     )
-            except ObjectDoesNotExist:  # ✅ fixed
+            except ObjectDoesNotExist:
                 raise AuthenticationFailed("Academy profile not found.")
 
+        # generate tokens manually
+        refresh = self.get_token(user)
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+
+        self.user = user
         return data
 
 

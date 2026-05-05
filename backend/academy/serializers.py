@@ -48,7 +48,22 @@ class TrainerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trainer
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'gender',
+            'bio',
+            'car_model',
+            'image',
+            'location',
+            'experience_years',
+            'working_days',
+            'session_start_time',
+            'session_end_time',
+            'is_active',
+            'avg_rating',
+            'reviews_count',
+        ]
 
 class CourseSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -85,7 +100,20 @@ class TrainerHomeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Trainer
-        fields = '__all__'
+        fields = [
+            'id',
+            'name',
+            'gender',
+            'bio',
+            'car_model',
+            'image',
+            'location',
+            'experience_years',
+            'working_days',
+            'session_start_time',
+            'session_end_time',
+            'is_active',
+        ]
 
 class TrainerProfileSerializer(serializers.ModelSerializer):
     location = serializers.StringRelatedField()
@@ -107,7 +135,7 @@ class AcademyDetailSerializer(AcademySerializer):
     # Courses
     # =========================
     def get_courses(self, obj):
-        courses = obj.courses.annotate(
+        courses = obj.courses.filter(status='approved').annotate(
             avg_rating=Avg('ratings__rating'),
             reviews_count=Count('ratings'),
         ).prefetch_related('trainers')  # optimization
@@ -122,7 +150,7 @@ class AcademyDetailSerializer(AcademySerializer):
     # Trainers (Academy level)
     # =========================
     def get_trainers(self, obj):
-        trainers = obj.trainers.annotate(
+        trainers = obj.trainers.filter(status='approved').annotate(
             avg_rating=Avg('ratings__rating'),
             reviews_count=Count('ratings'),
         )

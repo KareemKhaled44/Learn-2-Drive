@@ -184,21 +184,25 @@ const Header = () => {
 
   useEffect(() => {
     const checkAuth = () => {
-      const access = localStorage.getItem("access");
-      setIsLoggedIn(!!access);
-      
-      if (access && !localStorage.getItem("userName")) {
-        setUserName("User");
-      } else if (!access) {
-        setUserName("Guest");
-      } else {
-        const storedName = localStorage.getItem("userName");
-        if (storedName) setUserName(storedName);
-      }
-    };
+        const access = localStorage.getItem("access")
+        const storedName = localStorage.getItem("userName")
+        
+        setIsLoggedIn(!!access)
+        setUserName(access ? (storedName || "User") : "Guest")
+    }
     
-    checkAuth();
-  }, []);
+    checkAuth()
+
+    // listen for storage changes from other tabs
+    window.addEventListener('storage', checkAuth)
+    // listen for custom login event from same tab
+    window.addEventListener('userLoggedIn', checkAuth)
+
+    return () => {
+        window.removeEventListener('storage', checkAuth)
+        window.removeEventListener('userLoggedIn', checkAuth)
+    }
+}, [])
 
   // Handle hash navigation for FAQ
   useEffect(() => {
@@ -247,19 +251,20 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const refresh = localStorage.getItem("refresh");
-      await api.post("/auth/logout/", { refresh });
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-      localStorage.removeItem("userName");
-      setIsLoggedIn(false);
-      setUserName("Guest");
-      setIsMenuOpen(false);
-      navigate("/signin", { state: { successMessage: "You have logged out successfully!" } });
+        const refresh = localStorage.getItem("refresh")
+        await api.post("/auth/logout/", { refresh })
+        localStorage.removeItem("access")
+        localStorage.removeItem("refresh")
+        localStorage.removeItem("userName")
+        localStorage.removeItem("role")        
+        setIsLoggedIn(false)
+        setUserName("Guest")
+        setIsMenuOpen(false)
+        navigate("/signin", { state: { successMessage: "You have logged out successfully!" } })
     } catch (err) {
-      console.error(err);
+        console.error(err)
     }
-  };
+}
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -406,15 +411,24 @@ const Header = () => {
 
         {/* User Menu Button */}
         <div className="flex items-center">
-          <button 
-            id="user-menu-button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center justify-center rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 w-10 h-10 active:scale-95"
-          >
-            <span className="text-white font-bold text-sm">
-              {getInitial(userName)}
-            </span>
-          </button>
+            {isLoggedIn ? (
+                <button
+                    id="user-menu-button"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="flex items-center justify-center rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 w-10 h-10 active:scale-95"
+                >
+                    <span className="text-white font-bold text-sm">
+                        {getInitial(userName)}
+                    </span>
+                </button>
+            ) : (
+                <button
+                    onClick={() => navigate('/signin')}
+                    className="flex items-center gap-2 rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 px-4 h-10 text-white text-sm font-medium active:scale-95"
+                >
+                    Sign In
+                </button>
+            )}
         </div>
       </header>
 

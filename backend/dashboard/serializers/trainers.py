@@ -44,7 +44,6 @@ class TrainerCreateUpdateSerializer(serializers.ModelSerializer):
             'bio',
             'car_model',
             'image',
-            'location',
             'experience_years',
             'working_days',
             'session_start_time',

@@ -23,6 +23,7 @@ class HomeAcademyListView(generics.ListAPIView):
                 courses_count=Count('courses'),
             )
             .order_by('-avg_rating')
+            .filter(status='approved')
             .distinct()
         )
         return qs[:3]
@@ -40,6 +41,7 @@ class AcademyListCreateView(generics.ListCreateAPIView):
                 reviews_count=Count('ratings'),
                 courses_count=Count('courses'),
             )
+            .filter(status='approved')
             .order_by('-avg_rating')
             .distinct()
         )
@@ -52,6 +54,7 @@ class AcademyListCreateView(generics.ListCreateAPIView):
 class AcademyDetailView(generics.RetrieveAPIView):
     queryset = (
         Academy.objects
+        .filter(status='approved')
         .prefetch_related('courses', 'trainers', 'contacts')
         .annotate(
             avg_rating=Avg('ratings__rating'),
@@ -68,6 +71,7 @@ class HomeCourseListView(generics.ListAPIView):
     def get_queryset(self):
         qs=(
             Course.objects
+            .filter(status='approved')
             .annotate(
                     avg_rating=Avg('ratings__rating'),
                     reviews_count=Count('ratings'),)
@@ -120,6 +124,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         qs=(
             Course.objects
+            .filter(status='approved')
             .annotate(
                     avg_rating=Avg('ratings__rating'),
                     reviews_count=Count('ratings'),)
@@ -134,6 +139,7 @@ class CourseDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         return (
             Course.objects
+            .filter(status='approved')
             .prefetch_related('trainers', 'academy')
             .annotate(
                 avg_rating=Avg('ratings__rating'),
@@ -143,18 +149,27 @@ class CourseDetailView(generics.RetrieveAPIView):
 
 class HomeTrainerListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
-        return Trainer.objects.prefetch_related("courses")[:4]
+        return Trainer.objects.filter(status='approved').prefetch_related("courses")[:4]
     
     serializer_class = TrainerHomeSerializer
 
 
 class TrainerListCreateView(generics.ListCreateAPIView):
-    queryset = Trainer.objects.all()
-    serializer_class = TrainerHomeSerializer
+    serializer_class = TrainerSerializer
+    def get_queryset(self):
+        return (
+            Trainer.objects
+            .filter(status='approved')
+            .annotate(
+                avg_rating=Avg('ratings__rating'),
+                reviews_count=Count('ratings'),
+            )
+        )
 
 
 class TrainerProfileView(generics.RetrieveAPIView):
-    queryset = Trainer.objects.all()
+    def get_queryset(self):
+        return Trainer.objects.filter(status='approved')
     serializer_class = TrainerProfileSerializer
 
 

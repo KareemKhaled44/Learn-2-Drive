@@ -135,6 +135,11 @@ class Location(models.Model):
 class Trainer(models.Model):
     name = models.CharField(max_length=100)
     GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     bio = models.TextField(blank=True)
     car_model = models.CharField(max_length=100, blank=True)
@@ -148,6 +153,18 @@ class Trainer(models.Model):
     session_end_time = models.TimeField(null=True, blank=True)
     max_bookings_per_day = models.IntegerField(default=3)
     is_active = models.BooleanField(default=True)
+
+    # Approval
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    rejected_reason = models.TextField(blank=True, null=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        'authentication.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_trainers'
+    )
 
     ratings = GenericRelation(Rating)
 
@@ -188,6 +205,11 @@ class Course(models.Model):
         ("manual", "Manual"),
         ("auto", "Automatic"),
     ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
 
     transmission = models.CharField(max_length=10, choices=TRANSMISSION_CHOICES, blank=True, null=True)
 
@@ -197,6 +219,18 @@ class Course(models.Model):
     trainers = models.ManyToManyField(Trainer, related_name="courses")
 
     ratings = GenericRelation(Rating)
+
+    # Approval
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    rejected_reason = models.TextField(blank=True, null=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        'authentication.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_courses'
+    )
 
     def clean(self):
         # Validate trainer/academy consistency when full_clean() is called.
@@ -215,13 +249,36 @@ class Course(models.Model):
 @receiver(m2m_changed, sender=Course.trainers.through)
 def validate_course_trainers_belong_to_academy(sender, instance, action, pk_set, **kwargs):
     """Prevent attaching trainers from another academy to a course."""
-    if action != "pre_add" or not pk_set or not instance.academy_id:
-        return
+    if action == "pre_add":
+        if not pk_set or not instance.academy_id:
+            return
 
-    invalid_trainers = Trainer.objects.filter(pk__in=pk_set).exclude(academy_id=instance.academy_id)
-    if invalid_trainers.exists():
-        names = ", ".join(invalid_trainers.values_list("name", flat=True))
-        raise ValidationError(
-            f"These trainers don't belong to {instance.academy.name}: {names}"
+        invalid_trainers = Trainer.objects.filter(pk__in=pk_set).exclude(academy_id=instance.academy_id)
+        if invalid_trainers.exists():
+            names = ", ".join(invalid_trainers.values_list("name", flat=True))
+            raise ValidationError(
+                f"These trainers don't belong to {instance.academy.name}: {names}"
+            )
+
+    if action in {"pre_remove", "pre_clear"}:
+        from bookings.models import Booking
+
+        trainer_ids = pk_set if action == "pre_remove" else set(instance.trainers.values_list("id", flat=True))
+        if not trainer_ids:
+            return
+
+        blocked_ids = set(
+            Booking.objects.filter(
+                course=instance,
+                trainer_id__in=trainer_ids,
+                status='confirmed',
+            ).values_list("trainer_id", flat=True)
         )
+        if blocked_ids:
+            names = ", ".join(
+                Trainer.objects.filter(id__in=blocked_ids).values_list("name", flat=True)
+            )
+            raise ValidationError(
+                f"Cannot unassign trainer(s) with active confirmed bookings for this course: {names}"
+            )
     

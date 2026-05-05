@@ -36,7 +36,9 @@ function App() {
         <Route path="/all-trainers" element={<AllTrainers />} />
         <Route path="/trainer-profile/:id" element={<TrainerProfile />} />
         <Route path="/contact-us" element={<ContactUs />} />
+
         <Route path="/courses/:id" element={<CourseDetails/>} />
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
       </Routes>

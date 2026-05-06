@@ -1,30 +1,32 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import { 
-  Star, MapPin, Phone, Mail, Globe, BookOpen, MessageCircle, 
-  DollarSign, Venus, Users, Award, Calendar, Clock, Filter,
-  ChevronRight, User, ThumbsUp, Share2, Heart, StarHalf
-} from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import {Header} from '../exports/index.js';
+import { Star, MapPin, Phone, Mail, Globe, Venus, Users, Award, Settings, Zap, Calendar, Clock, Filter, ChevronRight, User, ThumbsUp, StarHalf} from 'lucide-react'
 import api from '../exports/Axios.jsx'
+import CarLoading from '../components/ui/loading/CarLoading.jsx';
 
 const AcademyDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [academy, setAcademy] = React.useState(null)
   const [loading, setLoading] = React.useState(true)
   const [activeTab, setActiveTab] = React.useState('courses')
   const [selectedTransmission, setSelectedTransmission] = React.useState('all')
   const [reviews, setReviews] = React.useState([])
+  const [reviewsCount, setReviewsCount] = React.useState(0) // 👈 أضف هذه الحالة
   const [reviewsLoading, setReviewsLoading] = React.useState(false)
+  const isBestSeller = (course) => course.quantity_sold > 5;
+  const isManual = (course) => course.transmission === 'manual';
 
   const getAcademyDetails = () => {
     setLoading(true)
     api.get(`api/academies/${id}/`)
-      .then(response => {
+      .then(async response => {
+        await new Promise(resolve => setTimeout(resolve, 500));
         setAcademy(response.data)
+        setReviews(response.data.reviews || [])
+        setReviewsCount(response.data.reviews?.length || 0) // 👈 أضف هذا السطر
         console.log(response.data)
-        // After getting academy details, fetch reviews
-        fetchReviews()
       })
       .catch(error => {
         console.error("Error fetching academy details:", error)
@@ -32,68 +34,6 @@ const AcademyDetails = () => {
       .finally(() => {
         setLoading(false)
       })
-  }
-
-  const fetchReviews = () => {
-    setReviewsLoading(true)
-    // In a real app, you would fetch from API
-    // api.get(`api/academies/${id}/reviews/`)
-    //   .then(response => setReviews(response.data))
-    //   .catch(error => console.error("Error fetching reviews:", error))
-    //   .finally(() => setReviewsLoading(false))
-    
-    // Mock data for now
-    setTimeout(() => {
-      const mockReviews = [
-        {
-          id: 1,
-          user_name: "Ahmed Mohamed",
-          rating: 5,
-          date: "2026-03-01",
-          text: "Excellent academy! The instructors are very professional and patient. I passed my driving test on the first try.",
-          user_image: null,
-          helpful_count: 12
-        },
-        {
-          id: 2,
-          user_name: "Sarah Khaled",
-          rating: 4,
-          date: "2026-02-15",
-          text: "Good experience overall. The courses are well-structured and the prices are reasonable. Would recommend.",
-          user_image: null,
-          helpful_count: 8
-        },
-        {
-          id: 3,
-          user_name: "Omar Hassan",
-          rating: 5,
-          date: "2026-02-10",
-          text: "Best driving academy in Cairo! The trainers are experienced and the cars are well-maintained.",
-          user_image: null,
-          helpful_count: 15
-        },
-        {
-          id: 4,
-          user_name: "Nour El-Din",
-          rating: 3,
-          date: "2026-01-28",
-          text: "Decent academy but sometimes scheduling can be difficult. The training quality is good though.",
-          user_image: null,
-          helpful_count: 4
-        },
-        {
-          id: 5,
-          user_name: "Mariam Adel",
-          rating: 5,
-          date: "2026-01-15",
-          text: "Very satisfied with my experience. The female trainer option was perfect for me. Highly recommended!",
-          user_image: null,
-          helpful_count: 21
-        }
-      ]
-      setReviews(mockReviews)
-      setReviewsLoading(false)
-    }, 1000)
   }
 
   React.useEffect(() => {
@@ -120,10 +60,7 @@ const AcademyDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#22d3ee] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading academy details...</p>
-        </div>
+        <CarLoading />
       </div>
     )
   }
@@ -172,7 +109,7 @@ const AcademyDetails = () => {
                 <div className="flex items-center gap-1 bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-full border border-yellow-400/30">
                   <Star className="h-4 w-4 fill-current" />
                   <span className="text-white font-bold">{academy.avg_rating ? Number(academy.avg_rating).toFixed(1) : 'New'}</span>
-                  <span className="text-gray-300">({academy.reviews_count} reviews)</span>
+                  <span className="text-gray-300">({reviewsCount} reviews)</span> {/* 👈 تم التعديل هنا */}
                 </div>
               </div>
 
@@ -202,7 +139,7 @@ const AcademyDetails = () => {
                   <div className="text-xs text-gray-400">Branches</div>
                 </div>
                 <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700">
-                  <div className="text-2xl font-bold text-[#22d3ee]">{academy.minimum_price}</div>
+                  <div className="text-2xl font-bold text-[#22d3ee]">{academy.minimum_price} EGP</div>
                   <div className="text-xs text-gray-400">Starting From</div>
                 </div>
               </div>
@@ -226,9 +163,9 @@ const AcademyDetails = () => {
                 }`}
               >
                 {tab === 'info' ? 'About' : tab}
-                {tab === 'reviews' && (
+                {tab === 'reviews' && reviewsCount > 0 && ( // 👈 تم التعديل هنا
                   <span className="ml-2 text-xs bg-gray-700 px-2 py-0.5 rounded-full">
-                    {academy.reviews_count}
+                    {reviewsCount}
                   </span>
                 )}
               </button>
@@ -237,6 +174,7 @@ const AcademyDetails = () => {
         </div>
       </div>
 
+      {/* باقي الكود كما هو دون تغيير */}
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Courses Section */}
@@ -264,59 +202,182 @@ const AcademyDetails = () => {
             {/* Courses Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCourses.map((course) => (
-                <div 
-                  key={course.id}
-                  className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden hover:border-[#22d3ee] transition-all duration-300 group"
-                >
+                <div key={course.id} className={`group bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden transition-all duration-300 
+                hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative
+                ${!course.is_active ? 'opacity-55 grayscale-[40%] pointer-events-none' : ''}`}>
+
                   {/* Course Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={course.image} 
+                  <div className="relative overflow-hidden h-48">
+                    <img
+                      src={course.image || '/placeholder-course.jpg'} 
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                    
-                    {/* Transmission Badge */}
-                    <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#22d3ee]/30">
-                      <span className="text-white text-xs font-medium uppercase">
-                        {course.transmission === 'auto' ? 'Automatic' : 'Manual'}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    {/* Right badge: bestseller / inactive */}
+                    {!course.is_active ? (
+                      <div className="absolute top-3.5 right-3.5 bg-gray-800/80 backdrop-blur-sm text-gray-400
+                        border border-gray-600/40 text-xs font-semibold px-2.5 py-1 rounded-full">
+                        Unavailable
+                      </div>
+                    ) : isBestSeller(course) && (
+                      <div className="absolute top-3.5 right-3.5 bg-[#22d3ee] text-[#0f172a]
+                        text-xs font-bold px-2.5 py-1 rounded-full">
+                      BEST SELLER
+                      </div>
+                    )}
+
+                    {/* Academy strip */}
+                    {course.academy && (
+                      <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 px-3.5 py-2.5">
+                        <img
+                          src={course.academy.logo}
+                          alt={course.academy.name}
+                          className="w-9 h-9 rounded-md object-cover border border-[#22d3ee]/25 bg-[#0f172a] flex-shrink-0"
+                        />
+                        <span className="text-base text-gray-400 truncate">{course.academy.name}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Transmission badge */}
+                  {course.transmission && (
+                    <div className={`absolute top-3.5 left-3.5 flex items-center gap-1.5 px-2.5 py-1
+                      rounded-full text-xs font-bold tracking-wide backdrop-blur-sm border
+                      ${isManual(course)
+                        ? 'bg-orange-400/10 text-orange-400 border-orange-400/30'
+                        : 'bg-[#22d3ee]/10 text-[#1fbfd8] border-[#22d3ee]/30'
+                      }`}
+                    >
+                      {isManual(course)
+                        ? <Settings className="h-3 w-3" />
+                        : <Zap className="h-3 w-3" />
+                      }
+                      {isManual(course) ? 'MANUAL' : 'AUTOMATIC'}
+                    </div>
+                  )}
+
+                  {/* Course Content */}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-xl font-bold text-[#22d3ee]">{course.title}</h3>
+                        {course.avg_rating != null && (
+                          <div className="flex items-center gap-1 bg-yellow-400/8 border border-yellow-400/20
+                            rounded-full px-2 py-1 flex-shrink-0">
+                            <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                            <span className="text-xs font-semibold text-yellow-400">
+                              {Number(course.avg_rating).toFixed(1)}
+                            </span>
+                            <span className="text-xs text-gray-500">({course.reviews_count})</span>
+                          </div>
+                        )}
+                      </div>
+                    <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed mb-4">{course.description}</p>
+
+                    {/* Stats */}
+                    <div className="flex flex-wrap gap-4 mb-2">
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <Clock className="h-3.5 w-3.5 text-[#22d3ee]" />
+                        {course.sessions} sessions
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <Users className="h-3.5 w-3.5 text-[#22d3ee]" />
+                        {course.duration} min / session
+                      </div>
+                    </div>
+
+                    {/* Trainers */}
+                  {Array.isArray(course.trainers) && course.trainers.length > 0 && (
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex">
+                        {course.trainers.slice(0, 3).map((trainer, i) => (
+                          <div
+                            key={trainer.id}
+                            className="relative group/trainer"
+                            style={{ marginLeft: i === 0 ? 0 : -6, zIndex: 3 - i }}
+                          >
+                            {/* Avatar */}
+                            <div
+                              className="w-6 h-6 rounded-full border-2 border-[#1e293b] bg-[#334155]
+                                flex items-center justify-center text-[9px] font-bold text-gray-300
+                                overflow-hidden flex-shrink-0 cursor-pointer"
+                            >
+                              {trainer.image
+                                ? <img src={trainer.image} alt={trainer.name} className="w-full h-full object-cover" />
+                                : trainer.name.slice(0, 2).toUpperCase()
+                              }
+                            </div>
+
+                            {/* Hover tooltip */}
+                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50
+                              opacity-0 group-hover/trainer:opacity-100 pointer-events-none
+                              transition-opacity duration-200">
+                              <div className="bg-[#0f172a] border border-gray-700 rounded-lg p-2.5
+                                shadow-xl shadow-black/40 w-40 flex-shrink-0">
+                                {/* Trainer name */}
+                                <p className="text-white text-xs font-semibold truncate mb-1">{trainer.name}</p>
+                                {/* Rating */}
+                                <div className="flex items-center gap-1 mb-1">
+                                  <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                                  {trainer.avg_rating != null
+                                    ? <span className="text-yellow-400 text-xs font-bold">{Number(trainer.avg_rating).toFixed(1)}</span>
+                                    : <span className="text-gray-500 text-xs">No ratings</span>
+                                  }
+                                  {trainer.reviews_count > 0 && (
+                                    <span className="text-gray-500 text-[10px]">({trainer.reviews_count})</span>
+                                  )}
+                                </div>
+                                {/* Experience */}
+                                <p className="text-gray-400 text-[10px]">{trainer.experience_years} yrs experience</p>
+                              </div>
+                              {/* Tooltip arrow */}
+                              <div className="w-2 h-2 bg-[#0f172a] border-r border-b border-gray-700
+                                rotate-45 mx-auto -mt-1" />
+                            </div>
+                          </div>
+                        ))}
+
+                        {course.trainers.length > 3 && (
+                          <div className="w-6 h-6 rounded-full border-2 border-[#1e293b] bg-[#334155]
+                            flex items-center justify-center text-[9px] font-bold text-gray-400"
+                            style={{ marginLeft: -6 }}>
+                            +{course.trainers.length - 3}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {course.trainers.length} trainer{course.trainers.length !== 1 ? 's' : ''} available
                       </span>
                     </div>
 
-                    {/* Price Badge */}
-                    <div className="absolute bottom-4 left-4 bg-[#22d3ee] text-[#0f172a] px-3 py-1.5 rounded-full font-bold">
-                      {course.price} EGP
-                    </div>
+                    {course.has_female_trainer && (
+                      <div className="flex items-center gap-1 bg-pink-400/10 border border-pink-400/25
+                        text-pink-400 px-2 py-0.5 rounded-full flex-shrink-0">
+                        <Venus className="h-3 w-3" />
+                        <span className="text-[10px] font-medium">Female Available</span>
+                      </div>
+                    )}
                   </div>
+                )}
 
-                  {/* Course Content */}
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-white mb-2">{course.title}</h3>
-                    
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-gray-300">
-                        <Clock className="h-4 w-4 text-[#22d3ee]" />
-                        <span className="text-sm">Duration: {course.duration} hours</span>
+                    {/* Price & Button */}
+                    <div className="flex items-center justify-between border-t border-gray-700 pt-4">
+                      <div>
+                        <span className="text-xs text-gray-500 block">Starting from</span>
+                        <span className="text-2xl font-bold text-white">
+                          {Number(course.price).toLocaleString()}
+                          <span className="text-sm font-normal text-gray-400 ml-1">EGP</span>
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-300">
-                        <Users className="h-4 w-4 text-[#22d3ee]" />
-                        <span className="text-sm">Trainer: {course.trainers.map(t => t.name).join(', ')}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-300">
-                        <BookOpen className="h-4 w-4 text-[#22d3ee]" />
-                        <span className="text-sm">Sessions: {course.sessions}</span>
-                      </div>
+                      <button 
+                        onClick={() => navigate(`/courses/${course.id}`)}
+                        className="px-5 py-2 bg-[#22d3ee] text-white font-medium rounded-full 
+                          hover:bg-[#1e40af] transition-all duration-300 hover:shadow-md hover:shadow-[#22d3ee]/30"
+                      >
+                        View Course
+                      </button>
                     </div>
-
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                      {course.description}
-                    </p>
-                    <Link to={`/courses/${course.id}`}>
-                    <button className="w-full px-4 py-2 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300">
-                      View Details
-                    </button>
-                    </Link>
                   </div>
                 </div>
               ))}
@@ -330,68 +391,86 @@ const AcademyDetails = () => {
           </div>
         )}
 
-        {/* Trainers Section */}
+        {/* باقي الأقسام كما هي (trainers, reviews, info, contact) */}
         {activeTab === 'trainers' && (
-          <div className="space-y-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">
-              Our Expert <span className="text-[#22d3ee]">Trainers</span>
-            </h2>
+        <div className="space-y-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white">
+            Our Expert <span className="text-[#22d3ee]">Trainers</span>
+          </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {academy.trainers.map((trainer) => (
-                <div 
-                  key={trainer.id}
-                  className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden hover:border-[#22d3ee] transition-all duration-300"
-                >
-                  <div className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af]">
-                        {trainer.image ? (
-                          <img 
-                            src={trainer.image} 
-                            alt={trainer.name}
-                            className="w-full h-full object-cover"
-                          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {academy.trainers.map((trainer) => (
+              <div 
+                key={trainer.id}
+                className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative
+                transition-all duration-300"
+              >
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af]">
+                      {trainer.image ? (
+                        <img 
+                          src={trainer.image} 
+                          alt={trainer.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <User className="h-8 w-8 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white">{trainer.name}</h3>
+                      <p className="text-sm text-gray-400">{trainer.car_model}</p>
+                      
+                      {/* Rating Badge */}
+                      <div className="flex items-center gap-1 mt-1">
+                        {trainer.avg_rating ? (
+                          <>
+                            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                            <span className="text-yellow-400 text-sm font-semibold">
+                              {Number(trainer.avg_rating).toFixed(1)}
+                            </span>
+                            <span className="text-gray-500 text-xs">
+                              ({trainer.reviews_count || 0} {trainer.reviews_count === 1 ? 'review' : 'reviews'})
+                            </span>
+                          </>
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <User className="h-8 w-8 text-white" />
-                          </div>
+                          <span className="text-gray-500 text-xs">No ratings yet</span>
                         )}
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{trainer.name}</h3>
-                        <p className="text-sm text-gray-400">{trainer.car_model}</p>
-                      </div>
                     </div>
-
-                    <p className="text-gray-300 text-sm mb-4">
-                      {trainer.bio || "Experienced driving instructor"}
-                    </p>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-gray-400 text-sm">
-                        <Award className="h-4 w-4 text-[#22d3ee]" />
-                        <span>{trainer.experience_years} years experience</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-400 text-sm">
-                        <MapPin className="h-4 w-4 text-[#22d3ee]" />
-                        <span>{trainer.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-400 text-sm">
-                        <Calendar className="h-4 w-4 text-[#22d3ee]" />
-                        <span>{trainer.availability}</span>
-                      </div>
-                    </div>
-
-                    <button className="w-full px-4 py-2 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300">
-                      View Profile
-                    </button>
                   </div>
+
+                  <p className="text-gray-300 text-sm mb-4">
+                    {trainer.bio || "Experienced driving instructor"}
+                  </p>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Award className="h-4 w-4 text-[#22d3ee]" />
+                      <span>{trainer.experience_years} years experience</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <MapPin className="h-4 w-4 text-[#22d3ee]" />
+                      <span>{trainer.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Calendar className="h-4 w-4 text-[#22d3ee]" />
+                      <span>{trainer.availability}</span>
+                    </div>
+                  </div>
+
+                  <button className="w-full px-4 py-2 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300">
+                    View Profile
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
         {/* Reviews Section */}
         {activeTab === 'reviews' && (
@@ -400,13 +479,15 @@ const AcademyDetails = () => {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 className="text-2xl md:text-3xl font-bold text-white">
                 Student <span className="text-[#22d3ee]">Reviews</span>
+                {reviewsCount > 0 && (
+                  <span className="text-sm text-gray-400 ml-2">({reviewsCount})</span>
+                )}
               </h2>
             </div>
 
             {reviewsLoading ? (
               <div className="text-center py-12">
-                <div className="w-12 h-12 border-4 border-[#22d3ee] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-400">Loading reviews...</p>
+                <CarLoading />
               </div>
             ) : (
               <>
@@ -418,7 +499,7 @@ const AcademyDetails = () => {
                         <div className="text-5xl font-bold text-[#22d3ee]">
                           {academy.avg_rating ? Number(academy.avg_rating).toFixed(1) : '0.0'}
                         </div>
-                        <div className="text-gray-400 text-sm mt-1">{academy.reviews_count} total reviews</div>
+                        <div className="text-gray-400 text-sm mt-1">{reviewsCount} total reviews</div> {/* 👈 تم التعديل هنا */}
                       </div>
                       <div className="flex items-center gap-1">
                         {renderStars(academy.avg_rating || 0)}
@@ -451,16 +532,12 @@ const AcademyDetails = () => {
                             <h4 className="text-white font-semibold">{review.user_name}</h4>
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-1">
-                                {renderStars(review.rating)}
+                                {renderStars(review.rating || 0)}
                               </div>
-                              <span className="text-gray-400 text-xs">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                              <span className="text-gray-400 text-xs">{new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
                           </div>
                         </div>
-                        <button className="text-gray-400 hover:text-[#22d3ee] transition-colors group flex items-center gap-1">
-                          <ThumbsUp className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                          <span className="text-xs">{review.helpful_count}</span>
-                        </button>
                       </div>
                       <p className="text-gray-300">{review.text}</p>
                     </div>
@@ -550,7 +627,7 @@ const AcademyDetails = () => {
                     </li>
                     <li className="flex justify-between text-gray-300">
                       <span>Total Reviews</span>
-                      <span className="text-[#22d3ee] font-bold">{academy.reviews_count}</span>
+                      <span className="text-[#22d3ee] font-bold">{reviewsCount}</span> {/* 👈 تم التعديل هنا */}
                     </li>
                   </ul>
                 </div>
@@ -674,16 +751,6 @@ const AcademyDetails = () => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
-        <button className="p-3 bg-[#22d3ee] text-[#0f172a] rounded-full shadow-lg hover:bg-[#1e40af] hover:text-white transition-all duration-300 group">
-          <Share2 className="h-5 w-5" />
-        </button>
-        <button className="p-3 bg-[#1e293b] text-white rounded-full shadow-lg border border-gray-700 hover:border-[#22d3ee] transition-all duration-300 group">
-          <Heart className="h-5 w-5" />
-        </button>
       </div>
     </div>
   )

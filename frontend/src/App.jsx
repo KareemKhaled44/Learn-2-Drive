@@ -17,6 +17,9 @@ import CourseDetails from './pages/CourseDetails.jsx';
 import ForgotPassword from './pages/ForgotPassword';
 import PendingApproval from './pages/PendingApproval';
 import AcademyRegister from './pages/AcademyRegister';
+import Booking from './pages/Booking';
+import BookingDetail from './pages/BookingDetail';
+import MyBookings from './pages/MyBookings';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -41,6 +44,10 @@ function App() {
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
+        <Route path="/booking/:courseId" element={<Booking />} />
+        <Route path="/booking/:id" element={<BookingDetail />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+        
       </Routes>
       <Footer />
 

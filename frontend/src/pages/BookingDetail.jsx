@@ -17,14 +17,13 @@ const BookingDetails = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   
-  useEffect(() => {
-    fetchBookingDetails()
-  }, [id])
+  
   
   const fetchBookingDetails = async () => {
     setLoading(true)
     try {
-      const response = await api.get('/bookings/')
+      const response = await api.get(`/bookings/${id}/`)
+      setBooking(response.data)
       
       
       // التعامل مع هيكل البيانات المختلفة
@@ -53,6 +52,10 @@ const BookingDetails = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchBookingDetails()
+  }, [id])
   
   const getStatusConfig = (status) => {
     const statusMap = {

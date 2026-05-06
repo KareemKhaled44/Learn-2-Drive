@@ -222,9 +222,9 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ###
 
 ### 3 - Get booking detail
-GET http://localhost:8000/bookings/1/
+GET http://localhost:8000/bookings/13/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3ODQ0MDQzLCJpYXQiOjE3Nzc4NDM3NDMsImp0aSI6ImIwNWJkOGRkY2IyZDQ1OTI4NjhhMmNlNTNkN2EwY2NjIiwidXNlcl9pZCI6MX0.djYvdwARkzsWYLEan1kPqsVqBIancADpI-KTXRpM0CI
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDY5MDYxLCJpYXQiOjE3NzgwNjg3NjEsImp0aSI6IjEyZWY2Y2YwMWM4MDRlYmI4NzY3OWMwNmMwMDUxYmQ2IiwidXNlcl9pZCI6MX0.nhiQGH8hY2xuVwPhc0IWr8hQocc2nUt9uubOjDK5IYE
 ###
 
 ### 4 - Cancel a booking

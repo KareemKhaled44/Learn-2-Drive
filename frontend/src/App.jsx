@@ -44,7 +44,7 @@ function App() {
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
-        <Route path="/booking/:courseId" element={<Booking />} />
+        <Route path="/booking/course/:courseId" element={<Booking />} />
         <Route path="/booking/:id" element={<BookingDetail />} />
         <Route path="/my-bookings" element={<MyBookings />} />
         

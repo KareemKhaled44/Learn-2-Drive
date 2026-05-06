@@ -206,7 +206,7 @@ const MyBookings = () => {
         {/* Header */}
         <div className="mb-8">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/all-courses')}
             className="mb-4 flex items-center gap-2 text-gray-400 hover:text-[#22d3ee] transition"
           >
             <ChevronRight className="h-5 w-5 rotate-180" />

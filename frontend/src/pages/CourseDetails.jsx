@@ -1,23 +1,22 @@
 import React from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom' // 👈 أضف useNavigate هنا
+import { useParams, Link, useNavigate } from 'react-router-dom' 
 import { 
-  Star, MapPin, Phone, Mail, Globe, BookOpen, MessageCircle, 
-  DollarSign, Venus, Users, Award, Calendar, Clock, Filter,
-  ChevronRight, User, ThumbsUp, Share2, Heart, StarHalf,
+  Star, MapPin,  Globe, BookOpen,  
+   Venus, Users, Award, Calendar, 
+   User, StarHalf,
   Car, Gauge, AlertCircle, CheckCircle, XCircle, UserCheck
 } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 
 const CourseDetails = () => {
   const { id } = useParams()
-  const navigate = useNavigate() // 👈 أضف هذا السطر
+  const navigate = useNavigate() 
   const [course, setCourse] = React.useState(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
 
-  // 👈 أضف هذه الدالة للتنقل إلى صفحة الحجز
   const handleBookNow = () => {
-    navigate(`/booking/${id}`)
+    navigate(`/booking/course/${id}`)
   }
 
   const getCourseDetails = () => {

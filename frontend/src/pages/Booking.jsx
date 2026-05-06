@@ -4,6 +4,7 @@ import { Calendar, Clock, User, CheckCircle, ChevronRight, AlertCircle, ArrowLef
 import api from '../exports/Axios.jsx'
 import { format } from 'date-fns'
 import CarLoading from '../components/ui/loading/CarLoading.jsx'
+import { toast } from 'react-toastify'
 
 const Booking = () => {
   const { courseId } = useParams()
@@ -23,6 +24,12 @@ const Booking = () => {
   
   // Current step
   const [currentStep, setCurrentStep] = useState(1) // 1: Trainer, 2: Date, 3: Time, 4: Confirm
+
+  const isPastDate = (date) => {
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    return date < today
+  }
   
   // Working days mapping
   const workingDaysMap = {
@@ -84,6 +91,9 @@ const Booking = () => {
           console.warn('Unexpected data format from API:', response.data)
           slotsData = []
         }
+      } else {
+        console.warn('Unexpected data format from API:', response.data)
+        slotsData = []
       }
       
       setAvailableSlots(slotsData)
@@ -103,6 +113,10 @@ const Booking = () => {
   }
   
   const handleSelectDate = (date) => {
+    if (isPastDate(date)) {
+      toast.error("You cannot select a past date")
+      return
+    }
     setSelectedDate(date)
     setSelectedTime(null)
     setCurrentStep(3)

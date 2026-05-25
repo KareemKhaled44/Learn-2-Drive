@@ -1,5 +1,4 @@
 import axios from "axios";
-import { toast } from "react-toastify";
 
 const baseURL = "http://localhost:8000/";
 
@@ -18,6 +17,16 @@ api.interceptors.request.use(
     if (access) {
       config.headers.Authorization = `Bearer ${access}`;
     }
+
+    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+    if (isFormData) {
+      delete config.headers["Content-Type"];
+      delete config.headers.common?.["Content-Type"];
+      delete config.headers.post?.["Content-Type"];
+      delete config.headers.patch?.["Content-Type"];
+      delete config.headers.put?.["Content-Type"];
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -44,7 +53,7 @@ api.interceptors.response.use(
           originalRequest.headers["Authorization"] = "Bearer " + res.data.access;
           return api(originalRequest);
         }
-      } catch (err) {
+      } catch {
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
       }

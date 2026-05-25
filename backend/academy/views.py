@@ -200,6 +200,10 @@ class LocationListView(APIView):
         )
         return Response(cities)
 
+class ContactMessageCreateView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = ContactMessageSerializer
+
 class ReviewCreateView(generics.CreateAPIView):
 
     serializer_class = ReviewCreateSerializer

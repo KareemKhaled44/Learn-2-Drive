@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import api from '../../exports/Axios'
 
-const DAYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 const TrainerForm = () => {
     const navigate = useNavigate()
@@ -23,17 +23,16 @@ const TrainerForm = () => {
         working_days: [],
         session_start_time: '',
         session_end_time: '',
-        is_active: true,
         image: null,
+        is_active: true,
     })
 
-    // fetch trainer data if editing
     useEffect(() => {
         if (!isEdit) return
         const fetchTrainer = async () => {
             try {
-                const response = await api.get(`/dashboard/trainers/${id}/`)
-                const t = response.data
+                const res = await api.get(`/dashboard/trainers/${id}/`)
+                const t = res.data
                 setFormData({
                     name: t.name || '',
                     gender: t.gender || '',
@@ -41,10 +40,10 @@ const TrainerForm = () => {
                     car_model: t.car_model || '',
                     experience_years: t.experience_years || 0,
                     working_days: t.working_days || [],
-                    session_start_time: t.session_start_time?.slice(0, 5) || '',
-                    session_end_time: t.session_end_time?.slice(0, 5) || '',
-                    is_active: t.is_active,
+                    session_start_time: t.session_start_time || '',
+                    session_end_time: t.session_end_time || '',
                     image: null,
+                    is_active: t.is_active,
                 })
             } catch (err) {
                 console.error(err)
@@ -53,7 +52,7 @@ const TrainerForm = () => {
             }
         }
         fetchTrainer()
-    }, [id])
+    }, [id, isEdit])
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target
@@ -83,11 +82,12 @@ const TrainerForm = () => {
 
         try {
             const hasImage = Boolean(formData.image)
-            const normalizedPayload = {
+
+            const normalized = {
                 name: formData.name.trim(),
                 gender: formData.gender || null,
                 bio: formData.bio || '',
-                car_model: formData.car_model.trim(),
+                car_model: formData.car_model || '',
                 experience_years: Number(formData.experience_years) || 0,
                 working_days: formData.working_days,
                 session_start_time: formData.session_start_time || null,
@@ -95,17 +95,16 @@ const TrainerForm = () => {
                 is_active: Boolean(formData.is_active),
             }
 
-            const payload = hasImage ? new FormData() : normalizedPayload
+            const payload = hasImage ? new FormData() : normalized
 
             if (hasImage) {
-                Object.entries(normalizedPayload).forEach(([key, value]) => {
+                Object.entries(normalized).forEach(([key, value]) => {
                     if (key === 'working_days') {
                         payload.append('working_days', JSON.stringify(value))
                     } else if (value !== null && value !== undefined && value !== '') {
                         payload.append(key, value)
                     }
                 })
-
                 payload.append('image', formData.image)
             }
 
@@ -121,9 +120,7 @@ const TrainerForm = () => {
         } catch (err) {
             console.log('Trainer submit error status:', err.response?.status)
             console.log('Trainer submit error data:', err.response?.data)
-            if (err.response?.data) {
-                setErrors(err.response.data)
-            }
+            if (err.response?.data) setErrors(err.response.data)
         } finally {
             setLoading(false)
         }
@@ -136,187 +133,96 @@ const TrainerForm = () => {
     )
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
-
-            {/* Header */}
+        <div className="max-w-3xl mx-auto space-y-8">
             <div className="flex items-center gap-3">
                 <button
                     onClick={() => navigate('/dashboard/trainers')}
-                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
+                    className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all"
                 >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
-                    <h2 className="text-white text-2xl font-bold">
-                        {isEdit ? 'Edit Trainer' : 'Add Trainer'}
-                    </h2>
-                    <p className="text-gray-400 text-sm mt-1">
-                        {isEdit ? 'Update trainer information' : 'New trainer will need admin approval'}
-                    </p>
+                    <h2 className="text-white text-3xl font-bold">{isEdit ? 'Edit Trainer' : 'Add Trainer'}</h2>
+                    <p className="text-slate-300 text-sm mt-1">{isEdit ? 'Update trainer details' : 'Create a new trainer'}</p>
                 </div>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
-
-                {/* Basic info */}
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
+                <div className="dash-card p-6 space-y-4">
                     <h3 className="text-white font-medium">Basic Info</h3>
 
-                    {/* Name */}
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Name *</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                            placeholder="Trainer name"
-                        />
+                        <label className="text-slate-300 text-sm mb-1 block">Name *</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} required className="dash-input" />
                         {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name[0]}</p>}
                     </div>
 
-                    {/* Gender */}
-                    <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Gender</label>
-                        <select
-                            name="gender"
-                            value={formData.gender}
-                            onChange={handleChange}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                        >
-                            <option value="">Select gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-slate-300 text-sm mb-1 block">Gender</label>
+                            <select name="gender" value={formData.gender} onChange={handleChange} className="dash-select">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="text-slate-300 text-sm mb-1 block">Experience (years)</label>
+                            <input type="number" name="experience_years" value={formData.experience_years} onChange={handleChange} min="0" className="dash-input" />
+                        </div>
                     </div>
 
-                    {/* Car model */}
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Car Model *</label>
-                        <input
-                            type="text"
-                            name="car_model"
-                            value={formData.car_model}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                            placeholder="e.g. Toyota Corolla"
-                        />
-                        {errors.car_model && <p className="text-red-400 text-xs mt-1">{errors.car_model[0]}</p>}
+                        <label className="text-slate-300 text-sm mb-1 block">Bio</label>
+                        <textarea name="bio" value={formData.bio} onChange={handleChange} rows={3} className="dash-input resize-none" />
                     </div>
 
-                    {/* Experience */}
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Experience Years</label>
-                        <input
-                            type="number"
-                            name="experience_years"
-                            value={formData.experience_years}
-                            onChange={handleChange}
-                            min="0"
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                        />
+                        <label className="text-slate-300 text-sm mb-1 block">Car Model</label>
+                        <input type="text" name="car_model" value={formData.car_model} onChange={handleChange} className="dash-input" />
                     </div>
 
-                    {/* Bio */}
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Bio</label>
-                        <textarea
-                            name="bio"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            rows={3}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500 resize-none"
-                            placeholder="Brief description about the trainer"
-                        />
-                    </div>
-
-                    {/* Image */}
-                    <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Profile Image</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-400 text-sm focus:outline-none focus:border-cyan-500"
-                        />
-                    </div>
-
-                    {/* Active */}
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="checkbox"
-                            name="is_active"
-                            id="is_active"
-                            checked={formData.is_active}
-                            onChange={handleChange}
-                            className="w-4 h-4 accent-cyan-500"
-                        />
-                        <label htmlFor="is_active" className="text-gray-400 text-sm">
-                            Active trainer
-                        </label>
+                        <label className="text-slate-300 text-sm mb-1 block">Image</label>
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="dash-input text-slate-300" />
+                        {errors.image && <p className="text-red-400 text-xs mt-1">{errors.image[0]}</p>}
                     </div>
                 </div>
 
-                {/* Schedule */}
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-                    <h3 className="text-white font-medium">Schedule</h3>
+                <div className="dash-card p-6 space-y-4">
+                    <h3 className="text-white font-medium">Availability</h3>
 
-                    {/* Working days */}
                     <div>
-                        <label className="text-gray-400 text-sm mb-2 block">Working Days</label>
+                        <label className="text-slate-300 text-sm mb-2 block">Working Days</label>
                         <div className="flex flex-wrap gap-2">
                             {DAYS.map(day => (
-                                <button
-                                    key={day}
-                                    type="button"
-                                    onClick={() => handleDayToggle(day)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all ${
-                                        formData.working_days.includes(day)
-                                            ? 'bg-cyan-500 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                    }`}
-                                >
-                                    {day.slice(0, 3)}
+                                <button key={day} type="button" onClick={() => handleDayToggle(day)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${formData.working_days.includes(day) ? 'bg-gradient-to-r from-[#22d3ee] to-[#1e40af] text-white shadow-[0_8px_20px_rgba(30,64,175,0.35)]' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
+                                    {day}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* Start time */}
-                    <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Session Start Time</label>
-                        <input
-                            type="time"
-                            name="session_start_time"
-                            value={formData.session_start_time}
-                            onChange={handleChange}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-slate-300 text-sm mb-1 block">Session Start Time</label>
+                            <input type="time" name="session_start_time" value={formData.session_start_time} onChange={handleChange} className="dash-input" />
+                        </div>
+
+                        <div>
+                            <label className="text-slate-300 text-sm mb-1 block">Session End Time</label>
+                            <input type="time" name="session_end_time" value={formData.session_end_time} onChange={handleChange} className="dash-input" />
+                        </div>
                     </div>
 
-                    {/* End time */}
-                    <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Session End Time</label>
-                        <input
-                            type="time"
-                            name="session_end_time"
-                            value={formData.session_end_time}
-                            onChange={handleChange}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500"
-                        />
+                    <div className="flex items-center gap-3">
+                        <input type="checkbox" name="is_active" id="is_active" checked={formData.is_active} onChange={handleChange} className="w-4 h-4 accent-cyan-500" />
+                        <label htmlFor="is_active" className="text-slate-300 text-sm">Active</label>
                     </div>
                 </div>
 
-                {/* Submit */}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 rounded-lg bg-cyan-500 text-white font-medium hover:bg-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
+                <button type="submit" disabled={loading} className="dash-btn w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                     {loading ? (
                         <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -326,13 +232,6 @@ const TrainerForm = () => {
                         isEdit ? 'Save Changes' : 'Add Trainer'
                     )}
                 </button>
-
-                {/* Pending note */}
-                {!isEdit && (
-                    <p className="text-center text-gray-500 text-xs">
-                        New trainers require admin approval before appearing on the website
-                    </p>
-                )}
             </form>
         </div>
     )

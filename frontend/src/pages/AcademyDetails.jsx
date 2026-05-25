@@ -57,6 +57,10 @@ const AcademyDetails = () => {
     return stars
   }
 
+  const handleTrainerProfile = (trainerId) => {
+    navigate(`/trainer-profile/${trainerId}`)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
@@ -402,67 +406,93 @@ const AcademyDetails = () => {
             {academy.trainers.map((trainer) => (
               <div 
                 key={trainer.id}
-                className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative
-                transition-all duration-300"
+                className="group bg-[#1e293b] border border-gray-700 rounded-2xl overflow-hidden hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative transition-all duration-300"
               >
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#22d3ee] to-[#1e40af]" />
                 <div className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af]">
-                      {trainer.image ? (
-                        <img 
-                          src={trainer.image} 
-                          alt={trainer.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <User className="h-8 w-8 text-white" />
+                  <div className="flex items-start justify-between gap-3 mb-5">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="relative shrink-0">
+                        <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af] border border-[#22d3ee]/20">
+                          {trainer.image ? (
+                            <img 
+                              src={trainer.image} 
+                              alt={trainer.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <User className="h-8 w-8 text-white" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white">{trainer.name}</h3>
-                      <p className="text-sm text-gray-400">{trainer.car_model}</p>
-                      
-                      {/* Rating Badge */}
-                      <div className="flex items-center gap-1 mt-1">
-                        {trainer.avg_rating ? (
-                          <>
-                            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
-                            <span className="text-yellow-400 text-sm font-semibold">
-                              {Number(trainer.avg_rating).toFixed(1)}
-                            </span>
-                            <span className="text-gray-500 text-xs">
-                              ({trainer.reviews_count || 0} {trainer.reviews_count === 1 ? 'review' : 'reviews'})
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-gray-500 text-xs">No ratings yet</span>
-                        )}
+                        <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#1e293b] ${trainer.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-white truncate">{trainer.name}</h3>
+                          {trainer.gender === 'female' ? (
+                            <Venus className="h-4 w-4 text-pink-400 shrink-0" />
+                          ) : (
+                            <User className="h-4 w-4 text-blue-400 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-400 truncate">{trainer.car_model || 'Standard training vehicle'}</p>
+                        <div className="flex items-center gap-1 mt-2">
+                          <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
+                          <span className="text-yellow-400 text-sm font-semibold">
+                            {trainer.avg_rating ? Number(trainer.avg_rating).toFixed(1) : '0.0'}
+                          </span>
+                          <span className="text-gray-500 text-xs">
+                            ({trainer.reviews_count || 0} {trainer.reviews_count === 1 ? 'review' : 'reviews'})
+                          </span>
+                        </div>
                       </div>
                     </div>
+
+                    <div className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold border ${trainer.is_active ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                      {trainer.is_active ? 'Active' : 'Inactive'}
+                    </div>
                   </div>
 
-                  <p className="text-gray-300 text-sm mb-4">
-                    {trainer.bio || "Experienced driving instructor"}
+                  <p className="text-gray-300 text-sm mb-4 line-clamp-3 min-h-[3rem]">
+                    {trainer.bio || 'Experienced driving instructor committed to safe, practical lessons.'}
                   </p>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <Award className="h-4 w-4 text-[#22d3ee]" />
-                      <span>{trainer.experience_years} years experience</span>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f172a] border border-gray-700 text-xs text-gray-300">
+                      <Award className="h-3.5 w-3.5 text-[#22d3ee]" />
+                      {trainer.experience_years || 0} yrs
                     </div>
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <MapPin className="h-4 w-4 text-[#22d3ee]" />
-                      <span>{trainer.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <Calendar className="h-4 w-4 text-[#22d3ee]" />
-                      <span>{trainer.availability}</span>
-                    </div>
+                    {trainer.location && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f172a] border border-gray-700 text-xs text-gray-300">
+                        <MapPin className="h-3.5 w-3.5 text-[#22d3ee]" />
+                        {trainer.location}
+                      </div>
+                    )}
+                    {trainer.session_start_time && trainer.session_end_time && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f172a] border border-gray-700 text-xs text-gray-300">
+                        <Clock className="h-3.5 w-3.5 text-[#22d3ee]" />
+                        {trainer.session_start_time.slice(0, 5)} - {trainer.session_end_time.slice(0, 5)}
+                      </div>
+                    )}
                   </div>
 
-                  <button className="w-full px-4 py-2 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300">
+                  {trainer.working_days?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      {trainer.working_days.slice(0, 4).map((day) => (
+                        <span key={day} className="px-2.5 py-1 text-[11px] rounded-full bg-[#0f172a] border border-gray-700 text-gray-300 capitalize">
+                          {day}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => handleTrainerProfile(trainer.id)}
+                    className="w-full px-4 py-2.5 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300 font-medium"
+                  >
                     View Profile
                   </button>
                 </div>

@@ -1,4 +1,4 @@
-import {React, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Lock, Building, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {Header} from '../exports/index.js';
@@ -41,11 +41,11 @@ const SignIn = () => {
         
         //  get real user info from server
         const meResponse = await api.get('auth/me/')
-        console.log('Me response:', meResponse.data)  // ✅ add this
-        const { role, academy_id } = meResponse.data
-        const username = meResponse.data.username      // ✅ get it separately
+        console.log('Me response:', meResponse.data) 
+        const { role: serverRole } = meResponse.data
+        const username = meResponse.data.username     
 
-        localStorage.setItem('role', role)
+        localStorage.setItem('role', serverRole)
         localStorage.setItem('userName', username)
 
 
@@ -55,8 +55,8 @@ const SignIn = () => {
         toast.success(`Welcome back!`)
         
         // redirect based on real role from server
-        if (role === 'academy') {
-          navigate(`/academies/${academy_id}`)  // temporary 
+        if (serverRole === 'academy') {
+          navigate('/dashboard')   
         } else {
           navigate('/')
         }
@@ -202,9 +202,10 @@ const SignIn = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-[#22d3ee] hover:bg-[#1e40af] text-white font-medium rounded-lg transition duration-300 shadow-md hover:shadow-[#22d3ee]/30 flex items-center justify-center cursor-pointer"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-[#22d3ee] hover:bg-[#1e40af] text-white font-medium rounded-lg transition duration-300 shadow-md hover:shadow-[#22d3ee]/30 flex items-center justify-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
 
             {/* Social Login */}

@@ -29,6 +29,7 @@ class TrainerDashboardSerializer(serializers.ModelSerializer):
             'session_start_time',
             'session_end_time',
             'is_active',
+            'status',
             'contacts',
             'avg_rating',
             'reviews_count',

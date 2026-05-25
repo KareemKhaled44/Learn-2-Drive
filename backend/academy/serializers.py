@@ -96,8 +96,10 @@ class CourseSerializer(serializers.ModelSerializer):
     
 
 class TrainerHomeSerializer(serializers.ModelSerializer):
-    location = serializers.StringRelatedField() # get only the location name
-
+    location = serializers.StringRelatedField()
+    avg_rating = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Trainer
         fields = [
@@ -113,14 +115,70 @@ class TrainerHomeSerializer(serializers.ModelSerializer):
             'session_start_time',
             'session_end_time',
             'is_active',
+            'status',
+            'max_bookings_per_day',
+            'avg_rating',
+            'reviews_count',
         ]
-
+    
+    def get_avg_rating(self, obj):
+        result = obj.ratings.aggregate(avg=Avg('rating'))
+        return round(result['avg'] or 0, 1)
+    
+    def get_reviews_count(self, obj):
+        return obj.ratings.count()
+    
 class TrainerProfileSerializer(serializers.ModelSerializer):
-    location = serializers.StringRelatedField()
-
+    avg_rating = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
+    students_count = serializers.SerializerMethodField()
+    courses = serializers.SerializerMethodField()
+    academy_name = serializers.CharField(source='academy.name', read_only=True)
+    academy_id = serializers.IntegerField(source='academy.id', read_only=True)
+    academy_logo = serializers.ImageField(source='academy.logo', read_only=True)
+    
+    # Get all contact info
+    contact_info = serializers.SerializerMethodField()
+    
     class Meta:
         model = Trainer
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'gender', 'bio', 'car_model', 'image',
+            'experience_years', 'working_days', 'session_start_time',
+            'session_end_time', 'max_bookings_per_day', 'is_active', 'status',
+            'avg_rating', 'reviews_count', 'students_count',
+            'academy_name', 'academy_id', 'academy_logo',
+            'courses',
+            'contact_info'
+        ]
+    
+    def get_avg_rating(self, obj):
+        result = obj.ratings.aggregate(avg=Avg('rating'))
+        return round(result['avg'] or 0, 1)
+    
+    def get_reviews_count(self, obj):
+        return obj.ratings.count()
+    
+    def get_students_count(self, obj):
+        return obj.bookings.filter(status='completed').count() if hasattr(obj, 'bookings') else 0
+
+    def get_courses(self, obj):
+        courses = obj.courses.filter(status='approved').order_by('-created_at')
+        return [
+            {
+                'id': course.id,
+                'title': course.title,
+            }
+            for course in courses
+        ]
+    
+    def get_contact_info(self, obj):
+        contacts = obj.contacts.all()
+        return {
+            "phones": [c.value for c in contacts if c.type == "phone"],
+            "emails": [c.value for c in contacts if c.type == "email"],
+            "websites": [c.value for c in contacts if c.type == "website"],
+        }
 
 class AcademyDetailSerializer(AcademySerializer):
 
@@ -298,3 +356,17 @@ class ReviewCreateSerializer(serializers.Serializer):
         )
 
         return review
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = [
+            'id',
+            'name',
+            'email',
+            'phone',
+            'subject',
+            'message',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'created_at']

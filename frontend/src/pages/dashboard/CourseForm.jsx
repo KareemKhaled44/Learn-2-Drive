@@ -12,6 +12,7 @@ const CourseForm = () => {
     const [fetching, setFetching] = useState(isEdit)
     const [errors, setErrors] = useState({})
     const [trainers, setTrainers] = useState([])
+    const [showPending, setShowPending] = useState(false)
 
     const [formData, setFormData] = useState({
         title: '',
@@ -30,7 +31,6 @@ const CourseForm = () => {
         const fetchTrainers = async () => {
             try {
                 const res = await api.get('/dashboard/trainers/')
-                // endpoint returns results or array
                 const list = res.data.results || res.data
                 setTrainers(list)
             } catch (err) {
@@ -65,7 +65,7 @@ const CourseForm = () => {
             }
         }
         fetchCourse()
-    }, [id])
+    }, [id, isEdit])
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target
@@ -137,6 +137,10 @@ const CourseForm = () => {
         }
     }
 
+    const approvedTrainers = trainers.filter(t => t.status === 'approved' || !t.status)
+    const pendingTrainers = trainers.filter(t => t.status === 'pending')
+    const visibleTrainers = showPending ? [...approvedTrainers, ...pendingTrainers] : approvedTrainers
+
     if (fetching) return (
         <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
@@ -144,69 +148,69 @@ const CourseForm = () => {
     )
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-8">
             <div className="flex items-center gap-3">
                 <button
                     onClick={() => navigate('/dashboard/courses')}
-                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
+                    className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all"
                 >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
-                    <h2 className="text-white text-2xl font-bold">{isEdit ? 'Edit Course' : 'Add Course'}</h2>
-                    <p className="text-gray-400 text-sm mt-1">{isEdit ? 'Update course details' : 'Create a new course'}</p>
+                    <h2 className="text-white text-3xl font-bold">{isEdit ? 'Edit Course' : 'Add Course'}</h2>
+                    <p className="text-slate-300 text-sm mt-1">{isEdit ? 'Update course details' : 'Create a new course'}</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
+                <div className="dash-card p-6 space-y-4">
                     <h3 className="text-white font-medium">Basic Info</h3>
 
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Title *</label>
-                        <input type="text" name="title" value={formData.title} onChange={handleChange} required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
+                        <label className="text-slate-300 text-sm mb-1 block">Title *</label>
+                        <input type="text" name="title" value={formData.title} onChange={handleChange} required className="dash-input" />
                         {errors.title && <p className="text-red-400 text-xs mt-1">{errors.title[0]}</p>}
                     </div>
 
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Description</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500 resize-none" />
+                        <label className="text-slate-300 text-sm mb-1 block">Description</label>
+                        <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="dash-input resize-none" />
                     </div>
 
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Image</label>
-                        <input type="file" accept="image/*" onChange={handleImageChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-400 text-sm focus:outline-none focus:border-cyan-500" />
+                        <label className="text-slate-300 text-sm mb-1 block">Image</label>
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="dash-input text-slate-300" />
                         {errors.image && <p className="text-red-400 text-xs mt-1">{errors.image[0]}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-gray-400 text-sm mb-1 block">Price</label>
-                            <input type="number" name="price" value={formData.price} onChange={handleChange} min="0" step="0.01" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
+                            <label className="text-slate-300 text-sm mb-1 block">Price</label>
+                            <input type="number" name="price" value={formData.price} onChange={handleChange} min="0" step="0.01" className="dash-input" />
                             {errors.price && <p className="text-red-400 text-xs mt-1">{errors.price[0]}</p>}
                         </div>
 
                         <div>
-                            <label className="text-gray-400 text-sm mb-1 block">Sessions</label>
-                            <input type="number" name="sessions" value={formData.sessions} onChange={handleChange} min="1" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
+                            <label className="text-slate-300 text-sm mb-1 block">Sessions</label>
+                            <input type="number" name="sessions" value={formData.sessions} onChange={handleChange} min="1" className="dash-input" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-gray-400 text-sm mb-1 block">Duration (min)</label>
-                            <input type="number" name="duration" value={formData.duration} onChange={handleChange} min="1" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
+                            <label className="text-slate-300 text-sm mb-1 block">Duration (min)</label>
+                            <input type="number" name="duration" value={formData.duration} onChange={handleChange} min="1" className="dash-input" />
                         </div>
 
                         <div>
-                            <label className="text-gray-400 text-sm mb-1 block">Quantity</label>
-                            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} min="0" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
+                            <label className="text-slate-300 text-sm mb-1 block">Quantity</label>
+                            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} min="0" className="dash-input" />
                         </div>
                     </div>
 
                     <div>
-                        <label className="text-gray-400 text-sm mb-1 block">Transmission</label>
-                        <select name="transmission" value={formData.transmission} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500">
+                        <label className="text-slate-300 text-sm mb-1 block">Transmission</label>
+                        <select name="transmission" value={formData.transmission} onChange={handleChange} className="dash-select">
                             <option value="">Select transmission</option>
                             <option value="manual">Manual</option>
                             <option value="auto">Automatic</option>
@@ -215,24 +219,55 @@ const CourseForm = () => {
 
                     <div className="flex items-center gap-3">
                         <input type="checkbox" name="is_active" id="is_active" checked={formData.is_active} onChange={handleChange} className="w-4 h-4 accent-cyan-500" />
-                        <label htmlFor="is_active" className="text-gray-400 text-sm">Active</label>
+                        <label htmlFor="is_active" className="text-slate-300 text-sm">Active</label>
                     </div>
 
                     <div>
-                        <label className="text-gray-400 text-sm mb-2 block">Trainers</label>
+                        <div className="flex items-center justify-between">
+                            <label className="text-slate-300 text-sm mb-2 block">Trainers</label>
+                            <label className="flex items-center gap-2 text-xs text-slate-300">
+                                <input
+                                    type="checkbox"
+                                    checked={showPending}
+                                    onChange={(e) => setShowPending(e.target.checked)}
+                                    className="w-4 h-4 accent-cyan-500"
+                                />
+                                Show pending
+                            </label>
+                        </div>
                         <div className="flex flex-wrap gap-2">
-                            {trainers.map(t => (
-                                <button key={t.id} type="button" onClick={() => handleTrainerToggle(t.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${formData.trainers.includes(t.id) ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
-                                    {t.name}
-                                </button>
-                            ))}
+                            {visibleTrainers.length === 0 ? (
+                                <p className="text-slate-400 text-xs">No approved trainers available.</p>
+                            ) : visibleTrainers.map(t => {
+                                const isApproved = t.status === 'approved' || !t.status
+                                const isSelected = formData.trainers.includes(t.id)
+                                const isDisabled = !isApproved && !isSelected
+                                const isPending = t.status === 'pending'
+
+                                return (
+                                    <button
+                                        key={t.id}
+                                        type="button"
+                                        onClick={() => { if (isApproved || isSelected) handleTrainerToggle(t.id) }}
+                                        disabled={isDisabled}
+                                        title={isPending ? 'Pending approval' : undefined}
+                                        className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isSelected ? 'bg-gradient-to-r from-[#22d3ee] to-[#1e40af] text-white shadow-[0_8px_20px_rgba(30,64,175,0.35)]' : isDisabled ? 'bg-white/5 text-slate-500 opacity-60 cursor-not-allowed' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}
+                                    >
+                                        <span>{t.name}</span>
+                                        {isPending && (
+                                            <span className="ml-2 rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
+                                                Pending approval
+                                            </span>
+                                        )}
+                                    </button>
+                                )
+                            })}
                         </div>
                         {errors.trainers && <p className="text-red-400 text-xs mt-1">{errors.trainers[0]}</p>}
                     </div>
-
                 </div>
 
-                <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-cyan-500 text-white font-medium hover:bg-cyan-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <button type="submit" disabled={loading} className="dash-btn w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                     {loading ? (
                         <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

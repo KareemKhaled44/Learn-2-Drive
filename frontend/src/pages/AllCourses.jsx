@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import api from '@/exports/Axios.jsx';
 import { Clock, Venus , Star, Filter, X, Search, Eye, MapPin, ArrowUpDown, DollarSign , Users, Car, Award, Settings, Zap   } from 'lucide-react'
@@ -53,7 +53,7 @@ const AllCourses = () => {
 
   const [loading, setLoading] = useState(true);
   
-  const getCourses =  (page = 1) => {
+  const getCourses = useCallback((page = 1) => {
     setLoading(true);
 
     const params = new URLSearchParams()
@@ -76,13 +76,13 @@ const AllCourses = () => {
     .finally(() => {
         setLoading(false);
       });
-  }
+  }, [searchQuery, ordering, transmissionFilter, femaleTrainer, minPrice, maxPrice, duration])
 
   const totalPages = Math.ceil(count / pageSize);
 
   useEffect(() => {
     getCourses(1)
-  }, [searchQuery, ordering, transmissionFilter, femaleTrainer, minPrice, maxPrice, duration])
+  }, [getCourses])
 
   console.log("Count:", count);
   console.log("Total Pages:", totalPages);
@@ -355,7 +355,7 @@ const AllCourses = () => {
             <div className="flex items-center gap-2">
               <button
                 disabled={currentPage === 1}
-                onClick={() => getCourses(currentPage - 1, searchQuery)}
+                onClick={() => getCourses(currentPage - 1)}
                 className="px-4 py-2 bg-[#1e293b] border border-gray-700 text-gray-300 rounded-lg disabled:opacity-50 hover:border-[#22d3ee] transition z-50"
               >
                 Previous
@@ -366,7 +366,7 @@ const AllCourses = () => {
                 return (
                   <button
                     key={page}
-                    onClick={() => getCourses(page, searchQuery)}
+                    onClick={() => getCourses(page)}
                     className={`px-4 py-2 rounded-lg transition ${
                       currentPage === page
                         ? "bg-[#22d3ee] text-white"
@@ -380,7 +380,7 @@ const AllCourses = () => {
 
               <button
                 disabled={currentPage === totalPages}
-                onClick={() => getCourses(currentPage + 1, searchQuery)}
+                onClick={() => getCourses(currentPage + 1)}
                 className="px-4 py-2 bg-[#1e293b] border border-gray-700 text-gray-300 rounded-lg disabled:opacity-50 hover:border-[#22d3ee] transition z-50"
               >
                 Next

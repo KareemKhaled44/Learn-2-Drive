@@ -189,6 +189,18 @@ class ContactInfo(models.Model):
     def __str__(self):
         return f"{self.type}: {self.value}"
 
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"
+
 class Course(models.Model):
     title = models.CharField(max_length=200, db_index=True)        
     description = models.TextField()     

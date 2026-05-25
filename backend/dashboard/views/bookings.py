@@ -1,6 +1,8 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from django.db.models import Count, Sum
+from django.utils import timezone
+from datetime import timedelta
 from authentication.permissions import IsAcademy
 from dashboard.serializers.bookings import (
     AcademyBookingSerializer,
@@ -65,11 +67,38 @@ class AcademyBookingStatsView(generics.GenericAPIView):
         academy = request.user.academy_profile
         bookings = Booking.objects.filter(course__academy=academy)
 
+        today = timezone.localdate()
+        days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+        daily_counts = bookings.filter(booked_at__date__in=days).values('booked_at__date').annotate(count=Count('id'))
+        counts_by_date = {item['booked_at__date']: item['count'] for item in daily_counts}
+        weekly_sessions = [
+            {
+                'date': day.isoformat(),
+                'label': day.strftime('%a'),
+                'count': counts_by_date.get(day, 0),
+            }
+            for day in days
+        ]
+
+        revenue_base = bookings.filter(status__in=['confirmed', 'completed'])
+        daily_revenue = revenue_base.filter(booked_at__date__in=days).values('booked_at__date').annotate(total=Sum('total_price'))
+        revenue_by_date = {item['booked_at__date']: float(item['total'] or 0) for item in daily_revenue}
+        weekly_revenue = [
+            {
+                'date': day.isoformat(),
+                'label': day.strftime('%a'),
+                'total': revenue_by_date.get(day, 0),
+            }
+            for day in days
+        ]
+
         stats = {
             'total_bookings': bookings.count(),
             'confirmed_bookings': bookings.filter(status='confirmed').count(),
             'completed_bookings': bookings.filter(status='completed').count(),
             'cancelled_bookings': bookings.filter(status='cancelled').count(),
+            'weekly_sessions': weekly_sessions,
+            'weekly_revenue': weekly_revenue,
             'total_revenue': bookings.filter(
                 status__in=['confirmed', 'completed']
             ).aggregate(

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import api from '../../exports/Axios'
 
 const STATUS_TABS = [
@@ -18,15 +18,7 @@ const Bookings = () => {
     const [courseFilter, setCourseFilter] = useState('')
     const [errors, setErrors] = useState(null)
 
-    useEffect(() => {
-        fetchLookups()
-    }, [])
-
-    useEffect(() => {
-        fetchBookings()
-    }, [statusFilter, trainerFilter, courseFilter])
-
-    const fetchLookups = async () => {
+    const fetchLookups = useCallback(async () => {
         try {
             const [tRes, cRes] = await Promise.all([
                 api.get('/dashboard/trainers/'),
@@ -37,9 +29,9 @@ const Bookings = () => {
         } catch (err) {
             console.error('lookup error', err)
         }
-    }
+    }, [])
 
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         setLoading(true)
         setErrors(null)
         try {
@@ -56,7 +48,15 @@ const Bookings = () => {
         } finally {
             setLoading(false)
         }
-    }
+    }, [statusFilter, trainerFilter, courseFilter])
+
+    useEffect(() => {
+        fetchLookups()
+    }, [fetchLookups])
+
+    useEffect(() => {
+        fetchBookings()
+    }, [fetchBookings])
 
     const markCompleted = async (bookingId) => {
         try {
@@ -69,41 +69,41 @@ const Bookings = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-white text-2xl font-bold">Bookings</h2>
-                    <p className="text-gray-400 text-sm mt-1">Manage scheduled bookings and update statuses</p>
+                    <h2 className="text-white text-3xl font-bold">Bookings</h2>
+                    <p className="text-slate-300 text-sm mt-1">Manage scheduled bookings and update statuses</p>
                 </div>
             </div>
 
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div className="dash-card p-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-2">
                         {STATUS_TABS.map(tab => (
-                            <button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`px-3 py-1.5 rounded-full text-sm font-medium ${statusFilter === tab.key ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
+                            <button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`px-3 py-1.5 rounded-full text-sm font-medium ${statusFilter === tab.key ? 'bg-gradient-to-r from-[#22d3ee] to-[#1e40af] text-white shadow-[0_8px_20px_rgba(30,64,175,0.35)]' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
                                 {tab.label}
                             </button>
                         ))}
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <select value={trainerFilter} onChange={e => setTrainerFilter(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                        <select value={trainerFilter} onChange={e => setTrainerFilter(e.target.value)} className="dash-select">
                             <option value="">All trainers</option>
                             {trainers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
 
-                        <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
+                        <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="dash-select">
                             <option value="">All courses</option>
                             {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                         </select>
                     </div>
                 </div>
 
-                <div className="mt-4 overflow-x-auto">
+                <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
                     <table className="w-full text-left table-fixed">
                         <thead>
-                            <tr className="text-xs text-gray-400 border-b border-gray-800">
+                            <tr className="text-xs text-slate-300 bg-white/5 border-b border-white/10">
                                 <th className="py-3 px-3 w-12">#</th>
                                 <th className="py-3 px-3">Student</th>
                                 <th className="py-3 px-3">Course</th>
@@ -117,26 +117,30 @@ const Bookings = () => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan={9} className="p-6 text-center text-gray-400">Loading...</td></tr>
+                                <tr><td colSpan={9} className="p-6 text-center text-slate-300">Loading...</td></tr>
                             ) : bookings.length === 0 ? (
-                                <tr><td colSpan={9} className="p-6 text-center text-gray-400">No bookings found</td></tr>
+                                <tr><td colSpan={9} className="p-6 text-center text-slate-300">No bookings found</td></tr>
                             ) : bookings.map(b => (
-                                <tr key={b.id} className="text-sm text-gray-200 border-b border-gray-800 hover:bg-gray-850">
+                                <tr key={b.id} className="text-sm text-slate-200 border-b border-white/10 hover:bg-white/5">
                                     <td className="py-3 px-3">{b.id}</td>
                                     <td className="py-3 px-3">
                                         <div className="font-medium">{b.student_name}</div>
-                                        <div className="text-gray-400 text-xs">{b.student_email}</div>
+                                        <div className="text-slate-400 text-xs">{b.student_email}</div>
                                     </td>
                                     <td className="py-3 px-3">{b.course_title}</td>
                                     <td className="py-3 px-3">{b.trainer_name}</td>
                                     <td className="py-3 px-3">{b.scheduled_date}</td>
                                     <td className="py-3 px-3">{b.start_time}</td>
                                     <td className="py-3 px-3">{b.total_price}</td>
-                                    <td className="py-3 px-3">{b.status}</td>
+                                    <td className="py-3 px-3">
+                                        <span className={`dash-chip ${b.status === 'completed' ? 'bg-[#22d3ee]/15 text-[#22d3ee]' : b.status === 'confirmed' ? 'bg-[#1e40af]/20 text-[#22d3ee]' : 'bg-red-500/15 text-red-200'}`}>
+                                            {b.status}
+                                        </span>
+                                    </td>
                                     <td className="py-3 px-3">
                                         <div className="flex items-center gap-2">
                                             {b.status !== 'completed' && (
-                                                <button onClick={() => markCompleted(b.id)} className="px-3 py-1.5 rounded-lg bg-emerald-500 text-xs text-white">Mark completed</button>
+                                                <button onClick={() => markCompleted(b.id)} className="dash-btn text-xs px-3 py-1.5">Mark completed</button>
                                             )}
                                         </div>
                                     </td>
@@ -146,7 +150,7 @@ const Bookings = () => {
                     </table>
                 </div>
 
-                {errors && <div className="mt-3 text-red-400 text-sm">{typeof errors === 'string' ? errors : JSON.stringify(errors)}</div>}
+                {errors && <div className="mt-3 text-red-200 text-sm">{typeof errors === 'string' ? errors : JSON.stringify(errors)}</div>}
             </div>
         </div>
     )

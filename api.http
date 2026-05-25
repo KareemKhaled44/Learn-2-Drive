@@ -181,7 +181,7 @@ POST http://localhost:8000/auth/login/
 Content-Type: application/json
 
 {
-    "username": "oracademy",
+    "email": "kemokingo@gmail.com",
     "password": "testpass123"
 }
 
@@ -252,13 +252,13 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ### 6 - Try to book as academy (should fail)
 POST http://localhost:8000/bookings/create/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU4MTM4LCJpYXQiOjE3NzY0NTc4MzgsImp0aSI6ImNkMGY4NmE3NzZkODQzNzJiOTY3NjUxYmU0NDc0MjI1IiwidXNlcl9pZCI6MTF9.DPYMCFaRenzazuSejLTQiVOwKr98fFLQ_sTuqexxNT0
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE5MTg5LCJpYXQiOjE3NzgwMTg4ODksImp0aSI6ImQxOTUwOWEyNDQ3ZTRiYjA5NDBjMmNjOGQxY2JiY2MwIiwidXNlcl9pZCI6MX0.BBBOslffadaRVDEYwpFRQESWmr2-Nh46I-I32b2jzzY
 
 {
     "course": 1,
     "trainer": 3,
-    "scheduled_date": "2026-04-25",
-    "start_time": "10:00"
+    "scheduled_date": "2026-05-10",
+    "start_time": "9:00"
 }
 
 ### Additional tests for availability endpoint
@@ -289,9 +289,9 @@ Content-Type: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2MDI2LCJpYXQiOjE3NzcxNTU3MjYsImp0aSI6IjIzZTUzZDY1ZGFkOTRkYjQ5NTlkMDAzNTg4Mjc4ZDAyIiwidXNlcl9pZCI6MX0.j7irfdfMolLQr-CODKIp1YKQipr37WyHS5moEDSUKxE
 
 ### Get booking detail with schedule
-GET http://localhost:8000/bookings/9/
+GET http://localhost:8000/bookings/12/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU3MTUxLCJpYXQiOjE3NzcxNTY4NTEsImp0aSI6IjcwYjhlYTNjZDFhMDQ5YmNiODdkYjEyYmQxMzE1YjdiIiwidXNlcl9pZCI6MX0.YD02g2zIknxEwSuhtS6tAP2A20Gb0LBMih3JiRKlX8k
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE5MTg5LCJpYXQiOjE3NzgwMTg4ODksImp0aSI6ImQxOTUwOWEyNDQ3ZTRiYjA5NDBjMmNjOGQxY2JiY2MwIiwidXNlcl9pZCI6MX0.BBBOslffadaRVDEYwpFRQESWmr2-Nh46I-I32b2jzzY
 
 ###################################################
 ##academy dashboard
@@ -341,16 +341,17 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 ###########
 ## 1 - Create a trainer
 POST http://localhost:8000/dashboard/trainers/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MzQ3LCJpYXQiOjE3NzcxNDcwNDcsImp0aSI6ImUwZjgwNjZiYjEwMjRmMjFiMmZkNmVkYTNjMTcxMzI1IiwidXNlcl9pZCI6MTF9.OnPTDIzc3QoD2C6eS31yUVNoZgACDp1Slto1aEH3Aek
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE2MDI5LCJpYXQiOjE3NzgwMTU3MjksImp0aSI6IjZmNjEyNDVmMjUyMTRjNGFiYmY0YTUyNGZmODc3ZjZjIiwidXNlcl9pZCI6MTF9.QjvcicbiCL8ycJbtSzQkrttbNzsCYKbPwjzCHOr3oCw
+Content-Type: application/json
 
 {
-    "name": "Test Trainer",
+    "name": "John Doe",
     "gender": "male",
     "bio": "Test bio",
     "car_model": "Honda Civic",
     "experience_years": 5,
-    "working_days": ["saturday", "sunday"],
-    "session_start_time": "09:00",
+    "working_days": ["monday", "sunday"],
+    "session_start_time": "9:00",
     "session_end_time": "17:00",
     "is_active": true
 }
@@ -467,6 +468,75 @@ Content-Type: application/json
 
 ### 7 - Get academy booking stats
 GET http://localhost:8000/dashboard/bookings/stats/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE0OTI4LCJpYXQiOjE3NzgwMTQ2MjgsImp0aSI6IjA1NmE3Njc5MTNmNzQ0OThiODNjNTY3MTZkZjc5ZDJmIiwidXNlcl9pZCI6MTF9.I6yxqREDacy-RW7jJWIIlOIWWEp36CQUqaz0tbnzMSw
 
 
+
+
+
+### 1 - Review an academy
+POST http://localhost:8000/reviews/
+Authorization: Bearer your_user_token_here
+Content-Type: application/json
+
+{
+    "content_type": "academy",
+    "object_id": 1,
+    "rating": 5,
+    "text": "Great academy, highly recommended!"
+}
+
+###
+
+### 2 - Review a course
+POST http://localhost:8000/reviews/
+Authorization: Bearer your_user_token_here
+Content-Type: application/json
+
+{
+    "content_type": "course",
+    "object_id": 1,
+    "rating": 4,
+    "text": "Very good course, learned a lot!"
+}
+
+###
+
+### 3 - Review a trainer
+POST http://localhost:8000/reviews/
+Authorization: Bearer your_user_token_here
+Content-Type: application/json
+
+{
+    "content_type": "trainer",
+    "object_id": 1,
+    "rating": 5,
+    "text": "Amazing trainer, very patient!"
+}
+
+###
+
+### 4 - Try to review same object twice (should fail)
+POST http://localhost:8000/reviews/
+Authorization: Bearer your_user_token_here
+Content-Type: application/json
+
+{
+    "content_type": "academy",
+    "object_id": 1,
+    "rating": 3,
+    "text": "Trying to review again"
+}
+
+###
+
+### 5 - Try without token (should fail)
+POST http://localhost:8000/reviews/
+Content-Type: application/json
+
+{
+    "content_type": "academy",
+    "object_id": 1,
+    "rating": 5,
+    "text": "No token test"
+}

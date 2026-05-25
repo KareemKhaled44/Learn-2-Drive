@@ -13,4 +13,5 @@ urlpatterns = [
     path('trainers/', TrainerListCreateView.as_view(), name='trainer-list'),
     path('trainer-profile/<int:pk>/', TrainerProfileView.as_view(), name='trainer-profile'),
     path("locations/", LocationListView.as_view()),
+    path("contact-messages/", ContactMessageCreateView.as_view(), name="contact-message-create"),
 ]

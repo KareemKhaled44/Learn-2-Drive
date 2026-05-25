@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -116,5 +117,67 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes dash-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer components {
+  .dash-shell {
+    font-family:
+      "Space Grotesk",
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+
+  .dash-card {
+    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.35)];
+  }
+
+  .dash-soft {
+    @apply rounded-2xl border border-white/10 bg-[#0b1430]/70 backdrop-blur-md;
+  }
+
+  .dash-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition;
+    background: linear-gradient(135deg, #22d3ee 0%, #1e40af 100%);
+    box-shadow: 0 10px 24px rgba(34, 211, 238, 0.2);
+  }
+
+  .dash-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .dash-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-slate-200 transition;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .dash-input {
+    @apply w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-cyan-300 focus:outline-none;
+  }
+
+  .dash-select {
+    @apply w-full rounded-xl border border-white/10 bg-[#0b1430]/80 px-3 py-2 text-sm text-white focus:border-cyan-300 focus:outline-none;
+  }
+
+  .dash-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  .dash-animate {
+    animation: dash-fade 0.6s ease both;
   }
 }

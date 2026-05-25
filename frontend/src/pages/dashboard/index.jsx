@@ -1,144 +1,88 @@
 import { useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import {
-    LayoutDashboard,
-    Users,
-    BookOpen,
-    CalendarCheck,
-    User,
-    LogOut,
-    Menu,
-    X
-} from 'lucide-react'
-import api from '../../exports/Axios'
-const navItems = [
-    { label: 'Overview', path: '/dashboard', icon: LayoutDashboard, end: true },
-    { label: 'Trainers', path: '/dashboard/trainers', icon: Users },
-    { label: 'Courses', path: '/dashboard/courses', icon: BookOpen },
-    { label: 'Bookings', path: '/dashboard/bookings', icon: CalendarCheck },
-    { label: 'Profile', path: '/dashboard/profile', icon: User },
-]
+import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
+import { Menu, X, Home, Users, BookOpen, Calendar, Settings, LogOut } from 'lucide-react'
 
 const Dashboard = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(true)
     const navigate = useNavigate()
-    const [sidebarOpen, setSidebarOpen] = useState(false)
-    const academyName = localStorage.getItem('userName') || 'Academy'
+    const location = useLocation()
 
-    const handleLogout = async () => {
-        try {
-            const refresh = localStorage.getItem('refresh')
-            await api.post('/auth/logout/', { refresh })
-            localStorage.removeItem('access')
-            localStorage.removeItem('refresh')
-            localStorage.removeItem('role')
-            localStorage.removeItem('userName')
-            navigate('/login')
-        } catch (err) {
-            console.error(err)
-        }
+    const handleLogout = () => {
+        localStorage.removeItem('access')
+        localStorage.removeItem('refresh')
+        navigate('/signin')
+    }
+
+    const menuItems = [
+        { icon: Home, label: 'Overview', path: '/dashboard' },
+        { icon: Users, label: 'Trainers', path: '/dashboard/trainers' },
+        { icon: BookOpen, label: 'Courses', path: '/dashboard/courses' },
+        { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings' },
+        { icon: Settings, label: 'Profile', path: '/dashboard/profile' },
+    ]
+
+    const isActive = (path) => {
+        if (path === '/dashboard') return location.pathname === '/dashboard'
+        return location.pathname.startsWith(path)
     }
 
     return (
-        <div className="flex h-screen bg-gray-950 overflow-hidden">
+        <div className="dash-shell relative flex h-screen overflow-hidden bg-[#0a0f1f] text-slate-100">
+            <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -top-32 -right-20 h-72 w-72 rounded-full bg-[#22d3ee]/20 blur-3xl" />
+                <div className="absolute -bottom-24 left-10 h-80 w-80 rounded-full bg-[#1e40af]/25 blur-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1f] via-[#0d1b3b] to-[#111c4a]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_45%)]" />
+            </div>
 
-            {/* ================================ */}
-            {/* Sidebar */}
-            {/* ================================ */}
-            <aside className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800
-                transform transition-transform duration-300 ease-in-out
-                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                lg:relative lg:translate-x-0 lg:flex lg:flex-col
-            `}>
-                {/* Logo */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800">
-                    <span className="text-xl font-bold text-cyan-400">AutoMaster</span>
-                    <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden text-gray-400 hover:text-white"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-
-                {/* Academy name */}
-                <div className="px-6 py-4 border-b border-gray-800">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
-                            {academyName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <p className="text-white text-sm font-medium truncate max-w-[140px]">{academyName}</p>
-                            <p className="text-gray-400 text-xs">Academy</p>
-                        </div>
+            <div className="relative flex h-full w-full">
+                {/* Sidebar */}
+                <div className={`${sidebarOpen ? 'w-64' : 'w-20'} dash-soft transition-all duration-300 flex flex-col`}> 
+                    <div className="p-4 flex items-center justify-between border-b border-white/10">
+                        {sidebarOpen && <h1 className="text-lg md:text-xl font-bold text-white">
+                            LEARN  <span className="text-[#22d3ee]">2</span> DRIVE
+                        </h1>}
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1.5 rounded-lg hover:bg-white/10">
+                            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                        </button>
                     </div>
-                </div>
 
-                {/* Nav items */}
-                <nav className="flex-1 px-4 py-4 space-y-1">
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            end={item.end}
-                            onClick={() => setSidebarOpen(false)}
-                            className={({ isActive }) => `
-                                flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all
-                                ${isActive
-                                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                                }
-                            `}
+                    <nav className="flex-1 p-4 space-y-2">
+                        {menuItems.map(item => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                                    isActive(item.path)
+                                        ? 'bg-gradient-to-r from-[#22d3ee] to-[#1e40af] text-white shadow-[0_8px_20px_rgba(30,64,175,0.35)]'
+                                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                }`}
+                            >
+                                <item.icon size={20} />
+                                {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    <div className="p-4 border-t border-white/10">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 transition-all"
                         >
-                            <item.icon size={18} />
-                            {item.label}
-                        </NavLink>
-                    ))}
-                </nav>
-
-                {/* Logout */}
-                <div className="px-4 py-4 border-t border-gray-800">
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
-                    >
-                        <LogOut size={18} />
-                        Logout
-                    </button>
-                </div>
-            </aside>
-
-            {/* Backdrop for mobile */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/60 lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* ================================ */}
-            {/* Main content */}
-            {/* ================================ */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-
-                {/* Top bar */}
-                <header className="flex items-center justify-between px-6 py-4 bg-gray-900 border-b border-gray-800">
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="lg:hidden text-gray-400 hover:text-white"
-                    >
-                        <Menu size={22} />
-                    </button>
-                    <h1 className="text-white font-semibold text-lg">Dashboard</h1>
-                    <div className="text-gray-400 text-sm">
-                        {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                            <LogOut size={20} />
+                            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+                        </button>
                     </div>
-                </header>
+                </div>
 
-                {/* Page content */}
-                <main className="flex-1 overflow-y-auto p-6">
-                    <Outlet />
-                </main>
+                {/* Main Content */}
+                <div className="flex-1 overflow-auto">
+                    <div className="p-6 md:p-8">
+                        <div className="dash-animate">
+                            <Outlet />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )

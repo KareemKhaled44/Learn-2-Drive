@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Calendar, Clock, User, CheckCircle, ChevronRight, AlertCircle, ArrowLeft, Loader } from 'lucide-react'
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
+import { Calendar, Clock, User, CheckCircle, AlertCircle, ArrowLeft, Loader } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 import { format } from 'date-fns'
 import CarLoading from '../components/ui/loading/CarLoading.jsx'
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 
 const Booking = () => {
   const { courseId } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   
   const [course, setCourse] = useState(null)
@@ -59,6 +60,23 @@ const Booking = () => {
     
     fetchCourseDetails()
   }, [courseId])
+
+  useEffect(() => {
+    if (!course?.trainers?.length) {
+      return
+    }
+
+    const trainerId = searchParams.get('trainer')
+    if (!trainerId) {
+      return
+    }
+
+    const trainer = course.trainers.find((item) => String(item.id) === String(trainerId))
+    if (trainer) {
+      setSelectedTrainer(trainer)
+      setCurrentStep(2)
+    }
+  }, [course, searchParams])
   
   // Fetch available time slots when date changes
   useEffect(() => {

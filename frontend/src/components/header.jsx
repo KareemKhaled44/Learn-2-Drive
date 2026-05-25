@@ -1,5 +1,5 @@
-import { LogIn, LogOut } from 'lucide-react'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { LogIn, LogOut, CalendarCheck } from 'lucide-react' 
+import { useState, useEffect, useRef } from 'react'
 import api from '@/exports/Axios'
 import { toast } from 'react-toastify'
 import { useNavigate } from "react-router-dom";
@@ -46,6 +46,14 @@ const Header = () => {
       'Contact Us': '/contact-us'
     };
     return routeMap[item];
+  };
+
+  // أضف هذه الدالة للتنقل إلى My Bookings
+  const handleMyBookings = () => {
+    setIsMenuOpen(false);
+    setTimeout(() => {
+      navigate('/my-bookings');
+    }, 100);
   };
 
   // Improved scroll to section function with multiple attempts
@@ -337,6 +345,26 @@ const Header = () => {
                   <span>{item}</span>
                 </button>
               ))}
+              
+              {/* 👈 أضف قسم My Bookings - يظهر فقط للمستخدمين المسجلين */}
+              {isLoggedIn && (
+                <>
+                  {/* Divider */}
+                  <div className="my-3 h-px bg-gray-800" />
+                  
+                  {/* My Bookings Button */}
+                  <button
+                    onClick={handleMyBookings}
+                    className="w-full text-left flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium text-[#22d3ee] transition-all hover:bg-[#1e293b] hover:text-[#22d3ee] hover:translate-x-2 cursor-pointer active:scale-95"
+                    style={{
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <CalendarCheck className="h-5 w-5" />
+                    <span>My Bookings</span>
+                  </button>
+                </>
+              )}
             </nav>
             
             {/* Logout/Sign In Button */}

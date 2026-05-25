@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { 
   Star, MapPin, Phone, Mail, Globe, BookOpen, MessageCircle, 
   DollarSign, Venus, Users, Award, Calendar, Clock, Filter,
@@ -10,6 +10,7 @@ import api from '../exports/Axios.jsx'
 
 const CourseDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [course, setCourse] = React.useState(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
@@ -213,12 +214,13 @@ const CourseDetails = () => {
                 </div>
               </div>
 
-              {/* Enroll Button */}
+              {/* Enroll Button - 👈 تم التعديل هنا */}
               <button 
+                onClick={handleBookNow}
                 disabled={!isActive}
                 className={`w-full md:w-auto px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#22d3ee] hover:bg-[#1e40af] text-white shadow-lg hover:shadow-xl'
+                    ? 'bg-[#22d3ee] hover:bg-[#1e40af] text-white shadow-lg hover:shadow-xl cursor-pointer'
                     : 'bg-gray-600 cursor-not-allowed text-gray-300'
                 }`}
               >
@@ -229,6 +231,7 @@ const CourseDetails = () => {
         </div>
       </div>
 
+      {/* باقي الكود كما هو دون تغيير */}
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Academy Section */}
@@ -239,9 +242,9 @@ const CourseDetails = () => {
               Academy Information
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              {/* Academy Logo */}
-              <Link to={`/academies/${course.academy.id}/`} className="flex-shrink-0">
-                <div className="w-20 h-20 bg-[#0f172a] rounded-xl border border-gray-700 overflow-hidden hover:border-[#22d3ee] transition-colors">
+              {/* Academy Logo - Linked to Academy Details */}
+              <Link to={`/academy-details/${course.academy.id}`} className="flex-shrink-0">
+                <div className="w-20 h-20 bg-[#0f172a] rounded-xl border border-gray-700 overflow-hidden hover:border-[#22d3ee] transition-colors cursor-pointer">
                   <img 
                     src={course.academy.logo} 
                     alt={course.academy.name}
@@ -253,10 +256,10 @@ const CourseDetails = () => {
                 </div>
               </Link>
               
-              {/* Academy Details */}
+              {/* Academy Details - Linked to Academy Details */}
               <div className="flex-1">
-                <Link to={`/academies/${course.academy.id}/`}>
-                  <h3 className="text-xl font-bold text-white hover:text-[#22d3ee] transition-colors">
+                <Link to={`/academy-details/${course.academy.id}`}>
+                  <h3 className="text-xl font-bold text-white hover:text-[#22d3ee] transition-colors cursor-pointer">
                     {course.academy.name}
                   </h3>
                 </Link>
@@ -437,16 +440,6 @@ const CourseDetails = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3">
-        <button className="p-3 bg-[#22d3ee] text-[#0f172a] rounded-full shadow-lg hover:bg-[#1e40af] hover:text-white transition-all duration-300">
-          <Share2 className="h-5 w-5" />
-        </button>
-        <button className="p-3 bg-[#1e293b] text-white rounded-full shadow-lg border border-gray-700 hover:border-[#22d3ee] transition-all duration-300">
-          <Heart className="h-5 w-5" />
-        </button>
       </div>
     </div>
   )

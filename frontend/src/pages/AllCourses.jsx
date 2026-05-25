@@ -4,9 +4,11 @@ import api from '@/exports/Axios.jsx';
 import { Clock, Venus , Star, Filter, X, Search, Eye, MapPin, ArrowUpDown, DollarSign , Users, Car, Award, Settings, Zap   } from 'lucide-react'
 import {Header} from '../exports/index.js';
 import CarLoading from '../components/ui/loading/CarLoading.jsx';
-
+import { useNavigate } from 'react-router-dom'; // 👈 أضف هذا الاستيراد
 
 const AllCourses = () => {
+  const navigate = useNavigate(); // 👈 أضف هذا الـ hook
+  
   const [searchQuery, setSearchQuery] = useState('')
   const [courses , setCourses] = useState([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -17,7 +19,13 @@ const AllCourses = () => {
   const [priceValue, setPriceValue] = useState([300, 10000])
   const [minPrice, setMinPrice] = useState(null)
   const [maxPrice, setMaxPrice] = useState(null)
-    const handlePriceChange = (e) => {
+  
+  // 👈 أضف هذه الدالة للتنقل إلى تفاصيل الكورس
+  const handleViewCourse = (courseId) => {
+    navigate(`/courses/${courseId}`)
+  }
+  
+  const handlePriceChange = (e) => {
     const { name, value } = e.target
 
     if (name === "min") {
@@ -26,7 +34,8 @@ const AllCourses = () => {
       setPriceValue([priceValue[0], Number(value)])
     }
   }
-    const applyPriceRange = () => {
+  
+  const applyPriceRange = () => {
     setMinPrice(priceValue[0])
     setMaxPrice(priceValue[1])
   }
@@ -311,7 +320,7 @@ const AllCourses = () => {
                     </div>
                   )}
 
-                    {/* Price & Button */}
+                    {/* Price & Button - تم تعديل الزر هنا */}
                     <div className="flex items-center justify-between border-t border-gray-700 pt-4">
                       <div>
                         <span className="text-xs text-gray-500 block">Starting from</span>
@@ -320,9 +329,12 @@ const AllCourses = () => {
                           <span className="text-sm font-normal text-gray-400 ml-1">EGP</span>
                         </span>
                       </div>
-                      <button className="px-5 py-2 bg-[#22d3ee] text-white font-medium rounded-full 
-                        hover:bg-[#1e40af] transition-all duration-300 hover:shadow-md hover:shadow-[#22d3ee]/30">
-                        Book Now
+                      <button 
+                        onClick={() => handleViewCourse(course.id)}
+                        className="px-5 py-2 bg-[#22d3ee] text-white font-medium rounded-full 
+                        hover:bg-[#1e40af] transition-all duration-300 hover:shadow-md hover:shadow-[#22d3ee]/30"
+                      >
+                        View Course
                       </button>
                     </div>
                   </div>

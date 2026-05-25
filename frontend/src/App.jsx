@@ -15,6 +15,7 @@ import CourseDetails from './pages/CourseDetails.jsx';
 import ForgotPassword from './pages/ForgotPassword';
 import PendingApproval from './pages/PendingApproval';
 import AcademyRegister from './pages/AcademyRegister';
+<<<<<<< HEAD
 import Dashboard from './pages/dashboard/index'
 import Overview from './pages/dashboard/Overview'
 import Trainers from './pages/dashboard/Trainers'
@@ -29,6 +30,12 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 const AppLayout = () => {
   const location = useLocation()
   const hideFooter = location.pathname.startsWith('/dashboard')
+=======
+import Booking from './pages/Booking';
+import BookingDetail from './pages/BookingDetail';
+import MyBookings from './pages/MyBookings';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+>>>>>>> 924e0839d3d6bd2bc6e6b775374683712f0fc600
 
   return (
     <>
@@ -66,6 +73,10 @@ const AppLayout = () => {
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
+        <Route path="/booking/:courseId" element={<Booking />} />
+        <Route path="/booking/:id" element={<BookingDetail />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+        
       </Routes>
     
 

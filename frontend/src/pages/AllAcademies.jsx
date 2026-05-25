@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Search, Star, MapPin, Phone, Mail, Globe, Award, Car, X , DollarSign, Eye, Filter, ArrowUpDown, BookOpen, MessageCircle, Venus } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -12,8 +12,6 @@ const AllAcademies = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   const [femaleTrainer, setFemaleTrainer] = useState(false);
-  const params = new URLSearchParams();
-  if (femaleTrainer) params.append('has_female_trainer', 'true');
 
   const [transmissionFilter, setTransmissionFilter] = useState("");
   
@@ -29,9 +27,11 @@ const AllAcademies = () => {
   const [academies, setAcademies] = useState([])
 
 
-  const getAcademies = (page = 1) => {
-
+  const getAcademies = useCallback((page = 1) => {
     setLoading(true);
+
+    const params = new URLSearchParams();
+    if (femaleTrainer) params.append('has_female_trainer', 'true');
 
     api.get(`api/academies/?page=${page}&search=${searchQuery}&ordering=${ordering}&location__city=${city}&location__area=${area}&courses__transmission=${transmissionFilter}&${params.toString()}`)
       .then(async response => {
@@ -50,13 +50,12 @@ const AllAcademies = () => {
       .finally(() => {
         setLoading(false);
       });
-
-  };
+  }, [searchQuery, ordering, city, area, transmissionFilter, femaleTrainer]);
   const totalPages = Math.ceil(count / pageSize);
 
    useEffect(() => {
-    getAcademies(1, searchQuery, ordering, city, area, transmissionFilter, femaleTrainer);
-  }, [searchQuery, ordering, city, area, transmissionFilter, femaleTrainer]);
+    getAcademies(1);
+  }, [getAcademies]);
 
    return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
@@ -337,7 +336,7 @@ const AllAcademies = () => {
           <div className="flex items-center gap-2">
             <button
               disabled={currentPage === 1}
-              onClick={() => getAcademies(currentPage - 1, searchQuery)}
+                onClick={() => getAcademies(currentPage - 1)}
               className="px-4 py-2 bg-[#1e293b] border border-gray-700 text-gray-300 rounded-lg disabled:opacity-50 hover:border-[#22d3ee] transition"
             >
               Previous
@@ -348,7 +347,7 @@ const AllAcademies = () => {
               return (
                 <button
                   key={page}
-                  onClick={() => getAcademies(page, searchQuery)}
+                    onClick={() => getAcademies(page)}
                   className={`px-4 py-2 rounded-lg transition ${
                     currentPage === page
                       ? "bg-[#22d3ee] text-white"
@@ -362,7 +361,7 @@ const AllAcademies = () => {
 
             <button
               disabled={currentPage === totalPages}
-              onClick={() => getAcademies(currentPage + 1, searchQuery)}
+              onClick={() => getAcademies(currentPage + 1)}
               className="px-4 py-2 bg-[#1e293b] border border-gray-700 text-gray-300 rounded-lg disabled:opacity-50 hover:border-[#22d3ee] transition"
             >
               Next
@@ -401,7 +400,7 @@ const FilterContent = ({ ordering, setOrdering, setIsFilterOpen, city, setCity, 
     })
     .catch(err => console.error(err));
 
-}, [city]);
+}, [city, setArea, setAreas]);
 console.log("CITY state:", cities);
 console.log("Areas state:", areas);
   return (

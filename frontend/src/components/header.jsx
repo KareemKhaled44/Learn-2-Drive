@@ -1,5 +1,5 @@
 import { LogIn, LogOut } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import api from '@/exports/Axios'
 import { toast } from 'react-toastify'
 import { useNavigate } from "react-router-dom";
@@ -49,7 +49,7 @@ const Header = () => {
   };
 
   // Improved scroll to section function with multiple attempts
-  const scrollToSection = (sectionId, retryCount = 0) => {
+  const scrollToSection = useCallback((sectionId, retryCount = 0) => {
     console.log('Attempting to scroll to section:', sectionId, 'Retry:', retryCount);
     
     const element = document.getElementById(sectionId);
@@ -76,7 +76,7 @@ const Header = () => {
       console.error(`Element with id "${sectionId}" not found after 5 attempts`);
       return false;
     }
-  };
+  }, []);
 
   // Function to handle FAQ navigation
   const handleFaqNavigation = () => {
@@ -212,7 +212,7 @@ const Header = () => {
         scrollToSection('faqs');
       }, 500);
     }
-  }, [location]);
+  }, [location, scrollToSection]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {

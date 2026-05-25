@@ -14,7 +14,7 @@ const CourseDetails = () => {
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState(null)
 
-  const getCourseDetails = () => {
+  const getCourseDetails = React.useCallback(() => {
     setLoading(true)
     setError(null)
     api.get(`api/courses/${id}/`)
@@ -29,13 +29,13 @@ const CourseDetails = () => {
       .finally(() => {
         setLoading(false)
       })
-  }
+  }, [id])
 
   React.useEffect(() => {
     if (id) {
       getCourseDetails()
     }
-  }, [id])
+  }, [id, getCourseDetails])
 
   const renderStars = (rating) => {
     if (!rating || rating === 0) {

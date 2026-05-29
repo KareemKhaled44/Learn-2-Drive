@@ -1,4 +1,4 @@
-import { LogIn, LogOut, CalendarCheck, LayoutDashboard } from 'lucide-react' 
+import { LogIn, LogOut, LayoutDashboard, User } from 'lucide-react' 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import api from '@/exports/Axios'
 import { toast } from 'react-toastify'
@@ -8,7 +8,6 @@ import { createPortal } from 'react-dom'
 
 const Header = () => {
   const navItems = ['Home', 'Academies', 'Courses', 'Trainers', 'FAQs', 'Contact Us']
-
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef(null);
@@ -52,11 +51,11 @@ const Header = () => {
     return routeMap[item];
   };
 
-  // أضف هذه الدالة للتنقل إلى My Bookings
-  const handleMyBookings = () => {
+  // تعديل الدالة للتنقل إلى My Profile
+  const handleMyProfile = () => {
     setIsMenuOpen(false);
     setTimeout(() => {
-      navigate('/my-bookings');
+      navigate('/userdashboard');
     }, 100);
   };
 
@@ -131,6 +130,40 @@ const Header = () => {
     }
   };
 
+  // ✅ Function to handle Trainers navigation (same as FAQ)
+  const handleTrainersNavigation = () => {
+    console.log('Trainers clicked, current path:', location.pathname);
+    const isHomePage = location.pathname === '/' || location.pathname === '/home';
+    
+    // Close menu first
+    setIsMenuOpen(false);
+    
+    if (isHomePage) {
+      // If on home page, wait a bit for menu to close then scroll to Trainers section
+      setTimeout(() => {
+        console.log('Trying to scroll to Trainers section on home page');
+        const trainersSection = document.getElementById('trainers');
+        if (trainersSection) {
+          const headerHeight = 80;
+          const elementPosition = trainersSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          // If not found, try with retry mechanism
+          scrollToSection('trainers');
+        }
+      }, 300);
+    } else {
+      // If on another page, navigate to home page and scroll to Trainers section
+      console.log('Navigating to home page with trainers hash');
+      navigate('/#trainers');
+    }
+  };
+
   // Function to handle Contact Us navigation
   const handleContactNavigation = () => {
     setIsMenuOpen(false);
@@ -153,6 +186,12 @@ const Header = () => {
       return;
     }
     
+    // ✅ Handle Trainers separately (same as FAQ)
+    if (item === 'Trainers') {
+      handleTrainersNavigation();
+      return;
+    }
+    
     // Handle Contact Us separately
     if (item === 'Contact Us') {
       handleContactNavigation();
@@ -169,7 +208,7 @@ const Header = () => {
       }
     } 
     else {
-      // For Academies, Courses, Trainers
+      // For Academies, Courses
       if (isHomePage) {
         // If on home page, just scroll to section
         const sectionId = getSectionId(item);
@@ -225,12 +264,19 @@ const Header = () => {
     }
 }, [])
 
-  // Handle hash navigation for FAQ
+  // Handle hash navigation for FAQ and Trainers
   useEffect(() => {
     if (location.hash === '#faqs') {
       console.log('Hash detected, scrolling to FAQ');
       setTimeout(() => {
         scrollToSection('faqs');
+      }, 500);
+    }
+    // ✅ Handle trainers hash navigation
+    if (location.hash === '#trainers') {
+      console.log('Hash detected, scrolling to Trainers');
+      setTimeout(() => {
+        scrollToSection('trainers');
       }, 500);
     }
   }, [location, scrollToSection]);
@@ -336,13 +382,13 @@ const Header = () => {
                 <div>
                   <h3 className="text-white font-semibold text-xl">{userName}</h3>
                   <p className="text-gray-400 text-sm mt-1">
-                    {isLoggedIn ? "Logged In" : "Not Logged In"}
+                    {isLoggedIn ? "Logged In" : "Guest"}
                   </p>
                 </div>
               </div>
             </div>
             
-            {/* Navigation Items */}
+            {/* Navigation Items - Always visible */}
             <nav className="flex-1 space-y-1 px-4">
               {navItems.map((item) => (
                 <button
@@ -360,7 +406,7 @@ const Header = () => {
                 </button>
               ))}
               
-              {/* 👈 أضف قسم My Bookings - يظهر فقط للمستخدمين المسجلين */}
+              {/* 👈 قسم My Profile و Dashboard - يظهر فقط للمستخدمين المسجلين */}
               {isLoggedIn && (
                 <>
                   {/* Divider */}
@@ -379,14 +425,14 @@ const Header = () => {
                     </button>
                   ) : (
                     <button
-                      onClick={handleMyBookings}
+                      onClick={handleMyProfile}
                       className="w-full text-left flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium text-[#22d3ee] transition-all hover:bg-[#1e293b] hover:text-[#22d3ee] hover:translate-x-2 cursor-pointer active:scale-95"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                       }}
                     >
-                      <CalendarCheck className="h-5 w-5" />
-                      <span>My Bookings</span>
+                      <User className="h-5 w-5" />
+                      <span>My Profile</span>
                     </button>
                   )}
                 </>
@@ -463,26 +509,17 @@ const Header = () => {
           ))}
         </ul>
 
-        {/* User Menu Button */}
+        {/* User Menu Button - Shows "G" for Guest when not logged in */}
         <div className="flex items-center">
-            {isLoggedIn ? (
-                <button
-                    id="user-menu-button"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="flex items-center justify-center rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 w-10 h-10 active:scale-95"
-                >
-                    <span className="text-white font-bold text-sm">
-                        {getInitial(userName)}
-                    </span>
-                </button>
-            ) : (
-                <button
-                    onClick={() => navigate('/signin')}
-                    className="flex items-center gap-2 rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 px-4 h-10 text-white text-sm font-medium active:scale-95"
-                >
-                    Sign In
-                </button>
-            )}
+            <button
+                id="user-menu-button"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex items-center justify-center rounded-full cursor-pointer border-2 border-[#22d3ee] bg-[#22d3ee]/10 hover:bg-[#22d3ee] transition-all duration-200 w-10 h-10 active:scale-95"
+            >
+                <span className="text-white font-bold text-sm">
+                    {getInitial(userName)}
+                </span>
+            </button>
         </div>
       </header>
 

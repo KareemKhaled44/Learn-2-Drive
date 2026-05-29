@@ -8,6 +8,7 @@ import {
 import { format } from 'date-fns'
 import api from '../exports/Axios.jsx'
 import CarLoading from '../components/ui/loading/CarLoading.jsx'
+import { toast } from 'react-toastify'
 
 const BookingDetails = () => {
   const { id } = useParams()
@@ -16,15 +17,13 @@ const BookingDetails = () => {
   const [booking, setBooking] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  
-  
+  const [cancelling, setCancelling] = useState(false)
   
   const fetchBookingDetails = async () => {
     setLoading(true)
     try {
       const response = await api.get(`/bookings/${id}/`)
       setBooking(response.data)
-      
       
       // التعامل مع هيكل البيانات المختلفة
       let bookingsData = []
@@ -41,8 +40,7 @@ const BookingDetails = () => {
       console.error('Error fetching booking details:', err)
       if (err.response?.status === 401) {
         setError('Session expired. Please login again.')
-        // Optional: Redirect to login page after 2 seconds
-        setTimeout(() => navigate('/login'), 2000)
+        setTimeout(() => navigate('/signin'), 2000)
       } else if (err.response?.status === 404) {
         setError('Booking not found')
       } else {
@@ -56,6 +54,35 @@ const BookingDetails = () => {
   useEffect(() => {
     fetchBookingDetails()
   }, [id])
+
+  // ✅ Function to handle cancel booking
+  const handleCancelBooking = async () => {
+    if (!window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+      return
+    }
+    
+    setCancelling(true)
+    try {
+      await api.patch(`/bookings/${id}/cancel/`)
+      toast.success('Booking cancelled successfully!')
+      // Refresh booking details
+      fetchBookingDetails()
+    } catch (err) {
+      console.error('Error cancelling booking:', err)
+      let errorMessage = 'Failed to cancel booking. Please try again.'
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please login again.'
+        setTimeout(() => navigate('/signin'), 2000)
+      } else if (err.response?.status === 400) {
+        errorMessage = 'Cannot cancel this booking. It may be too late or already completed.'
+      }
+      toast.error(errorMessage)
+    } finally {
+      setCancelling(false)
+    }
+  }
   
   const getStatusConfig = (status) => {
     const statusMap = {
@@ -115,10 +142,10 @@ const BookingDetails = () => {
           <p className="text-gray-400 mb-6">Please check the booking ID or try again later.</p>
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => navigate('/my-bookings')}
+              onClick={() => navigate('/userdashboard')}
               className="px-6 py-2 bg-[#22d3ee] text-[#0f172a] font-semibold rounded-lg hover:bg-[#1e40af] transition"
             >
-              My Bookings
+              My Profile
             </button>
             <button
               onClick={() => navigate('/')}
@@ -138,13 +165,13 @@ const BookingDetails = () => {
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         
-        {/* Back Button */}
+        {/* Back Button - Changed to "Back to My Profile" */}
         <button 
-          onClick={() => navigate('/my-bookings')}
+          onClick={() => navigate('/userdashboard')}
           className="mb-6 flex items-center gap-2 text-gray-400 hover:text-[#22d3ee] transition group"
         >
           <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition" />
-          Back to My Bookings
+          Back to My Profile
         </button>
         
         {/* Header with Status */}
@@ -355,95 +382,96 @@ const BookingDetails = () => {
           </div>
           
           {/* Sidebar - Right Side (1 column on large screens) */}
-          <div className="space-y-6">
-            
-            {/* Booking Summary */}
-            <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden sticky top-6">
-              <div className="bg-gradient-to-r from-[#22d3ee]/20 to-transparent px-6 py-4 border-b border-gray-700">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-[#22d3ee]" />
-                  Booking Summary
-                </h2>
+          <div className="lg:col-span-1">
+            <div className="sticky top-6">
+              
+              {/* Booking Summary + Need Help مدمجين مع بعض */}
+              <div className="bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-[#22d3ee]/20 to-transparent px-6 py-4 border-b border-gray-700">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-[#22d3ee]" />
+                    Booking Summary
+                  </h2>
+                </div>
+                
+                <div className="p-6 space-y-4">
+                  {/* Total Price */}
+                  <div className="bg-[#0f172a] rounded-lg p-4">
+                    <p className="text-gray-400 text-sm mb-1">Total Amount</p>
+                    <p className="text-3xl font-bold text-[#22d3ee]">
+                      {booking.total_price?.toLocaleString() || booking.course?.price?.toLocaleString() || '0'} EGP
+                    </p>
+                    {booking.payment_status && (
+                      <p className={`text-xs mt-2 ${
+                        booking.payment_status === 'paid' ? 'text-green-500' : 'text-yellow-500'
+                      }`}>
+                        {booking.payment_status === 'paid' ? '✓ Payment completed' : '⚠ Payment pending'}
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* Booking Info */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                      <span className="text-gray-400 text-sm">Booking Date</span>
+                      <span className="text-white text-sm">
+                        {booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy') : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                      <span className="text-gray-400 text-sm">Booking ID</span>
+                      <span className="text-white text-sm font-mono">#{booking.id}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                      <span className="text-gray-400 text-sm">Status</span>
+                      <span className={`text-sm font-semibold ${statusConfig.color}`}>
+                        {statusConfig.text}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="pt-4 space-y-3">
+                    {booking.status !== 'cancelled' && booking.status !== 'completed' && (
+                      <button 
+                        onClick={handleCancelBooking}
+                        disabled={cancelling}
+                        className="w-full px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {cancelling ? 'Cancelling...' : 'Cancel Booking'}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* خط فاصل بين Booking Summary و Need Help */}
+                  <div className="border-t border-gray-700 my-2"></div>
+
+                  {/* Need Help - مدمج جوه Booking Summary */}
+                  <div className="text-center pt-2">
+                    <h3 className="text-white font-semibold mb-2">Need Help?</h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      Having issues with your booking? Contact our support team.
+                    </p>
+                    <button 
+                      onClick={() => navigate('/contact-us')}
+                      className="text-[#22d3ee] hover:underline text-sm inline-flex items-center gap-1"
+                    >
+                      Contact Support <span aria-hidden="true">→</span>
+                    </button>
+                  </div>
+                </div>
               </div>
               
-              <div className="p-6 space-y-4">
-                {/* Total Price */}
-                <div className="bg-[#0f172a] rounded-lg p-4">
-                  <p className="text-gray-400 text-sm mb-1">Total Amount</p>
-                  <p className="text-3xl font-bold text-[#22d3ee]">
-                    {booking.total_price?.toLocaleString() || booking.course?.price?.toLocaleString() || '0'} EGP
-                  </p>
-                  {booking.payment_status && (
-                    <p className={`text-xs mt-2 ${
-                      booking.payment_status === 'paid' ? 'text-green-500' : 'text-yellow-500'
-                    }`}>
-                      {booking.payment_status === 'paid' ? '✓ Payment completed' : '⚠ Payment pending'}
-                    </p>
-                  )}
+              {/* Additional Notes - لو موجود يبقى لوحده تحت */}
+              {booking.notes && (
+                <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6 mt-6">
+                  <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                    <Info className="h-4 w-4 text-[#22d3ee]" />
+                    Additional Notes
+                  </h3>
+                  <p className="text-gray-400 text-sm">{booking.notes}</p>
                 </div>
-                
-                {/* Booking Info */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-700">
-                    <span className="text-gray-400 text-sm">Booking Date</span>
-                    <span className="text-white text-sm">
-                      {booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy') : 'N/A'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-700">
-                    <span className="text-gray-400 text-sm">Booking ID</span>
-                    <span className="text-white text-sm font-mono">#{booking.id}</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-700">
-                    <span className="text-gray-400 text-sm">Status</span>
-                    <span className={`text-sm font-semibold ${statusConfig.color}`}>
-                      {statusConfig.text}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="pt-4 space-y-3">
-                  {booking.status === 'pending' && (
-                    <button className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition">
-                      Confirm Payment
-                    </button>
-                  )}
-                  {booking.status !== 'cancelled' && booking.status !== 'completed' && (
-                    <button className="w-full px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-500 font-semibold rounded-lg hover:bg-red-500/20 transition">
-                      Cancel Booking
-                    </button>
-                  )}
-                  <button 
-                    onClick={() => navigate(`/contact-trainer/${booking.trainer?.id}`)}
-                    className="w-full px-4 py-2 bg-[#22d3ee]/10 border border-[#22d3ee] text-[#22d3ee] font-semibold rounded-lg hover:bg-[#22d3ee] hover:text-white transition"
-                  >
-                    Contact Instructor
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Additional Info */}
-            {booking.notes && (
-              <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                  <Info className="h-4 w-4 text-[#22d3ee]" />
-                  Additional Notes
-                </h3>
-                <p className="text-gray-400 text-sm">{booking.notes}</p>
-              </div>
-            )}
-            
-            {/* Need Help */}
-            <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6 text-center">
-              <h3 className="text-white font-semibold mb-2">Need Help?</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Having issues with your booking? Contact our support team.
-              </p>
-              <button className="text-[#22d3ee] hover:underline text-sm">
-                Contact Support →
-              </button>
+              )}
             </div>
           </div>
         </div>

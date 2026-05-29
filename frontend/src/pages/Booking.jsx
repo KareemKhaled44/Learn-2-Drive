@@ -163,7 +163,7 @@ const Booking = () => {
       alert('✓ Booking confirmed successfully!')
       
       // Navigate to My Bookings page
-      navigate('/my-bookings')
+      navigate('/userdashboard')
       
     } catch (err) {
       console.error('Error creating booking:', err)

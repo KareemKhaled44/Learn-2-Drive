@@ -21,23 +21,117 @@ const SignUp = () => {
     role: defaultRole
   })
 
+  // State for validation errors
+  const [errors, setErrors] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirm_password: ''
+  })
+
+  const [touched, setTouched] = useState({
+    username: false,
+    email: false,
+    password: false,
+    confirm_password: false
+  })
+
+  // Validation function
+  const validateField = (name, value) => {
+    switch(name) {
+      case 'username':
+        if (!value.trim()) {
+          return 'Username is required'
+        } else if (value.length < 3) {
+          return 'Username must be at least 3 characters'
+        }
+        return ''
+      
+      case 'email':
+        if (!value.trim()) {
+          return 'Email is required'
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          return 'Please enter a valid email address'
+        }
+        return ''
+      
+      case 'password':
+        if (!value) {
+          return 'Password is required'
+        } else if (value.length < 8) {
+          return 'Password must be at least 8 characters'
+        }
+        return ''
+      
+      case 'confirm_password':
+        if (!value) {
+          return 'Please confirm your password'
+        } else if (value !== formData.password) {
+          return 'Passwords do not match'
+        }
+        return ''
+      
+      default:
+        return ''
+    }
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      username: validateField('username', formData.username),
+      email: validateField('email', formData.email),
+      password: validateField('password', formData.password),
+      confirm_password: validateField('confirm_password', formData.confirm_password)
+    }
+    
+    setErrors(newErrors)
+    return !Object.values(newErrors).some(error => error !== '')
+  }
+
   const handleChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+    
+    // Validate confirm password when password or confirm_password changes
+    if (name === 'password' && formData.confirm_password) {
+      const confirmError = validateField('confirm_password', formData.confirm_password)
+      setErrors(prev => ({ ...prev, confirm_password: confirmError }))
+    }
+    
+    if (name === 'confirm_password') {
+      const confirmError = validateField('confirm_password', value)
+      setErrors(prev => ({ ...prev, confirm_password: confirmError }))
+    }
+  }
+
+  const handleBlur = (fieldName) => {
+    setTouched(prev => ({ ...prev, [fieldName]: true }))
+    const error = validateField(fieldName, formData[fieldName])
+    setErrors(prev => ({ ...prev, [fieldName]: error }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (formData.password !== formData.confirm_password) {
-      toast.error('Passwords do not match')
-      return
-    }
+    // Mark all fields as touched
+    setTouched({
+      username: true,
+      email: true,
+      password: true,
+      confirm_password: true
+    })
     
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters')
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form')
       return
     }
         
@@ -58,9 +152,19 @@ const SignUp = () => {
     } catch (error) {
       if (error.response?.data) {
         const errors = error.response.data
-        if (errors.username) toast.error(`Username: ${errors.username[0]}`)
-        if (errors.email) toast.error(`Email: ${errors.email[0]}`)
-        if (errors.password) toast.error(`Password: ${errors.password[0]}`)
+        // Set server errors to specific fields
+        if (errors.username) {
+          setErrors(prev => ({ ...prev, username: errors.username[0] }))
+          toast.error(`Username: ${errors.username[0]}`)
+        }
+        if (errors.email) {
+          setErrors(prev => ({ ...prev, email: errors.email[0] }))
+          toast.error(`Email: ${errors.email[0]}`)
+        }
+        if (errors.password) {
+          setErrors(prev => ({ ...prev, password: errors.password[0] }))
+          toast.error(`Password: ${errors.password[0]}`)
+        }
         if (errors.detail) toast.error(errors.detail)
       } else {
         toast.error('Registration failed. Please try again.')
@@ -95,17 +199,28 @@ const SignUp = () => {
               <label className="text-gray-300 text-sm font-medium">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-[#22d3ee]" />
+                  <User className={`h-5 w-5 ${errors.username && touched.username ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
                 <input
                   type="text"
                   value={formData.username}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('username')}
                   name="username"
-                  className="w-full pl-10 pr-4 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.username && touched.username 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-700 focus:ring-[#22d3ee]'
+                  }`}
                   placeholder="Username"
                 />
               </div>
+              {errors.username && touched.username && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.username}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -113,17 +228,28 @@ const SignUp = () => {
               <label className="text-gray-300 text-sm font-medium">Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-[#22d3ee]" />
+                  <Mail className={`h-5 w-5 ${errors.email && touched.email ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
                 <input
                   type="email"
-                  className="w-full pl-10 pr-4 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.email && touched.email 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-700 focus:ring-[#22d3ee]'
+                  }`}
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('email')}
                   name="email"
                 />
               </div>
+              {errors.email && touched.email && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -131,17 +257,28 @@ const SignUp = () => {
               <label className="text-gray-300 text-sm font-medium">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-[#22d3ee]" />
+                  <Lock className={`h-5 w-5 ${errors.password && touched.password ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
                 <input
                   type="password"
-                  className="w-full pl-10 pr-4 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.password && touched.password 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-700 focus:ring-[#22d3ee]'
+                  }`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('password')}
                   name="password"
                 />
               </div>
+              {errors.password && touched.password && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -149,17 +286,28 @@ const SignUp = () => {
               <label className="text-gray-300 text-sm font-medium">Confirm Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-[#22d3ee]" />
+                  <Lock className={`h-5 w-5 ${errors.confirm_password && touched.confirm_password ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
                 <input
                   type="password"
-                  className="w-full pl-10 pr-4 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.confirm_password && touched.confirm_password 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-700 focus:ring-[#22d3ee]'
+                  }`}
                   placeholder="••••••••"
                   value={formData.confirm_password}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('confirm_password')}
                   name="confirm_password"
                 />
               </div>
+              {errors.confirm_password && touched.confirm_password && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.confirm_password}
+                </p>
+              )}
             </div>
 
             {/* Terms Checkbox */}
@@ -168,6 +316,7 @@ const SignUp = () => {
                 <input
                   type="checkbox"
                   className="w-4 h-4 bg-[#0f172a] border-gray-700 rounded focus:ring-[#22d3ee] text-[#22d3ee]"
+                  required
                 />
               </div>
               <div className="ml-3 text-sm">

@@ -474,9 +474,30 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiY
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 1 - Review an academy
-POST http://localhost:8000/reviews/
-Authorization: Bearer your_user_token_here
+POST http://localhost:8000/api/reviews/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5OTc1Mzk3LCJpYXQiOjE3Nzk5NzUwOTcsImp0aSI6ImM1OGU2YTRiYjU4MzRjMTlhYzQ4MDc0ODhmMGQzN2FiIiwidXNlcl9pZCI6MX0.P-MhwpH6kIM-lLiWhRmjM0pZMB6UxR27Tjy2Cr3y0vA
 Content-Type: application/json
 
 {
@@ -489,8 +510,8 @@ Content-Type: application/json
 ###
 
 ### 2 - Review a course
-POST http://localhost:8000/reviews/
-Authorization: Bearer your_user_token_here
+POST http://localhost:8000/api/reviews/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5OTc1Mzk3LCJpYXQiOjE3Nzk5NzUwOTcsImp0aSI6ImM1OGU2YTRiYjU4MzRjMTlhYzQ4MDc0ODhmMGQzN2FiIiwidXNlcl9pZCI6MX0.P-MhwpH6kIM-lLiWhRmjM0pZMB6UxR27Tjy2Cr3y0vA
 Content-Type: application/json
 
 {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { Calendar, Clock, User, CheckCircle, AlertCircle, ArrowLeft, Loader } from 'lucide-react'
+import { Calendar, Clock, User, CheckCircle, AlertCircle, ArrowLeft, Loader, CreditCard, Banknote } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 import { format } from 'date-fns'
 import CarLoading from '../components/ui/loading/CarLoading.jsx'
@@ -22,6 +22,13 @@ const Booking = () => {
   const [availableSlots, setAvailableSlots] = useState([])
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('card')
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: '',
+    cardHolder: '',
+    expiryDate: '',
+    cvv: '',
+  })
   
   // Current step
   const [currentStep, setCurrentStep] = useState(1) // 1: Trainer, 2: Date, 3: Time, 4: Confirm
@@ -144,9 +151,30 @@ const Booking = () => {
     setSelectedTime(time)
     setCurrentStep(4)
   }
+
+  const handleCardDetailChange = (field, value) => {
+    setCardDetails((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const isCardPaymentValid = () => {
+    return (
+      cardDetails.cardNumber.trim() &&
+      cardDetails.cardHolder.trim() &&
+      cardDetails.expiryDate.trim() &&
+      cardDetails.cvv.trim()
+    )
+  }
   
   const handleConfirmBooking = async () => {
     if (!selectedTrainer || !selectedDate || !selectedTime) return
+
+    if (paymentMethod === 'card' && !isCardPaymentValid()) {
+      toast.error('Please fill in the card payment details')
+      return
+    }
     
     setSubmitting(true)
     try {
@@ -447,6 +475,97 @@ const Booking = () => {
                   <span className="text-2xl font-bold text-[#22d3ee]">{course.price.toLocaleString()} EGP</span>
                 </div>
               </div>
+
+              {/* Payment Method */}
+              <div className="pt-4 border-t border-gray-700 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Payment Method</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('card')}
+                      className={`rounded-lg border px-4 py-3 text-left transition ${
+                        paymentMethod === 'card'
+                          ? 'border-[#22d3ee] bg-[#22d3ee]/10 text-white'
+                          : 'border-gray-700 bg-[#0f172a] text-gray-300 hover:border-[#22d3ee]/50'
+                      }`}
+                    >
+                      <div className="flex gap-2 items-center mb-1">
+                        <CreditCard className="h-5 w-5 text-[#22d3ee]" />
+                        <span className="block font-semibold">Card payment</span>
+                        
+                      </div>
+                      <span className="block text-sm text-gray-400">Pay securely with your debit or credit card</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('cash')}
+                      className={`rounded-lg border px-4 py-3 text-left transition ${
+                        paymentMethod === 'cash'
+                          ? 'border-[#22d3ee] bg-[#22d3ee]/10 text-white'
+                          : 'border-gray-700 bg-[#0f172a] text-gray-300 hover:border-[#22d3ee]/50'
+                      }`}
+                    >
+                      <div className="flex gap-2 items-center mb-1">
+                        <Banknote className="h-5 w-5 text-[#22d3ee]" />
+                        <span className="block font-semibold">Cash on arrival</span>
+                      </div>
+                      <span className="block text-sm text-gray-400">Reserve now and pay later at the academy</span>
+                    </button>
+                  </div>
+                </div>
+
+                {paymentMethod === 'card' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm text-gray-300 mb-2">Card Number</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardDetails.cardNumber}
+                        onChange={(e) => handleCardDetailChange('cardNumber', e.target.value)}
+                        className="w-full rounded-lg border border-gray-700 bg-[#0f172a] px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-[#22d3ee]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-2">Card Holder Name</label>
+                      <input
+                        type="text"
+                        placeholder="Name on card"
+                        value={cardDetails.cardHolder}
+                        onChange={(e) => handleCardDetailChange('cardHolder', e.target.value)}
+                        className="w-full rounded-lg border border-gray-700 bg-[#0f172a] px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-[#22d3ee]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-2">Expiry Date</label>
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        value={cardDetails.expiryDate}
+                        onChange={(e) => handleCardDetailChange('expiryDate', e.target.value)}
+                        className="w-full rounded-lg border border-gray-700 bg-[#0f172a] px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-[#22d3ee]"
+                      />
+                    </div>
+                    <div className="md:col-span-2 max-w-xs">
+                      <label className="block text-sm text-gray-300 mb-2">CVV</label>
+                      <input
+                        type="password"
+                        inputMode="numeric"
+                        placeholder="123"
+                        maxLength={4}
+                        value={cardDetails.cvv}
+                        onChange={(e) => handleCardDetailChange('cvv', e.target.value)}
+                        className="w-full rounded-lg border border-gray-700 bg-[#0f172a] px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-[#22d3ee]"
+                      />
+                    </div>
+                    <p className="md:col-span-2 text-xs text-gray-400">
+                      This is UI only. Card details stay in the browser and are not sent to the backend.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Action Buttons */}
@@ -470,7 +589,7 @@ const Booking = () => {
                 ) : (
                   <>
                     <CheckCircle className="h-5 w-5" />
-                    Confirm Booking
+                    {paymentMethod === 'card' ? 'Pay & Confirm Booking' : 'Confirm Booking'}
                   </>
                 )}
               </button>

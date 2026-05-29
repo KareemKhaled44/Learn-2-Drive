@@ -1,4 +1,4 @@
-import { Header, Hero, PopularAcademies, Courses, Trainers, FAQs, Footer } from '../exports/index.js';
+import { Hero, PopularAcademies, Courses, Trainers, FAQs} from '../exports/index.js';
 
 export default function Home() {
   return (

@@ -10,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from .models import *
 from .serializers import *
+from django.db.models import Avg, Count, Prefetch
 
 class HomeAcademyListView(generics.ListAPIView):
     serializer_class = AcademySerializer
@@ -140,7 +141,17 @@ class CourseDetailView(generics.RetrieveAPIView):
         return (
             Course.objects
             .filter(status='approved')
-            .prefetch_related('trainers', 'academy')
+            .prefetch_related(
+                'trainers',
+                Prefetch(
+                    'academy',
+                    queryset=Academy.objects.annotate(
+                        avg_rating=Avg('ratings__rating'),
+                        reviews_count=Count('ratings'),
+                        courses_count=Count('courses'),
+                    ).prefetch_related('contacts', 'location')
+                )
+            )
             .annotate(
                 avg_rating=Avg('ratings__rating'),
                 reviews_count=Count('ratings'),
@@ -149,7 +160,7 @@ class CourseDetailView(generics.RetrieveAPIView):
 
 class HomeTrainerListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
-        return Trainer.objects.filter(status='approved').prefetch_related("courses")[:4]
+        return Trainer.objects.filter(status='approved').prefetch_related("courses")[:5]
     
     serializer_class = TrainerHomeSerializer
 

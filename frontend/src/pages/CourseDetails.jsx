@@ -180,14 +180,15 @@ const CourseDetails = () => {
 
               {/* Rating & Spots Row */}
               <div className="flex flex-wrap items-center gap-4 mb-6">
-                {/* Rating */}
-                <div className="flex items-center gap-2 bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-400/30">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="text-white font-bold">
-                    {course.avg_rating ? course.avg_rating.toFixed(1) : 'New'}
-                  </span>
-                  <span className="text-gray-300">({course.reviews_count || 0} reviews)</span>
-                </div>
+                {course.academy && (
+                  <div className="flex items-center gap-2 bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-400/30">
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                    <span className="text-white font-bold">
+                      {course.academy.avg_rating ? Number(course.academy.avg_rating).toFixed(1) : 'New'}
+                    </span>
+                    <span className="text-gray-300">({course.academy.reviews_count || 0} reviews)</span>
+                  </div>
+                )}
 
                 {/* Remaining Spots */}
                 <div className="flex items-center gap-2 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-400/30">

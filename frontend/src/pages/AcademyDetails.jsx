@@ -750,6 +750,18 @@ const AcademyDetails = () => {
                         </p>
                       ))}
                     </div>
+                    {/* Address */}
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 text-[#22d3ee] mt-0.5 flex-shrink-0" />
+                      <a 
+                        href={academy.google_maps_url}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[#22d3ee] text-xs hover:underline truncate"
+                      >
+                        {academy.address_text}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>

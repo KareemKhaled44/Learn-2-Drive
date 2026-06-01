@@ -125,6 +125,7 @@ class BookingListSerializer(serializers.ModelSerializer):
     course_title = serializers.CharField(source='course.title', read_only=True)
     trainer_name = serializers.CharField(source='trainer.name', read_only=True)
     academy_name = serializers.CharField(source='course.academy.name', read_only=True)
+    academy_id = serializers.IntegerField(source='course.academy.id', read_only=True)
 
     class Meta:
         model = Booking
@@ -133,6 +134,7 @@ class BookingListSerializer(serializers.ModelSerializer):
             'course_title',
             'trainer_name',
             'academy_name',
+            'academy_id',
             'status',
             'scheduled_date',
             'start_time',

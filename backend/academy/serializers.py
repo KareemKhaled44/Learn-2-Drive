@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.db.models import Avg, Count, Min
 from django.contrib.contenttypes.models import ContentType
+from bookings.models import Booking
 
 class AcademySerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
@@ -380,6 +381,52 @@ class ReviewCreateSerializer(serializers.Serializer):
         )
 
         return review
+
+    def validate(self, data):
+        """
+        Ensure the requesting user has a booking related to the target they are
+        trying to review. Users may only review academies/courses/trainers they
+        actually booked with (confirmed or completed bookings).
+        """
+        request = self.context.get('request')
+        user = request.user if request else None
+
+        ct = data.get('content_type')
+        obj_id = data.get('object_id')
+
+        if not user or not ct or not obj_id:
+            return data
+
+        allowed_statuses = ['confirmed', 'completed']
+
+        if ct == 'academy':
+            exists = Booking.objects.filter(
+                user=user,
+                course__academy_id=obj_id,
+                status__in=allowed_statuses
+            ).exists()
+            if not exists:
+                raise serializers.ValidationError('You can only review academies you have booked with.')
+
+        elif ct == 'course':
+            exists = Booking.objects.filter(
+                user=user,
+                course_id=obj_id,
+                status__in=allowed_statuses
+            ).exists()
+            if not exists:
+                raise serializers.ValidationError('You can only review courses you have booked.')
+
+        elif ct == 'trainer':
+            exists = Booking.objects.filter(
+                user=user,
+                trainer_id=obj_id,
+                status__in=allowed_statuses
+            ).exists()
+            if not exists:
+                raise serializers.ValidationError('You can only review trainers you have booked with.')
+
+        return data
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:

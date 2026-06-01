@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { 
   MapPin, Phone, Mail, Star, Clock, Award, Car, Calendar, 
   Shield, Users, Venus, Mars, CheckCircle, AlertCircle, 
-  MessageCircle, BookOpen, Briefcase, GraduationCap
+  MessageCircle, BookOpen, Briefcase, GraduationCap, Building
 } from 'lucide-react'
 import api from '@/exports/Axios'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -32,31 +32,6 @@ const TrainerProfile = () => {
       fetchTrainer()
     }
   }, [id])
-
-  const handleBookSession = () => {
-    if (localStorage.getItem('access')) {
-      const bookingCourseId = trainer.courses?.[0]?.id
-
-      if (!bookingCourseId) {
-        toast.info('This trainer is not assigned to an approved course yet')
-        return
-      }
-
-      navigate(`/booking/course/${bookingCourseId}?trainer=${trainer.id}`)
-    } else {
-      toast.info('Please login to book a session')
-      navigate('/signin')
-    }
-  }
-
-  const handleSendMessage = () => {
-    if (localStorage.getItem('access')) {
-      navigate(`/messages/trainer/${trainer.id}`)
-    } else {
-      toast.info('Please login to send a message')
-      navigate('/signin')
-    }
-  }
 
   if (loading) {
     return (
@@ -143,6 +118,22 @@ const TrainerProfile = () => {
                   </div>
                 </div>
 
+                {/* Academy Name - تغيير النص وجعله قابلاً للضغط */}
+                {trainer.academy_name && trainer.academy_id && (
+                  <div className="flex items-center justify-center lg:justify-start mb-3">
+                    <Building className="h-5 w-5 text-[#22d3ee] mr-2" />
+                    <span className="text-gray-300">
+                      Academy: {' '}
+                      <button 
+                        onClick={() => navigate(`/academy-details/${trainer.academy_id}`)}
+                        className="text-[#22d3ee] font-semibold hover:underline transition-all duration-200 cursor-pointer"
+                      >
+                        {trainer.academy_name}
+                      </button>
+                    </span>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   {/* Phone */}
                   {trainer.contact_info?.phones?.length > 0 && (
@@ -160,24 +151,6 @@ const TrainerProfile = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3 w-full lg:w-auto">
-                <button 
-                  onClick={handleBookSession}
-                  className="px-6 py-3 bg-[#22d3ee] text-white font-semibold rounded-lg hover:bg-[#1e40af] transition flex items-center justify-center gap-2"
-                >
-                  <Calendar className="h-5 w-5" />
-                  Book Session
-                </button>
-                <button 
-                  onClick={handleSendMessage}
-                  className="px-6 py-3 border border-[#22d3ee] text-[#22d3ee] font-semibold rounded-lg hover:bg-[#22d3ee] hover:text-white transition flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  Send Message
-                </button>
               </div>
             </div>
           </div>
@@ -299,40 +272,61 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
-              {/* Academy Info (if trainer belongs to an academy) */}
-              {trainer.academy && (
+              {/* Academy Info (if trainer belongs to an academy) - تحسين عرض الأكاديمية */}
+              {trainer.academy && trainer.academy_name && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
-                  <h2 className="text-xl font-bold text-[#22d3ee] mb-4">Affiliated Academy</h2>
+                  <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Affiliated Academy
+                  </h2>
                   <div className="text-center">
                     {trainer.academy_logo && (
                       <img 
                         src={trainer.academy_logo} 
                         alt={trainer.academy_name}
-                        className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border border-gray-700"
+                        className="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-[#22d3ee]"
                       />
                     )}
-                    <h3 className="text-white font-semibold">{trainer.academy_name || 'Auto Master Academy'}</h3>
-                    <p className="text-gray-400 text-sm mt-1">Approved Driving School</p>
+                    <h3 className="text-xl font-bold text-white mb-1">{trainer.academy_name}</h3>
+                    <p className="text-[#22d3ee] text-sm mb-2">Approved Driving School</p>
+                    
+                    {/* عرض معلومات إضافية عن الأكاديمية إذا وجدت */}
+                    {trainer.academy_address && (
+                      <div className="flex items-center justify-center text-gray-400 text-sm mt-2">
+                        <MapPin className="h-4 w-4 mr-1 text-[#22d3ee]" />
+                        <span>{trainer.academy_address}</span>
+                      </div>
+                    )}
+                    
+                    {trainer.academy_phone && (
+                      <div className="flex items-center justify-center text-gray-400 text-sm mt-1">
+                        <Phone className="h-4 w-4 mr-1 text-[#22d3ee]" />
+                        <span>{trainer.academy_phone}</span>
+                      </div>
+                    )}
+                    
                     <button 
                       onClick={() => navigate(`/academy-details/${trainer.academy_id}`)}
-                      className="mt-4 w-full px-4 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-[#22d3ee] text-sm hover:bg-[#22d3ee]/10 transition"
+                      className="mt-4 w-full px-4 py-2 bg-gradient-to-r from-[#22d3ee] to-[#1e40af] rounded-lg text-white text-sm font-semibold hover:shadow-lg hover:shadow-[#22d3ee]/30 transition-all duration-300"
                     >
-                      View Academy
+                      View Academy Details
                     </button>
                   </div>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* CTA Section */}
-          <div className="text-center mt-12">
-            <button 
-              onClick={handleBookSession}
-              className="px-8 py-4 bg-gradient-to-r from-[#22d3ee] to-[#1e40af] text-white font-bold rounded-lg hover:shadow-lg hover:shadow-[#22d3ee]/30 transition-all duration-300 text-lg"
-            >
-              Book Your First Lesson with {trainer.name.split(' ')[0]}
-            </button>
+              {/* إذا كان المدرب ليس لديه أكاديمية */}
+              {!trainer.academy && !trainer.academy_name && (
+                <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
+                  <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Academy Status
+                  </h2>
+                  <p className="text-gray-400 text-center">Independent Instructor</p>
+                  <p className="text-gray-500 text-sm text-center mt-2">This trainer operates independently</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

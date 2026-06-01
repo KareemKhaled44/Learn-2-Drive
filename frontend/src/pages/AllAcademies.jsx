@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Search, Star, MapPin, Phone, Mail, Globe, Award, Car, X , DollarSign, Eye, Filter, ArrowUpDown, BookOpen, MessageCircle, Venus } from 'lucide-react'
+import { Search, Star, MapPin, Phone, Mail, Globe, Award, Car, X, DollarSign, Eye, Filter, ArrowUpDown, BookOpen, MessageCircle, Venus } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import {Header} from '../exports/index.js';
+import { Header } from '../exports/index.js';
 import CarLoading from '../components/ui/loading/CarLoading.jsx';
 
 
@@ -14,7 +14,7 @@ const AllAcademies = () => {
   const [femaleTrainer, setFemaleTrainer] = useState(false);
 
   const [transmissionFilter, setTransmissionFilter] = useState("");
-  
+
   const [city, setCity] = useState("");
   const [area, setArea] = useState("");
 
@@ -33,11 +33,9 @@ const AllAcademies = () => {
     if (femaleTrainer) params.append('has_female_trainer', 'true');
 
     api.get(`api/academies/?page=${page}
-      &search=${searchQuery}&ordering=${ordering}&location__city=${city}
-      &location__area=${area}&courses__transmission=${transmissionFilter}
-      &${params.toString()}`)
+      &search=${searchQuery}&ordering=${ordering}&location__city=${city}&location__area=${area}&courses__transmission=${transmissionFilter}&${params.toString()}`)
       .then(async response => {
-        
+
         await new Promise(resolve => setTimeout(resolve, 500));
         setAcademies(response.data.results);
         setCount(response.data.count);
@@ -52,11 +50,11 @@ const AllAcademies = () => {
   }, [searchQuery, ordering, city, area, transmissionFilter, femaleTrainer]);
   const totalPages = Math.ceil(count / pageSize);
 
-   useEffect(() => {
+  useEffect(() => {
     getAcademies(1);
   }, [getAcademies]);
 
-   return (
+  return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="absolute inset-0 z-0">
@@ -85,11 +83,11 @@ const AllAcademies = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button>
-                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
               </button>
             </div>
           </div>
-          
+
           {/* Filter Button - Opens Sheet */}
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
@@ -98,12 +96,12 @@ const AllAcademies = () => {
                 <span className="hidden sm:inline">Filters</span>
               </button>
             </SheetTrigger>
-            
+
             {/* Filter Sheet Content */}
             <SheetContent side="left" className="w-full sm:w-[400px] bg-[#0f172a] border-r border-gray-800 overflow-y-auto p-0">
               <div className="h-full flex flex-col">
-                
-                
+
+
                 <div className="sticky top-0 z-10 flex items-center justify-between bg-gradient-to-r from-[#0f172a] to-[#1a2741] border-b border-gray-800 px-6 py-4">
                   <div className="flex items-center gap-3">
                     <Filter className="h-5 w-5 text-[#22d3ee]" />
@@ -111,10 +109,10 @@ const AllAcademies = () => {
                       Filter <span className="text-[#22d3ee]">Academies</span>
                     </h2>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                    
-                    <button 
+
+                    <button
                       onClick={() => setIsFilterOpen(false)}
                       className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1e293b] border border-gray-700 text-gray-400 hover:text-white hover:border-[#22d3ee] hover:bg-[#22d3ee]/10 transition"
                     >
@@ -125,7 +123,7 @@ const AllAcademies = () => {
 
                 {/* Filter Content - with adjusted padding */}
                 <div className="flex-1 px-6 py-5">
-                  <FilterContent 
+                  <FilterContent
                     city={city}
                     setCity={setCity}
                     ordering={ordering}
@@ -142,7 +140,7 @@ const AllAcademies = () => {
 
                 {/* Quick action footer */}
                 <div className="sticky bottom-0 border-t border-gray-800 bg-gradient-to-t from-[#0f172a] via-[#0f172a] to-transparent pt-8 pb-4 px-6">
-                  <button 
+                  <button
                     onClick={() => setIsFilterOpen(false)}
                     className="w-full py-3 bg-[#22d3ee] hover:bg-[#1e40af] text-[#0f172a] hover:text-white font-medium rounded-lg transition text-sm flex items-center justify-center gap-2"
                   >
@@ -168,19 +166,19 @@ const AllAcademies = () => {
         ) : academies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {academies.map((academy) => (
-              <div 
+              <div
                 key={academy.id}
                 className="group bg-[#1e293b] border border-gray-700 rounded-xl overflow-hidden transition-all duration-300 hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative"
               >
                 {/* Academy Logo/Image */}
                 <div className="relative overflow-hidden h-48">
-                  <img 
-                    src={academy.logo} 
-                    alt={academy.name} 
+                  <img
+                    src={academy.logo}
+                    alt={academy.name}
                     className="w-full h-full object-contain bg-[#0f172a] p-4 transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                  
+
                   {/* Female Trainers Available Badge - Positioned top left */}
                   {academy.has_female_trainer && (
                     <div className="absolute top-4 left-4 flex items-center gap-1 bg-black/70 backdrop-blur-sm text-pink-400 px-3 py-1.5 rounded-full border border-pink-400/30">
@@ -188,14 +186,14 @@ const AllAcademies = () => {
                       <span className="text-xs font-medium">Female Trainers</span>
                     </div>
                   )}
-                  
+
                   {/* Rating Badge */}
                   <div className="absolute top-4 right-4 flex items-center gap-1 bg-black/70 backdrop-blur-sm text-yellow-400 px-3 py-1.5 rounded-full border border-yellow-400/30">
                     <Star className="h-4 w-4 fill-current" />
                     <span className="text-white font-bold text-sm">   {academy.avg_rating ? Number(academy.avg_rating).toFixed(1) : 'New'}</span>
                     <span className="text-gray-300 text-xs">({academy.reviews_count})</span>
                   </div>
-                  
+
                   {/* Academy Name Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">{academy.name}</h3>
@@ -205,7 +203,7 @@ const AllAcademies = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Academy Content */}
                 <div className="p-6 space-y-4">
                   {/* ...existing code... */}
@@ -213,20 +211,20 @@ const AllAcademies = () => {
                   <p className="text-gray-300 text-sm line-clamp-2">
                     {academy.description || "No description available"}
                   </p>
-                  
+
                   {/* Address */}
                   <div className="flex items-start gap-2">
                     <MapPin className="h-4 w-4 text-[#22d3ee] mt-0.5 flex-shrink-0" />
-                    <a 
+                    <a
                       href={academy.google_maps_url}
-                      target="_blank" 
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#22d3ee] text-xs hover:underline truncate"
                     >
                       {academy.address_text}
                     </a>
                   </div>
-                  
+
                   {/* Stats Grid */}
                   <div className="grid grid-cols-3 gap-3 py-3 border-y border-gray-700">
                     <div className="text-center">
@@ -246,7 +244,7 @@ const AllAcademies = () => {
                       <div className="text-xs text-gray-400">Branches</div>
                     </div>
                   </div>
-                  
+
                   {/* Price Section */}
                   <div className="flex items-center justify-between bg-gradient-to-r from-[#0f172a] to-[#1a2741] rounded-lg p-3 border border-gray-700">
                     <div className="flex items-center gap-2">
@@ -262,7 +260,7 @@ const AllAcademies = () => {
                       per course
                     </div>
                   </div>
-                  
+
                   {/* Contact Info */}
                   <div className="space-y-2">
                     {/* Phones */}
@@ -281,7 +279,7 @@ const AllAcademies = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Emails */}
                     {academy.contactInfo.emails.length > 0 && (
                       <div className="flex items-center gap-2">
@@ -291,14 +289,14 @@ const AllAcademies = () => {
                         </span>
                       </div>
                     )}
-                    
+
                     {/* Website */}
                     {academy.contactInfo.websites.length > 0 && (
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-[#22d3ee] flex-shrink-0" />
-                        <a 
-                          href={academy.contactInfo.websites[0]} 
-                          target="_blank" 
+                        <a
+                          href={academy.contactInfo.websites[0]}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-[#22d3ee] text-xs hover:underline truncate"
                         >
@@ -307,13 +305,13 @@ const AllAcademies = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-2">
                     <a href={`/academy-details/${academy.id}`} className="flex-1 px-4 py-2.5 bg-[#22d3ee] hover:bg-[#1e40af] text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
-                                          <BookOpen className="h-4 w-4" />
-                                          View Courses
-                                        </a>
+                      <BookOpen className="h-4 w-4" />
+                      View Courses
+                    </a>
                     <button className="px-4 py-2.5 bg-transparent border border-[#22d3ee] text-[#22d3ee] hover:bg-[#22d3ee] hover:text-white rounded-lg transition-all duration-300">
                       <MessageCircle className="h-4 w-4" />
                     </button>
@@ -335,7 +333,7 @@ const AllAcademies = () => {
           <div className="flex items-center gap-2">
             <button
               disabled={currentPage === 1}
-                onClick={() => getAcademies(currentPage - 1)}
+              onClick={() => getAcademies(currentPage - 1)}
               className="px-4 py-2 bg-[#1e293b] border border-gray-700 text-gray-300 rounded-lg disabled:opacity-50 hover:border-[#22d3ee] transition"
             >
               Previous
@@ -346,12 +344,11 @@ const AllAcademies = () => {
               return (
                 <button
                   key={page}
-                    onClick={() => getAcademies(page)}
-                  className={`px-4 py-2 rounded-lg transition ${
-                    currentPage === page
+                  onClick={() => getAcademies(page)}
+                  className={`px-4 py-2 rounded-lg transition ${currentPage === page
                       ? "bg-[#22d3ee] text-white"
                       : "bg-[#1e293b] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-white"
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>
@@ -378,30 +375,30 @@ const FilterContent = ({ ordering, setOrdering, setIsFilterOpen, city, setCity, 
   const [areas, setAreas] = useState([]);
 
   useEffect(() => {
-  api.get("api/locations/")
-    .then(res => setCities(res.data));
+    api.get("api/locations/")
+      .then(res => setCities(res.data));
   }, []);
-  
+
   useEffect(() => {
-  console.log("City changed:", city);
+    console.log("City changed:", city);
 
-  if (!city) {
-    setAreas([]);
-    setArea('');
-    return;
-  }
-
-  api.get(`api/locations/?city=${city}`)
-    .then(res => {
-      console.log("Areas response:", res.data);
-      setAreas(res.data);
+    if (!city) {
+      setAreas([]);
       setArea('');
-    })
-    .catch(err => console.error(err));
+      return;
+    }
 
-}, [city, setArea, setAreas]);
-console.log("CITY state:", cities);
-console.log("Areas state:", areas);
+    api.get(`api/locations/?city=${city}`)
+      .then(res => {
+        console.log("Areas response:", res.data);
+        setAreas(res.data);
+        setArea('');
+      })
+      .catch(err => console.error(err));
+
+  }, [city, setArea, setAreas]);
+  console.log("CITY state:", cities);
+  console.log("Areas state:", areas);
   return (
     <div className="space-y-6">
       {/* Sort By */}
@@ -415,50 +412,46 @@ console.log("Areas state:", areas);
             onClick={() => {
               setOrdering("-avg_rating")
             }}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
-              ordering === "-avg_rating"
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${ordering === "-avg_rating"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}
+              }`}
           >
             <span>⭐</span> Highest Rated
           </button>
-          
+
           <button
             onClick={() => {
               setOrdering("-reviews_count")
             }}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
-              ordering === "-reviews_count"
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${ordering === "-reviews_count"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}
+              }`}
           >
             <span>🗣</span> Most Reviewed
           </button>
-          
+
           <button
             onClick={() => {
               setOrdering("-courses_count")
             }}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
-              ordering === "-courses_count"
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${ordering === "-courses_count"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}
+              }`}
           >
             <span>📚</span> Most Courses
           </button>
-          
+
           <button
             onClick={() => {
               setOrdering("-created_at")
             }}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
-              ordering === "-created_at"
+            className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${ordering === "-created_at"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}
+              }`}
           >
             <span>🆕</span> Newest
           </button>
@@ -473,9 +466,9 @@ console.log("Areas state:", areas);
         </label>
 
         <select className="w-full bg-[#0f172a] border border-gray-700 rounded-lg text-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
-        value={city} onChange={(e) => {
-          setCity(e.target.value);
-        }}>
+          value={city} onChange={(e) => {
+            setCity(e.target.value);
+          }}>
           <option value="">All Cities</option>
           {cities.map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -510,7 +503,7 @@ console.log("Areas state:", areas);
       {/* Female Trainers */}
       <div className="space-y-2 mt-8">
         <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-          <Venus className="h-4 w-4 text-[#22d3ee]"/>
+          <Venus className="h-4 w-4 text-[#22d3ee]" />
           Female Trainers
         </label>
         <div className="flex items-center bg-[#0f172a] border border-gray-700 rounded-lg px-4 py-2.5">
@@ -536,27 +529,27 @@ console.log("Areas state:", areas);
           Transmission Type
         </label>
         <div className="flex gap-2">
-          
-            <button onClick={() => { setTransmissionFilter("manual"); }}  
+
+          <button onClick={() => { setTransmissionFilter("manual"); }}
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "manual"
-                ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
-                : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}>
-              Manual
-            </button>
-            <button onClick={() => { setTransmissionFilter("auto"); }}  
+              ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
+              : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
+              }`}>
+            Manual
+          </button>
+          <button onClick={() => { setTransmissionFilter("auto"); }}
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "auto"
-                ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
-                : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
+              ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
+              : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
+              }`}>
+            Auto
+          </button>
+          <button onClick={() => { setTransmissionFilter(""); }} className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
+            ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
+            : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
-              Auto
-            </button>
-            <button onClick={() => { setTransmissionFilter(""); }}  className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
-                ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
-                : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
-            }`}>
-              both
-            </button>
+            both
+          </button>
         </div>
       </div>
     </div>

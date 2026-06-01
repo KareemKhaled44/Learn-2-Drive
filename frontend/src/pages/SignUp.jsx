@@ -1,5 +1,5 @@
 import {React, useState} from 'react'
-import { Lock, User, Mail, Building , Eye, EyeOff } from 'lucide-react'
+import { Lock, User, Mail, Building, Phone, Eye, EyeOff } from 'lucide-react' // أضفنا Phone
 import { Link } from 'react-router-dom'
 import {Header} from '../exports/index.js';
 import api from "../exports/Axios.jsx";
@@ -19,6 +19,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    phone: '',        // أضفنا phone
     password: '',
     confirm_password: '',
     role: defaultRole
@@ -28,6 +29,7 @@ const SignUp = () => {
   const [errors, setErrors] = useState({
     username: '',
     email: '',
+    phone: '',        // أضفنا phone
     password: '',
     confirm_password: ''
   })
@@ -35,6 +37,7 @@ const SignUp = () => {
   const [touched, setTouched] = useState({
     username: false,
     email: false,
+    phone: false,     // أضفنا phone
     password: false,
     confirm_password: false
   })
@@ -55,6 +58,16 @@ const SignUp = () => {
           return 'Email is required'
         } else if (!/\S+@\S+\.\S+/.test(value)) {
           return 'Please enter a valid email address'
+        }
+        return ''
+      
+      case 'phone':     // إضافة التحقق من رقم الهاتف
+        if (!value.trim()) {
+          return 'Phone number is required'
+        } else if (!/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(value)) {
+          return 'Please enter a valid phone number'
+        } else if (value.replace(/[\s\-\(\)\+]/g, '').length < 10) {
+          return 'Phone number must be at least 10 digits'
         }
         return ''
       
@@ -83,6 +96,7 @@ const SignUp = () => {
     const newErrors = {
       username: validateField('username', formData.username),
       email: validateField('email', formData.email),
+      phone: validateField('phone', formData.phone),     // أضفنا phone
       password: validateField('password', formData.password),
       confirm_password: validateField('confirm_password', formData.confirm_password)
     }
@@ -128,6 +142,7 @@ const SignUp = () => {
     setTouched({
       username: true,
       email: true,
+      phone: true,      // أضفنا phone
       password: true,
       confirm_password: true
     })
@@ -142,6 +157,7 @@ const SignUp = () => {
       const response = await api.post('auth/register/', {
         username: formData.username,
         email: formData.email,
+        phone: formData.phone,      // أضفنا phone في الإرسال
         password: formData.password,
         confirm_password: formData.confirm_password,
         role: formData.role
@@ -153,9 +169,9 @@ const SignUp = () => {
         navigate(`/signin?role=${formData.role}`)
       }
     } catch (error) {
+      console.log(error.response?.data);
       if (error.response?.data) {
         const errors = error.response.data
-        // Set server errors to specific fields
         if (errors.username) {
           setErrors(prev => ({ ...prev, username: errors.username[0] }))
           toast.error(`Username: ${errors.username[0]}`)
@@ -163,6 +179,10 @@ const SignUp = () => {
         if (errors.email) {
           setErrors(prev => ({ ...prev, email: errors.email[0] }))
           toast.error(`Email: ${errors.email[0]}`)
+        }
+        if (errors.phone) {      // إضافة معالجة خطأ phone من الخادم
+          setErrors(prev => ({ ...prev, phone: errors.phone[0] }))
+          toast.error(`Phone: ${errors.phone[0]}`)
         }
         if (errors.password) {
           setErrors(prev => ({ ...prev, password: errors.password[0] }))
@@ -251,6 +271,35 @@ const SignUp = () => {
                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
                   {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone - الحقل الجديد */}
+            <div className="space-y-1">
+              <label className="text-gray-300 text-sm font-medium">Phone Number</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className={`h-5 w-5 ${errors.phone && touched.phone ? 'text-red-500' : 'text-[#22d3ee]'}`} />
+                </div>
+                <input
+                  type="tel"
+                  className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.phone && touched.phone 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-700 focus:ring-[#22d3ee]'
+                  }`}
+                  placeholder="+20 123 456 7890"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur('phone')}
+                  name="phone"
+                />
+              </div>
+              {errors.phone && touched.phone && (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
+                  {errors.phone}
                 </p>
               )}
             </div>

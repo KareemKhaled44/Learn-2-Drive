@@ -186,7 +186,7 @@ const Header = () => {
       return;
     }
     
-    // ✅ Handle Trainers separately (same as FAQ)
+    //  Handle Trainers separately (same as FAQ)
     if (item === 'Trainers') {
       handleTrainersNavigation();
       return;
@@ -272,7 +272,7 @@ const Header = () => {
         scrollToSection('faqs');
       }, 500);
     }
-    // ✅ Handle trainers hash navigation
+    //  Handle trainers hash navigation
     if (location.hash === '#trainers') {
       console.log('Hash detected, scrolling to Trainers');
       setTimeout(() => {

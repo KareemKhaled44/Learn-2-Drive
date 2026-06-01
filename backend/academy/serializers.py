@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from django.db.models import Avg, Count, Min
+from django.contrib.contenttypes.models import ContentType
 
 class AcademySerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
@@ -317,6 +318,29 @@ class ReviewSerializer(serializers.ModelSerializer):
         ).first()
 
         return rating.rating if rating else 0
+
+
+class UserReviewSerializer(ReviewSerializer):
+
+    comment = serializers.CharField(source="text", read_only=True)
+    course_title = serializers.SerializerMethodField()
+
+    class Meta(ReviewSerializer.Meta):
+        fields = [
+            "id",
+            "course_title",
+            "comment",
+            "created_at",
+            "rating",
+        ]
+
+    def get_course_title(self, obj):
+        target = getattr(obj, "content_object", None)
+
+        if target is None:
+            return "Course"
+
+        return getattr(target, "title", None) or getattr(target, "name", None) or str(target)
 
 class ReviewCreateSerializer(serializers.Serializer):
 

@@ -43,13 +43,42 @@ const Footer = () => {
     }
   }
 
+  // ✅ Function to handle Trainers navigation - same as FAQ (scroll to trainers section on home page)
+  const handleTrainersNavigation = () => {
+    const isHomePage = location.pathname === '/'
+    
+    if (isHomePage) {
+      // If on home page, scroll to Trainers section
+      const trainersSection = document.getElementById('trainers')
+      if (trainersSection) {
+        trainersSection.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }
+    } else {
+      // If on another page, navigate to home page with trainers hash
+      navigate('/#trainers')
+      // Wait for page to load then scroll to Trainers section
+      setTimeout(() => {
+        const trainersSection = document.getElementById('trainers')
+        if (trainersSection) {
+          trainersSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          })
+        }
+      }, 500)
+    }
+  }
+
   // Function to handle Contact Us navigation - always go to contact page
   const handleContactNavigation = () => {
     navigate('/contact-us')
     scrollToTop() // Scroll to top when navigating
   }
 
-  // Function to handle navigation for other items
+  // Function to handle navigation for other items (Home, Courses, Academies)
   const handleNavigation = (sectionId) => {
     const isHomePage = location.pathname === '/'
     
@@ -57,7 +86,6 @@ const Footer = () => {
     const pageUrls = {
       home: '/',
       courses: '/all-courses',
-      trainers: '/all-trainers',
       academies: '/all-academies',
     }
     
@@ -88,13 +116,25 @@ const Footer = () => {
     scrollToTop()
   }, [location.pathname])
 
-  // Effect to handle hash navigation (for FAQ from other pages)
+  // Effect to handle hash navigation (for FAQ and Trainers from other pages)
   useEffect(() => {
     if (location.hash === '#faqs') {
       setTimeout(() => {
         const faqSection = document.getElementById('faqs')
         if (faqSection) {
           faqSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          })
+        }
+      }, 300)
+    }
+    // ✅ Handle trainers hash navigation
+    if (location.hash === '#trainers') {
+      setTimeout(() => {
+        const trainersSection = document.getElementById('trainers')
+        if (trainersSection) {
+          trainersSection.scrollIntoView({ 
             behavior: 'smooth',
             block: 'start'
           })
@@ -154,8 +194,9 @@ const Footer = () => {
                 </button>
               </li>
               <li>
+                {/* ✅ Updated Trainers button to use handleTrainersNavigation */}
                 <button 
-                  onClick={() => handleNavigation('trainers')}
+                  onClick={handleTrainersNavigation}
                   className="text-gray-400 hover:text-[#22d3ee] transition-colors bg-transparent border-none cursor-pointer w-full text-left"
                 >
                   Trainers

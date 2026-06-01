@@ -1,3 +1,4 @@
+# dashboard/urls/bookings.py
 from django.urls import path
 from dashboard.views.bookings import (
     AcademyBookingListView,

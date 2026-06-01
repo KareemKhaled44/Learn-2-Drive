@@ -1,563 +1,403 @@
-POST http://127.0.0.1:8000/auth/login/ HTTP/1.1
+﻿### Authentication
+
+### Login with email
+POST http://127.0.0.1:8000/auth/login/
 Content-Type: application/json
 
 {
-  "username": "karim",
+  "email": "kemokingo44@gmail.com",
   "password": "787898787899"
 }
-###
-POST http://127.0.0.1:8000/api/reviews/ HTTP/1.1
+
+### Register as a regular user
+POST http://localhost:8000/auth/register/
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczMzMwMzI0LCJpYXQiOjE3NzMzMzAwMjQsImp0aSI6IjEwNzhkMDM3MWU5MjQxMjdiMTc4MWQ3OGJjZDg5YWYzIiwidXNlcl9pZCI6MX0.kf81O-NZ7AS35LHgeFoM5uqxTvsw03XtDRzK5N5edfE
+
+{
+  "username": "testuser",
+  "email": "testuser@gmail.com",
+  "password": "testpass123",
+  "confirm_password": "testpass123",
+  "role": "user"
+}
+
+### Register as an academy user
+POST http://localhost:8000/auth/register/
+Content-Type: application/json
+
+{
+  "username": "ahmedacademy",
+  "email": "testacademy@gmail.com",
+  "password": "testpass123",
+  "confirm_password": "testpass123",
+  "role": "academy"
+}
+
+### Register academy details
+POST http://localhost:8000/auth/register/academy/
+Content-Type: application/json
+
+{
+  "username": "Email Test",
+  "email": "kemokingo44@gmail.com",
+  "password": "testpass123",
+  "confirm_password": "testpass123",
+  "academy_name": "Email Test Academy",
+  "phone": "01012345678",
+  "description": "Testing email system"
+}
+
+### Login as a regular user
+POST http://localhost:8000/auth/login/
+Content-Type: application/json
+
+{
+  "email": "kemokingo44@gmail.com",
+  "password": "kemo&24680"
+}
+
+### Login as an approved academy
+### First approve the academy from Django admin, then try again
+POST http://localhost:8000/auth/login/
+Content-Type: application/json
+
+{
+  "email": "kemokingo44@gmail.com",
+  "password": "787898787899"
+}
+
+### Try to login as a pending academy
+POST http://localhost:8000/auth/login/
+Content-Type: application/json
+
+{
+  "email": "karimkfawzy44@gmail.com",
+  "password": "testpass123"
+}
+
+### Refresh token
+POST http://localhost:8000/auth/refresh/
+Content-Type: application/json
+
+{
+  "refresh": "<REFRESH_TOKEN>"
+}
+
+### Logout
+POST http://localhost:8000/auth/logout/
+Content-Type: application/json
+
+{
+  "refresh": "<REFRESH_TOKEN>"
+}
+
+### Get current user info
+GET http://localhost:8000/auth/me/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Validation examples
+
+### Wrong confirm password
+POST http://localhost:8000/auth/register/
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "email": "testuser2@gmail.com",
+  "password": "testpass123",
+  "confirm_password": "wrongpassword",
+  "role": "user"
+}
+
+### Duplicate username
+POST http://localhost:8000/auth/register/
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "different@gmail.com",
+  "password": "testpass123",
+  "confirm_password": "testpass123",
+  "role": "user"
+}
+
+### Bookings
+
+### Create a booking
+POST http://localhost:8000/bookings/create/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "course": 3,
+  "trainer": 3,
+  "scheduled_date": "2026-06-08",
+  "start_time": "09:00",
+  "notes": "I prefer morning sessions"
+}
+
+### Try to book the same trainer at the same date and time
+POST http://localhost:8000/bookings/create/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "course": 3,
+  "trainer": 7,
+  "scheduled_date": "2026-04-28",
+  "start_time": "10:00",
+  "notes": "duplicate booking test"
+}
+
+### Try to book as an academy user
+POST http://localhost:8000/bookings/create/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "course": 1,
+  "trainer": 3,
+  "scheduled_date": "2026-05-10",
+  "start_time": "09:00"
+}
+
+### Get all my bookings
+GET http://localhost:8000/bookings/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Get booking detail
+GET http://localhost:8000/bookings/30/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Cancel a booking
+PATCH http://localhost:8000/bookings/1/cancel/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Check available slots
+
+### Working day
+GET http://localhost:8000/bookings/availability/?trainer=3&course=3&date=2026-05-02
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Non-working day
+GET http://localhost:8000/bookings/availability/?trainer=6&course=1&date=2026-04-24
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Past date
+GET http://localhost:8000/bookings/availability/?trainer=7&course=2&date=2026-04-28
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Missing params
+GET http://localhost:8000/bookings/availability/?trainer=7&course=2
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Dashboard - academy profile
+
+### Get academy profile
+GET http://localhost:8000/dashboard/profile/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Update academy profile
+PATCH http://localhost:8000/dashboard/profile/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "name": "motaz academy",
+  "description": "We offer a wide range of courses in various fields including programming, design, marketing, and more. Our experienced instructors and comprehensive curriculum ensure that you gain the skills needed to succeed in your career."
+}
+
+### Add contact
+POST http://localhost:8000/dashboard/profile/contacts/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "type": "phone",
+  "value": "01012345678"
+}
+
+### Delete contact
+DELETE http://localhost:8000/dashboard/profile/contacts/18/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Try accessing profile with a regular user token
+GET http://localhost:8000/dashboard/profile/
+Authorization: Bearer <USER_ACCESS_TOKEN>
+
+### Dashboard - trainers
+
+### Create a trainer
+POST http://localhost:8000/dashboard/trainers/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "name": "John Doe",
+  "gender": "male",
+  "bio": "Test bio",
+  "car_model": "Honda Civic",
+  "experience_years": 5,
+  "working_days": ["monday", "sunday"],
+  "session_start_time": "09:00",
+  "session_end_time": "17:00",
+  "is_active": true
+}
+
+### Update trainer
+PATCH http://localhost:8000/dashboard/trainers/12/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "experience_years": 7
+}
+
+### Delete trainer
+DELETE http://localhost:8000/dashboard/trainers/12/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Dashboard - courses
+
+### Get all academy courses
+GET http://localhost:8000/dashboard/courses/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Add new course
+POST http://localhost:8000/dashboard/courses/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "title": "New Manual Course",
+  "description": "Learn manual driving",
+  "price": "299.00",
+  "sessions": 10,
+  "duration": 60,
+  "quantity": 20,
+  "transmission": "manual",
+  "is_active": true,
+  "trainers": [14]
+}
+
+### Get course detail
+GET http://localhost:8000/dashboard/courses/16/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Update course
+PATCH http://localhost:8000/dashboard/courses/16/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "price": "350.00",
+  "quantity": 25
+}
+
+### Delete course
+DELETE http://localhost:8000/dashboard/courses/16/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Dashboard - bookings
+
+### Get all academy bookings
+GET http://localhost:8000/dashboard/bookings/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Filter bookings by status
+GET http://localhost:8000/dashboard/bookings/?status=confirmed
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Filter bookings by trainer
+GET http://localhost:8000/dashboard/bookings/?trainer=14
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Filter bookings by course
+GET http://localhost:8000/dashboard/bookings/?course=17
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Get booking detail
+GET http://localhost:8000/dashboard/bookings/2/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Update booking status to completed
+PATCH http://localhost:8000/dashboard/bookings/2/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "status": "completed"
+}
+
+### Get academy booking stats
+GET http://localhost:8000/dashboard/bookings/stats/
+Authorization: Bearer <ACCESS_TOKEN>
+
+### Reviews
+
+### Review an academy
+POST http://localhost:8000/api/reviews/
+Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
 
 {
   "content_type": "academy",
   "object_id": 1,
   "rating": 5,
-  "text": "Great academy!"
+  "text": "Great academy, highly recommended!"
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-### 1 - Register as a regular user
-POST http://localhost:8000/auth/register/
-Content-Type: application/json
-
-{
-    "username": "testuser",
-    "email": "testuser@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "testpass123",
-    "role": "user"
-}
-
-### 2 - Register as an academy
-POST http://localhost:8000/auth/register/
-Content-Type: application/json
-
-{
-    "username": "ahmedacademy",
-    "email": "testacademy@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "testpass123",
-    "role": "academy"
-}
-
-### 3 - Register with wrong confirm password (should fail)
-POST http://localhost:8000/auth/register/
-Content-Type: application/json
-
-{
-    "username": "testuser2",
-    "email": "testuser2@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "wrongpassword",
-    "role": "user"
-}
-
-### 4 - Register with duplicate username (should fail)
-POST http://localhost:8000/auth/register/
-Content-Type: application/json
-
-{
-    "username": "testuser",
-    "email": "different@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "testpass123",
-    "role": "user"
-}
-
-### 5 - Login as user
-POST http://localhost:8000/auth/login/
-Content-Type: application/json
-
-{
-    "username": "karim",
-    "password": "787898787899"
-}
-
-### 6 - Login as academy
-POST http://localhost:8000/auth/login/
-Content-Type: application/json
-
-{
-    "username": "ahmedacademy",
-    "password": "testpass123"
-}
-
-### 7 - Refresh token (paste refresh token from login response)
-POST http://localhost:8000/auth/refresh/
-Content-Type: application/json
-
-{
-    "refresh": "your_refresh_token_here"
-}
-
-### 8 - Logout (paste refresh token from login response)
-POST http://localhost:8000/auth/logout/
-Content-Type: application/json
-
-{
-    "refresh": "your_refresh_token_here"
-}
-
-
-
-
-
-
-
-
-
-
-
-
-#########################################
-### 1 - Register as a regular user
-POST http://localhost:8000/auth/register/
-Content-Type: application/json
-
-{
-    "username": "ahmed",
-    "email": "ahmed@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "testpass123"
-}
-
-###
-
-### 2 - Register as an academy
-POST http://localhost:8000/auth/register/academy/
-Content-Type: application/json
-
-{
-    "username": "Email Test",
-    "email": "kemokingo44@gmail.com",
-    "password": "testpass123",
-    "confirm_password": "testpass123",
-    "academy_name": "Email Test Academy",
-    "phone": "01012345678",
-    "description": "Testing email system"
-}
-
-###
-
-### 3 - Try to login as pending academy (should fail)
-POST http://localhost:8000/auth/login/
-Content-Type: application/json
-
-{
-    "username": "oracademy",
-    "password": "testpass123"
-}
-
-###
-
-### 4 - Login as regular user (should succeed)
-POST http://localhost:8000/auth/login/
-Content-Type: application/json
-
-{
-    "email": "kemokingo44@gmail.com",
-    "password": "kemo&24680"
-}
-
-###
-
-### 5 - Login as approved academy (should succeed)
-### first go to django admin and set the academy status to approved
-### then try to login
-POST http://localhost:8000/auth/login/
-Content-Type: application/json
-
-{
-    "email": "kemokingo@gmail.com",
-    "password": "testpass123"
-}
-
-
-
-### Get current user info
-GET http://localhost:8000/auth/me/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTMyNDY1LCJpYXQiOjE3NzcxMzIxNjUsImp0aSI6IjU3NTNhNjNhOGM0ZjRjYzg5ZjUyNjY0ZWQ5NDc1N2QyIiwidXNlcl9pZCI6MTF9.Ee5Xfd9-7mqmNME1zJ5djzVym-7ybOTh58Xk6-aGXeA
-
-
-
-
-
-
-############################################
-##bookings
-###########################################
-### 1 - Create a booking (need access token from login)
-POST http://localhost:8000/bookings/create/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU4Mzk3LCJpYXQiOjE3NzcxNTgwOTcsImp0aSI6ImU2YTdkMmM5ODgzYzQyY2ZiMjRkYzNhYjc5NTFjMTA1IiwidXNlcl9pZCI6MX0.9fqlAz6P7DFPOb4Fes6sk-9i7PSdY-B77yiOom-0cpM
-
-{
-    "course": 3,
-    "trainer": 3,
-    "scheduled_date": "2026-05-2",
-    "start_time": "9:00",
-    "notes": "I prefer morning sessions"
-}
-
-###
-
-### 2 - Get all my bookings
-GET http://localhost:8000/bookings/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU3Njg0LCJpYXQiOjE3NzcxNTczODQsImp0aSI6IjM0MDdhNDc2ZjNiNTRkMmU5NzVlNDdjZGRjOTFiZjEwIiwidXNlcl9pZCI6MX0.5GN9INi6ZZc87Df2Rs0ZOa_y_Si6-9_pOMYofDiUfw0
-###
-
-### 3 - Get booking detail
-GET http://localhost:8000/bookings/13/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDY5MDYxLCJpYXQiOjE3NzgwNjg3NjEsImp0aSI6IjEyZWY2Y2YwMWM4MDRlYmI4NzY3OWMwNmMwMDUxYmQ2IiwidXNlcl9pZCI6MX0.nhiQGH8hY2xuVwPhc0IWr8hQocc2nUt9uubOjDK5IYE
-###
-
-### 4 - Cancel a booking
-PATCH http://localhost:8000/bookings/1/cancel/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NDU3NzcwLCJpYXQiOjE3NzY0NTc0NzAsImp0aSI6IjMwOGQzNjVhNmFmOTQzNmU4ZGI2NDRhZDhjMmM1N2UzIiwidXNlcl9pZCI6MX0.QwgE-6aHvJtdJ6CaijCflbOKxR2TdnhdirJjyBWJ1OQ
-
-###
-
-### 5 - Try to book same trainer at same date and time (should fail)
-POST http://localhost:8000/bookings/create/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2Nzc2LCJpYXQiOjE3NzcxNTY0NzYsImp0aSI6IjRiM2EwYjYyZDI0NTQ3ZDZiYzRkMWEwMGYyN2I2MjE4IiwidXNlcl9pZCI6MX0.PVklbw3km0mBlUuDhjMQnG4sQ5SLIep5RdxJb1kCDzI
-
-{
-    "course": 3,
-    "trainer": 7,
-    "scheduled_date": "2026-04-28",
-    "start_time": "10:00",
-    "notes": "duplicate booking test"
-}
-
-###
-
-### 6 - Try to book as academy (should fail)
-POST http://localhost:8000/bookings/create/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE5MTg5LCJpYXQiOjE3NzgwMTg4ODksImp0aSI6ImQxOTUwOWEyNDQ3ZTRiYjA5NDBjMmNjOGQxY2JiY2MwIiwidXNlcl9pZCI6MX0.BBBOslffadaRVDEYwpFRQESWmr2-Nh46I-I32b2jzzY
-
-{
-    "course": 1,
-    "trainer": 3,
-    "scheduled_date": "2026-05-10",
-    "start_time": "9:00"
-}
-
-### Additional tests for availability endpoint
-### 1 - Get available slots for a trainer on a working day
-GET http://localhost:8000/bookings/availability/?trainer=3&course=3&date=2026-05-02
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3NzUxOTY4LCJpYXQiOjE3Nzc3NTE2NjgsImp0aSI6ImQwNWU0OTJkYTg3MDRmZjM4NGYyZDJmNzMyNjQ0YjA1IiwidXNlcl9pZCI6MX0.sHL_HpsXluRJRYx-eR9V8hSLe_icEXklypAJ2CQKn8g
-
-###
-
-### 2 - Get available slots on a non working day (should return empty slots)
-GET http://localhost:8000/bookings/availability/?trainer=6&course=1&date=2026-04-24
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2NTUwMDEzLCJpYXQiOjE3NzY1NDk3MTMsImp0aSI6IjlmNzlhNmM1M2VmZDQzN2Q5M2I5ZjI5MDhiNDE5ZDc1IiwidXNlcl9pZCI6MX0.4TNgfwhZjIpt20TcPR0HLaozq25NKMLOzXgZtmpNnlg
-
-###
-
-### 3 - Get available slots with past date (should fail)
-GET http://localhost:8000/bookings/availability/?trainer=7&course=2&date=2026-04-28
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2MDI2LCJpYXQiOjE3NzcxNTU3MjYsImp0aSI6IjIzZTUzZDY1ZGFkOTRkYjQ5NTlkMDAzNTg4Mjc4ZDAyIiwidXNlcl9pZCI6MX0.j7irfdfMolLQr-CODKIp1YKQipr37WyHS5moEDSUKxE
-
-###
-
-### 4 - Get available slots with missing params (should fail)
-GET http://localhost:8000/bookings/availability/?trainer=7&course=2
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTU2MDI2LCJpYXQiOjE3NzcxNTU3MjYsImp0aSI6IjIzZTUzZDY1ZGFkOTRkYjQ5NTlkMDAzNTg4Mjc4ZDAyIiwidXNlcl9pZCI6MX0.j7irfdfMolLQr-CODKIp1YKQipr37WyHS5moEDSUKxE
-
-### Get booking detail with schedule
-GET http://localhost:8000/bookings/12/
-Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE5MTg5LCJpYXQiOjE3NzgwMTg4ODksImp0aSI6ImQxOTUwOWEyNDQ3ZTRiYjA5NDBjMmNjOGQxY2JiY2MwIiwidXNlcl9pZCI6MX0.BBBOslffadaRVDEYwpFRQESWmr2-Nh46I-I32b2jzzY
-
-###################################################
-##academy dashboard
-###################################################
-### 1 - Get academy profile
-GET http://localhost:8000/dashboard/profile/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM3NzM4LCJpYXQiOjE3NzcxMzc0MzgsImp0aSI6IjZhYTA4MmQxZDgwNzQxNjc4NmExM2YxOWFlZTQ2MGIyIiwidXNlcl9pZCI6MTF9.DV8MzXJE4K7qs1VZKXPgzboDgm9Djhz5e7WJfAPWbkE
-
-###
-
-### 2 - Update academy profile
-PATCH http://localhost:8000/dashboard/profile/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
-Content-Type: application/json
-
-{
-    "name": "motaz academy",
-    "description": "We offer a wide range of courses in various fields including programming, design, marketing, and more. Our experienced instructors and comprehensive curriculum ensure that you gain the skills needed to succeed in your career."
-}
-
-###
-
-### 3 - Add contact
-POST http://localhost:8000/dashboard/profile/contacts/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
-Content-Type: application/json
-
-{
-    "type": "phone",
-    "value": "01012345678"
-}
-
-###
-
-### 4 - Delete contact
-DELETE http://localhost:8000/dashboard/profile/contacts/18/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MDcyLCJpYXQiOjE3NzcxMzc3NzIsImp0aSI6ImM0ZGQxZGQ1YTM5NzQ3MzE4NzMyOWY4MmNjMmQxYTI3IiwidXNlcl9pZCI6MTF9.-o9bhem4_OC3HkB1r8e-G7zzMUm7dy3hzkvXhavX89E
-
-###
-
-### 5 - Try accessing with regular user token (should fail)
-GET http://localhost:8000/dashboard/profile/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTM4MjQyLCJpYXQiOjE3NzcxMzc5NDIsImp0aSI6IjRhMjRlYjQwZDhlYzRlYjM5NmE2NmNlM2E0N2M2ZjdlIiwidXNlcl9pZCI6MX0.XNfA0yTZwVGQaIp3WxbthumHdn6JY6gXaxhAw66RkNs
-
-###########
-## trainer dashboard
-###########
-## 1 - Create a trainer
-POST http://localhost:8000/dashboard/trainers/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE2MDI5LCJpYXQiOjE3NzgwMTU3MjksImp0aSI6IjZmNjEyNDVmMjUyMTRjNGFiYmY0YTUyNGZmODc3ZjZjIiwidXNlcl9pZCI6MTF9.QjvcicbiCL8ycJbtSzQkrttbNzsCYKbPwjzCHOr3oCw
-Content-Type: application/json
-
-{
-    "name": "John Doe",
-    "gender": "male",
-    "bio": "Test bio",
-    "car_model": "Honda Civic",
-    "experience_years": 5,
-    "working_days": ["monday", "sunday"],
-    "session_start_time": "9:00",
-    "session_end_time": "17:00",
-    "is_active": true
-}
-
-###
-### 2 - Update trainer
-PATCH http://localhost:8000/dashboard/trainers/12/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MDA0LCJpYXQiOjE3NzcxNDY3MDQsImp0aSI6IjhhZTI5MWExNDNlNzQwMjdiOTdhMzRmY2FlNWQ2NmVmIiwidXNlcl9pZCI6MTF9.elqFk2OlwZhdZfCKBwu7a2V0nBVwsE9CXtTozk8BcjE
-Content-Type: application/json
-
-{
-    "experience_years": 7
-}
-
-### 3 - Delete trainer
-DELETE http://localhost:8000/dashboard/trainers/12/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3MDA0LCJpYXQiOjE3NzcxNDY3MDQsImp0aSI6IjhhZTI5MWExNDNlNzQwMjdiOTdhMzRmY2FlNWQ2NmVmIiwidXNlcl9pZCI6MTF9.elqFk2OlwZhdZfCKBwu7a2V0nBVwsE9CXtTozk8BcjE
-
-########
-### courses dashboard
-########
-### 1 - Get all academy courses
-GET http://localhost:8000/dashboard/courses/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
-
-###
-
-### 2 - Add new course
-POST http://localhost:8000/dashboard/courses/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3NTI3LCJpYXQiOjE3NzcxNDcyMjcsImp0aSI6ImJmOTA3NWIyZTRmYzRmNzc4ZDc5OGVjYzg3YTMzNzM4IiwidXNlcl9pZCI6MTF9.H40Hap4NlTpj1W4UJqVsSgOfxPgQrecQ4hmDbKH1pK0
-Content-Type: application/json
-
-{
-    "title": "New Manual Course",
-    "description": "Learn manual driving",
-    "price": "299.00",
-    "sessions": 10,
-    "duration": 60,
-    "quantity": 20,
-    "transmission": "manual",
-    "is_active": true,
-    "trainers": [14]
-}
-
-###
-
-### 3 - Get course detail
-GET http://localhost:8000/dashboard/courses/16/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3NTI3LCJpYXQiOjE3NzcxNDcyMjcsImp0aSI6ImJmOTA3NWIyZTRmYzRmNzc4ZDc5OGVjYzg3YTMzNzM4IiwidXNlcl9pZCI6MTF9.H40Hap4NlTpj1W4UJqVsSgOfxPgQrecQ4hmDbKH1pK0
-
-###
-
-### 4 - Update course
-PATCH http://localhost:8000/dashboard/courses/16/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
-Content-Type: application/json
-
-{
-    "price": "350.00",
-    "quantity": 25
-}
-
-###
-
-### 5 - Delete course
-DELETE http://localhost:8000/dashboard/courses/16/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTQ3ODM3LCJpYXQiOjE3NzcxNDc1MzcsImp0aSI6IjVmZTY5NWEwODE3MjQwZjVhM2Y5MDIwZGE5YjUxYzA2IiwidXNlcl9pZCI6MTF9.ifyYHv0duCvNY2chbmIQTQcdH3MOHXVQN-N0YRo76AM
-
-############
-###booking dashboard
-############
-### 1 - Get all academy bookings
-GET http://localhost:8000/dashboard/bookings/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-
-###
-
-### 2 - Get bookings filtered by status
-GET http://localhost:8000/dashboard/bookings/?status=confirmed
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-
-
-###
-
-### 3 - Get bookings filtered by trainer
-GET http://localhost:8000/dashboard/bookings/?trainer=14
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-
-
-###
-
-### 4 - Get bookings filtered by course
-GET http://localhost:8000/dashboard/bookings/?course=17
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-
-###
-
-### 5 - Get booking detail
-GET http://localhost:8000/dashboard/bookings/2/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-
-###
-
-### 6 - Update booking status to completed
-PATCH http://localhost:8000/dashboard/bookings/2/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3MTUwMTA3LCJpYXQiOjE3NzcxNDk4MDcsImp0aSI6IjNlNTgxOGY3OWUxZjQ1NmE5NmFhNTA0ZmE0NjhiOGZjIiwidXNlcl9pZCI6MTF9.uJZXpnGm-XDxq1Xsq_soUvbK1q1SKYp9wQGJK0msMJY
-Content-Type: application/json
-
-{
-    "status": "completed"
-}
-
-###
-
-### 7 - Get academy booking stats
-GET http://localhost:8000/dashboard/bookings/stats/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4MDE0OTI4LCJpYXQiOjE3NzgwMTQ2MjgsImp0aSI6IjA1NmE3Njc5MTNmNzQ0OThiODNjNTY3MTZkZjc5ZDJmIiwidXNlcl9pZCI6MTF9.I6yxqREDacy-RW7jJWIIlOIWWEp36CQUqaz0tbnzMSw
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 1 - Review an academy
+### Review a course
 POST http://localhost:8000/api/reviews/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5OTc1Mzk3LCJpYXQiOjE3Nzk5NzUwOTcsImp0aSI6ImM1OGU2YTRiYjU4MzRjMTlhYzQ4MDc0ODhmMGQzN2FiIiwidXNlcl9pZCI6MX0.P-MhwpH6kIM-lLiWhRmjM0pZMB6UxR27Tjy2Cr3y0vA
 Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
 
 {
-    "content_type": "academy",
-    "object_id": 1,
-    "rating": 5,
-    "text": "Great academy, highly recommended!"
+  "content_type": "course",
+  "object_id": 1,
+  "rating": 4,
+  "text": "Very good course, learned a lot!"
 }
 
-###
-
-### 2 - Review a course
+### Review a trainer
 POST http://localhost:8000/api/reviews/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc5OTc1Mzk3LCJpYXQiOjE3Nzk5NzUwOTcsImp0aSI6ImM1OGU2YTRiYjU4MzRjMTlhYzQ4MDc0ODhmMGQzN2FiIiwidXNlcl9pZCI6MX0.P-MhwpH6kIM-lLiWhRmjM0pZMB6UxR27Tjy2Cr3y0vA
 Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
 
 {
-    "content_type": "course",
-    "object_id": 1,
-    "rating": 4,
-    "text": "Very good course, learned a lot!"
+  "content_type": "trainer",
+  "object_id": 1,
+  "rating": 5,
+  "text": "Amazing trainer, very patient!"
 }
 
-###
-
-### 3 - Review a trainer
-POST http://localhost:8000/reviews/
-Authorization: Bearer your_user_token_here
+### Try to review the same object twice
+POST http://localhost:8000/api/reviews/
 Content-Type: application/json
+Authorization: Bearer <ACCESS_TOKEN>
 
 {
-    "content_type": "trainer",
-    "object_id": 1,
-    "rating": 5,
-    "text": "Amazing trainer, very patient!"
+  "content_type": "academy",
+  "object_id": 1,
+  "rating": 3,
+  "text": "Trying to review again"
 }
 
-###
-
-### 4 - Try to review same object twice (should fail)
-POST http://localhost:8000/reviews/
-Authorization: Bearer your_user_token_here
+### Try to review without a token
+POST http://localhost:8000/api/reviews/
 Content-Type: application/json
 
 {
-    "content_type": "academy",
-    "object_id": 1,
-    "rating": 3,
-    "text": "Trying to review again"
-}
-
-###
-
-### 5 - Try without token (should fail)
-POST http://localhost:8000/reviews/
-Content-Type: application/json
-
-{
-    "content_type": "academy",
-    "object_id": 1,
-    "rating": 5,
-    "text": "No token test"
+  "content_type": "academy",
+  "object_id": 1,
+  "rating": 5,
+  "text": "No token test"
 }

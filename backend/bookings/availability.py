@@ -1,14 +1,13 @@
+# availability.py
 from datetime import datetime, timedelta
 from .models import Booking
 
 
 def get_available_slots(trainer, date, course):
-    """
-    Returns a list of available time slots for a trainer on a given date.
-    """
+    #Returns a list of available time slots for a trainer on a given date.
 
     # 1 - check if the date is a working day for the trainer
-    day_name = date.strftime('%A').lower()  # e.g. "saturday"
+    day_name = date.strftime('%A').lower() 
     if day_name not in trainer.working_days:
         return []
 

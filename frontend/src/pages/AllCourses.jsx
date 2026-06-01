@@ -4,10 +4,10 @@ import api from '@/exports/Axios.jsx';
 import { Clock, Venus , Star, Filter, X, Search, Eye, MapPin, ArrowUpDown, DollarSign , Users, Car, Award, Settings, Zap   } from 'lucide-react'
 import {Header} from '../exports/index.js';
 import CarLoading from '../components/ui/loading/CarLoading.jsx';
-import { useNavigate } from 'react-router-dom'; // 👈 أضف هذا الاستيراد
+import { useNavigate } from 'react-router-dom'; 
 
 const AllCourses = () => {
-  const navigate = useNavigate(); // 👈 أضف هذا الـ hook
+  const navigate = useNavigate(); 
   
   const [searchQuery, setSearchQuery] = useState('')
   const [courses , setCourses] = useState([])
@@ -20,7 +20,6 @@ const AllCourses = () => {
   const [minPrice, setMinPrice] = useState(null)
   const [maxPrice, setMaxPrice] = useState(null)
   
-  // 👈 أضف هذه الدالة للتنقل إلى تفاصيل الكورس
   const handleViewCourse = (courseId) => {
     navigate(`/courses/${courseId}`)
   }
@@ -411,7 +410,6 @@ const FilterContent = ({
           <button
             onClick={() => {
               setOrdering("-avg_rating")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
               ordering === "-avg_rating"
@@ -425,7 +423,6 @@ const FilterContent = ({
           <button
             onClick={() => {
               setOrdering("-reviews_count");
-              setIsFilterOpen(false);
             }}
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${
               ordering === "-reviews_count"
@@ -439,7 +436,6 @@ const FilterContent = ({
           <button
             onClick={() => {
             setOrdering("price")        
-            setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${
               ordering === "price"
@@ -453,7 +449,6 @@ const FilterContent = ({
           <button
             onClick={() => {
               setOrdering("-price")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${
               ordering === "-price"
@@ -517,7 +512,6 @@ const FilterContent = ({
         <button
           onClick={() => {
             applyPriceRange();
-            setIsFilterOpen(false);
           }}
           className="w-full py-2 bg-[#22d3ee]/10 border border-[#22d3ee] text-[#22d3ee] rounded-lg text-sm hover:bg-[#22d3ee] hover:text-white transition"
         >
@@ -533,21 +527,21 @@ const FilterContent = ({
         </label>
         <div className="flex gap-2">
           
-            <button onClick={() => { setTransmissionFilter("manual"); setIsFilterOpen(false); }}  
+            <button onClick={() => { setTransmissionFilter("manual"); }}  
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "manual"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
               Manual
             </button>
-            <button onClick={() => { setTransmissionFilter("auto"); setIsFilterOpen(false); }}  
+            <button onClick={() => { setTransmissionFilter("auto"); }}  
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "auto"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
               Auto
             </button>
-            <button onClick={() => { setTransmissionFilter(""); setIsFilterOpen(false); }}  className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
+            <button onClick={() => { setTransmissionFilter(""); }}  className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
@@ -564,7 +558,7 @@ const FilterContent = ({
         </label>
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => { setDuration("short"); setIsFilterOpen(false); }}  
+            onClick={() => { setDuration("short"); }}  
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${duration === "short"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
@@ -572,7 +566,7 @@ const FilterContent = ({
             Short (1-6 sessions)
           </button>
           <button
-            onClick={() => { setDuration("medium"); setIsFilterOpen(false); }}  
+            onClick={() => { setDuration("medium"); }}  
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${duration === "medium"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
@@ -580,7 +574,7 @@ const FilterContent = ({
             Regular (6-10 sessions)
           </button>
           <button
-            onClick={() => { setDuration("long"); setIsFilterOpen(false); }}  
+            onClick={() => { setDuration("long"); }}  
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${duration === "long"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
@@ -588,7 +582,7 @@ const FilterContent = ({
             Full (11-20 sessions)
           </button>
           <button
-            onClick={() => { setDuration("intensive"); setIsFilterOpen(false); }}  
+            onClick={() => { setDuration("intensive"); }}  
             className={`flex items-center justify-center gap-1 py-2 rounded-md text-xs transition ${duration === "intensive"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
@@ -611,7 +605,6 @@ const FilterContent = ({
             checked={femaleTrainer}
             onChange={(e) => {
               setFemaleTrainer(e.target.checked);
-              setIsFilterOpen(false);
             }}
             className="w-4 h-4 bg-[#0f172a] border-gray-600 rounded focus:ring-[#22d3ee] text-[#22d3ee]"
           />

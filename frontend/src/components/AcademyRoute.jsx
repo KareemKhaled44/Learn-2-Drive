@@ -1,3 +1,4 @@
+// src/components/AcademyRoute.jsx
 import { Navigate } from 'react-router-dom'
 
 const AcademyRoute = ({ children }) => {

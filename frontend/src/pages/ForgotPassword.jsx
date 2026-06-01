@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -9,6 +9,10 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
   const [emailVerified, setEmailVerified] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [resetMode, setResetMode] = useState(false);
+  const [uid, setUid] = useState("");
+  const [token, setToken] = useState("");
+  const API_BASE = "http://localhost:8000";
   const initialEmailValues = { email: "" };
   const emailSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Email is required"),
@@ -22,31 +26,63 @@ const ForgotPassword = () => {
       .required("Confirm password is required"),
   });
   const handleEmailSubmit = (values, { setFieldError }) => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const normalizedEmail = values.email.trim().toLowerCase();
-    const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-
-    if (!user) {
-      setFieldError("email", "Email does not exist");
-      return;
-    }
-
-    setUserEmail(normalizedEmail);
-    setEmailVerified(true);
+    const email = values.email.trim().toLowerCase();
+    fetch(`${API_BASE}/auth/password-reset/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    })
+      .then((res) => res.json().then((data) => ({ status: res.status, data })))
+      .then(({ status, data }) => {
+        if (status === 200) {
+          toast.success(data.detail || "If an account exists, a reset link was sent.");
+          setUserEmail(email);
+          setEmailVerified(true);
+        } else {
+          const err = data.email || data.detail || JSON.stringify(data);
+          setFieldError("email", err);
+        }
+      })
+      .catch((err) => {
+        setFieldError("email", "Network error. Try again later.");
+      });
   };
 
   const handlePasswordSubmit = (values) => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.map((u) =>
-      u.email.toLowerCase() === userEmail
-        ? { ...u, password: values.newPassword }
-        : u
-    );
+    const payload = resetMode
+      ? { uid, token, new_password: values.newPassword }
+      : { uid: null, token: null, new_password: values.newPassword };
 
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    toast.success("Password updated successfully!");
-    navigate("/signin");
+    fetch(`${API_BASE}/auth/password-reset-confirm/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json().then((data) => ({ status: res.status, data })))
+      .then(({ status, data }) => {
+        if (status === 200) {
+          toast.success(data.detail || "Password updated successfully!");
+          navigate("/signin");
+        } else {
+          toast.error(data.detail || JSON.stringify(data));
+        }
+      })
+      .catch(() => {
+        toast.error("Network error. Try again later.");
+      });
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const qUid = params.get('uid');
+    const qToken = params.get('token');
+    if (qUid && qToken) {
+      setUid(qUid);
+      setToken(qToken);
+      setResetMode(true);
+      setEmailVerified(true);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0f172a] to-[#1e293b] px-4">

@@ -3,7 +3,7 @@ export { default as Hero } from '../components/hero'
 export { default as PopularAcademies } from '../components/academies'
 export { default as Footer } from '../components/footer'
 export { default as Courses } from '../components/courses'
-export { default as Trainers } from '../components/trainers'
+export { default as Trainers } from '../components/trainer'
 export { default as FAQs } from '../components/faqs'
 
 export { default as HeroImage } from "../assets/img/Hero.png";

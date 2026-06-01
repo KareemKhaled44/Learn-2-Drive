@@ -4,6 +4,7 @@ from django.db import models
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 
 def _normalize_working_days(working_days):
@@ -54,9 +55,14 @@ class Booking(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     class Meta:
-        # prevent double booking same trainer at same date and time
-        unique_together = ['trainer', 'scheduled_date', 'start_time']
         ordering = ['-booked_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['trainer', 'scheduled_date', 'start_time'],
+                condition=Q(status='confirmed'),
+                name='unique_confirmed_booking_slot',
+            )
+        ]
 
     def clean(self):
         errors = {}

@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import AllowAny
 from .models import *
 from .serializers import *
@@ -119,7 +120,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
     serializer_class = CourseSerializer
     search_fields = ['title']
     filterset_class = CourseFilter
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     ordering_fields = ['avg_rating', 'reviews_count', 'created_at', 'price']
     
     def get_queryset(self):
@@ -215,10 +216,22 @@ class ContactMessageCreateView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = ContactMessageSerializer
 
-class ReviewCreateView(generics.CreateAPIView):
+class ReviewCreateView(generics.ListCreateAPIView):
 
-    serializer_class = ReviewCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return UserReviewSerializer
+        return ReviewCreateSerializer
+
+    def get_queryset(self):
+        return (
+            Review.objects
+            .filter(user=self.request.user)
+            .select_related('user', 'content_type')
+            .order_by('-created_at')
+        )
 
     def create(self, request, *args, **kwargs):
 

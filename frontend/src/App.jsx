@@ -26,6 +26,10 @@ import AcademyRoute from './components/AcademyRoute'
 import Booking from './pages/Booking';
 import BookingDetail from './pages/BookingDetail';
 import MyBookings from './pages/MyBookings';
+import UserDashboard from "./pages/User_Dashboard/UserDashboard";
+import UserProfile from "./pages/User_Dashboard/UserProfile";
+import UserBookings from "./pages/User_Dashboard/UserBooking";
+import UserRatings from "./pages/User_Dashboard/UserRating";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 const AppLayout = () => {
@@ -65,10 +69,17 @@ const AppLayout = () => {
         <Route path="/courses/:id" element={<CourseDetails/>} />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ForgotPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
         <Route path="/booking/course/:courseId" element={<Booking />} />
         <Route path="/booking/:id" element={<BookingDetail />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        {/* User Dashboard Routes */}
+        <Route path="/userdashboard" element={<UserDashboard />}>
+          <Route index element={<UserProfile />} />
+          <Route path="bookings" element={<UserBookings />} />
+          <Route path="ratings" element={<UserRatings />} />
+        </Route>
         
       </Routes>
       {!isDashboard && <Footer />}   

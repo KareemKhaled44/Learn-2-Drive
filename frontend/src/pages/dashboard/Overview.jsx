@@ -134,7 +134,7 @@ const Overview = () => {
                 <p className="text-slate-300 text-sm">Welcome back! Here's your academy summary.</p>
                 <div className="h-1 w-16 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#1e40af]" />
             </div>
-
+            {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {statCards.map((card, idx) => {
                     const Icon = card.icon
@@ -154,7 +154,7 @@ const Overview = () => {
                     )
                 })}
             </div>
-
+            {/* Booking Mix & Revenue Trend */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="dash-card p-6 xl:col-span-2">
                     <div className="flex items-center justify-between mb-5">
@@ -255,6 +255,7 @@ const Overview = () => {
                 </div>
             </div>
 
+            {/* Weekly Sessions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="dash-card p-6">
                     <div className="flex items-center justify-between mb-5">
@@ -282,7 +283,7 @@ const Overview = () => {
                         </div>
                     )}
                 </div>
-
+                {/* Quick Links */}
                 <div className="dash-card p-6">
                     <h3 className="text-white font-bold mb-4">Quick Links</h3>
                     <div className="grid grid-cols-2 gap-3">

@@ -29,20 +29,19 @@ const AllAcademies = () => {
 
   const getAcademies = useCallback((page = 1) => {
     setLoading(true);
-
     const params = new URLSearchParams();
     if (femaleTrainer) params.append('has_female_trainer', 'true');
 
-    api.get(`api/academies/?page=${page}&search=${searchQuery}&ordering=${ordering}&location__city=${city}&location__area=${area}&courses__transmission=${transmissionFilter}&${params.toString()}`)
+    api.get(`api/academies/?page=${page}
+      &search=${searchQuery}&ordering=${ordering}&location__city=${city}
+      &location__area=${area}&courses__transmission=${transmissionFilter}
+      &${params.toString()}`)
       .then(async response => {
-        // Delay تجريبي
+        
         await new Promise(resolve => setTimeout(resolve, 500));
         setAcademies(response.data.results);
-
         setCount(response.data.count);
-
         setCurrentPage(page);
-
       })
       .catch(error => {
         console.error(error);
@@ -415,7 +414,6 @@ console.log("Areas state:", areas);
           <button
             onClick={() => {
               setOrdering("-avg_rating")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
               ordering === "-avg_rating"
@@ -429,7 +427,6 @@ console.log("Areas state:", areas);
           <button
             onClick={() => {
               setOrdering("-reviews_count")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
               ordering === "-reviews_count"
@@ -443,7 +440,6 @@ console.log("Areas state:", areas);
           <button
             onClick={() => {
               setOrdering("-courses_count")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
               ordering === "-courses_count"
@@ -457,7 +453,6 @@ console.log("Areas state:", areas);
           <button
             onClick={() => {
               setOrdering("-created_at")
-              setIsFilterOpen(false)
             }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition ${
               ordering === "-created_at"
@@ -500,7 +495,6 @@ console.log("Areas state:", areas);
             value={area}
             onChange={(e) => {
               setArea(e.target.value);
-              setIsFilterOpen(false);
             }}
           >
             <option value="">All Areas</option>
@@ -526,7 +520,6 @@ console.log("Areas state:", areas);
             checked={femaleTrainer}
             onChange={(e) => {
               setFemaleTrainer(e.target.checked);
-              setIsFilterOpen(false);
             }}
             className="w-4 h-4 bg-[#0f172a] border-gray-600 rounded focus:ring-[#22d3ee] text-[#22d3ee]"
           />
@@ -544,21 +537,21 @@ console.log("Areas state:", areas);
         </label>
         <div className="flex gap-2">
           
-            <button onClick={() => { setTransmissionFilter("manual"); setIsFilterOpen(false); }}  
+            <button onClick={() => { setTransmissionFilter("manual"); }}  
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "manual"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
               Manual
             </button>
-            <button onClick={() => { setTransmissionFilter("auto"); setIsFilterOpen(false); }}  
+            <button onClick={() => { setTransmissionFilter("auto"); }}  
             className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === "auto"
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>
               Auto
             </button>
-            <button onClick={() => { setTransmissionFilter(""); setIsFilterOpen(false); }}  className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
+            <button onClick={() => { setTransmissionFilter(""); }}  className={`flex-1 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-gray-300 hover:border-[#22d3ee] text-sm transition ${transmissionFilter === ""
                 ? 'bg-[#22d3ee] text-[#0f172a] font-medium'
                 : 'bg-[#0f172a] border border-gray-700 text-gray-300 hover:border-[#22d3ee] hover:text-[#22d3ee]'
             }`}>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Lock, Building, User } from 'lucide-react'
+import { Lock, Building, User, Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {Header} from '../exports/index.js';
 import api from "../exports/Axios.jsx";
@@ -12,7 +12,7 @@ const SignIn = () => {
     const location = useLocation()
     const searchParams = new URLSearchParams(location.search)
     const defaultRole = searchParams.get('role') || 'user'
-    
+    const [showPassword, setShowPassword] = useState(false)
     // Separate state for each field (simpler and more reliable)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -235,18 +235,20 @@ const SignIn = () => {
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Lock className={`h-5 w-5 ${errors.password ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                                 </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+                                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                >
+                                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
                                 <input
-                                    type="password"
-                                    className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
-                                        errors.password 
-                                            ? 'border-red-500 focus:ring-red-500' 
-                                            : 'border-gray-700 focus:ring-[#22d3ee]'
-                                    }`}
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={handlePasswordChange}
-                                    aria-invalid={!!errors.password}
-                                    aria-describedby={errors.password ? "password-error" : undefined}
+                                  type={showPassword ? 'text' : 'password'}
+                                  className="w-full pl-10 pr-12 py-3 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                                  placeholder="••••••••"
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
                             {errors.password && (

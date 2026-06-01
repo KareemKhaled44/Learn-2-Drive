@@ -28,6 +28,7 @@ const UserProfile = () => {
 
     // Edit states
     const [editName, setEditName] = useState('');
+    const [editEmail, setEditEmail] = useState('');
     const [editPhone, setEditPhone] = useState('');
     const [errors, setErrors] = useState(null);
     const [status, setStatus] = useState(null);
@@ -51,18 +52,19 @@ const UserProfile = () => {
     const fetchUserData = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/dashboard/user/profile/');
+            const res = await api.get('/auth/me/');
             const data = res.data;
             
-            if (data.name) localStorage.setItem("userName", data.name);
+            if (data.username) localStorage.setItem("userName", data.username);
             if (data.email) localStorage.setItem("userEmail", data.email);
             if (data.phone) localStorage.setItem("userPhone", data.phone);
             
-            setUserName(data.name || localStorage.getItem("userName") || "User");
+            setUserName(data.username || localStorage.getItem("userName") || "User");
             setUserEmail(data.email || localStorage.getItem("userEmail") || "");
             setUserPhone(data.phone || localStorage.getItem("userPhone") || "");
             
-            setEditName(data.name || localStorage.getItem("userName") || "");
+            setEditName(data.username || localStorage.getItem("userName") || "");
+            setEditEmail(data.email || localStorage.getItem("userEmail") || "");
             setEditPhone(data.phone || localStorage.getItem("userPhone") || "");
             
         } catch (err) {
@@ -72,6 +74,7 @@ const UserProfile = () => {
             setUserPhone(localStorage.getItem("userPhone") || "");
             
             setEditName(localStorage.getItem("userName") || "");
+            setEditEmail(localStorage.getItem("userEmail") || "");
             setEditPhone(localStorage.getItem("userPhone") || "");
             
             if (err.response?.status === 401) {
@@ -90,17 +93,20 @@ const UserProfile = () => {
         setStatus(null);
         
         try {
-            const response = await api.patch('/dashboard/user/profile/', {
+            const response = await api.patch('/auth/me/', {
                 name: editName,
+                email: editEmail,
                 phone: editPhone,
             });
             
             const data = response.data;
             
-            if (data.name) localStorage.setItem("userName", data.name);
+            if (data.username) localStorage.setItem("userName", data.username);
+            if (data.email) localStorage.setItem("userEmail", data.email);
             if (data.phone) localStorage.setItem("userPhone", data.phone);
             
-            setUserName(data.name || editName);
+            setUserName(data.username || editName);
+            setUserEmail(data.email || editEmail);
             setUserPhone(data.phone || editPhone);
             
             setStatus({ type: 'success', message: 'Profile updated successfully!' });
@@ -123,6 +129,7 @@ const UserProfile = () => {
     const cancelEdit = () => {
         setIsEditing(false);
         setEditName(userName);
+        setEditEmail(userEmail);
         setEditPhone(userPhone);
         setErrors(null);
     };
@@ -199,6 +206,18 @@ const UserProfile = () => {
                                 onChange={(e) => setEditName(e.target.value)} 
                                 className="dash-input text-sm sm:text-base" 
                                 placeholder="Your full name"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-gray-400 text-xs sm:text-sm block mb-1 sm:mb-2">Email Address</label>
+                            <input 
+                                type="email"
+                                value={editEmail} 
+                                onChange={(e) => setEditEmail(e.target.value)} 
+                                className="dash-input text-sm sm:text-base" 
+                                placeholder="your@email.com"
                                 required
                             />
                         </div>

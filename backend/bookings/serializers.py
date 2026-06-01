@@ -2,8 +2,10 @@ from datetime import datetime, timedelta
 
 from rest_framework import serializers
 from django.utils import timezone
+from django.db import transaction
 from .models import Booking
 from academy.models import Course, Trainer
+from authentication.emails import send_booking_confirmation_email
 
 
 def _normalize_working_days(working_days):
@@ -101,17 +103,22 @@ class BookingCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         course = validated_data['course']
 
-        # set total price from course price
-        validated_data['total_price'] = course.price
+        with transaction.atomic():
+            # set total price from course price
+            validated_data['total_price'] = course.price
 
-        # set the user from request
-        validated_data['user'] = self.context['request'].user
+            # set the user from request
+            validated_data['user'] = self.context['request'].user
 
-        # increment quantity sold
-        course.quantity_sold += 1
-        course.save()
+            # increment quantity sold
+            course.quantity_sold += 1
+            course.save()
 
-        return Booking.objects.create(**validated_data)
+            booking = Booking.objects.create(**validated_data)
+
+            transaction.on_commit(lambda: send_booking_confirmation_email(booking))
+
+        return booking
 
 
 class BookingListSerializer(serializers.ModelSerializer):

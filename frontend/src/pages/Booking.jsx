@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { Calendar, Clock, User, CheckCircle, AlertCircle, ArrowLeft, Loader } from 'lucide-react'
+import { Calendar, Clock, User, CheckCircle, AlertCircle, ArrowLeft, Loader, Wallet, CreditCard } from 'lucide-react'
 import api from '../exports/Axios.jsx'
 import { format } from 'date-fns'
 import CarLoading from '../components/ui/loading/CarLoading.jsx'
@@ -11,6 +11,8 @@ const Booking = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   
+  const [paymentMethod, setPaymentMethod] = useState('cash')
+
   const [course, setCourse] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -91,7 +93,6 @@ const Booking = () => {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
       const response = await api.get(`/bookings/availability/?trainer=${selectedTrainer.id}&course=${courseId}&date=${formattedDate}`)
       
-      // التحقق من نوع البيانات القادمة من API
       let slotsData = []
       
       if (Array.isArray(response.data)) {
@@ -101,7 +102,6 @@ const Booking = () => {
       } else if (response.data && Array.isArray(response.data.results)) {
         slotsData = response.data.results
       } else if (response.data && typeof response.data === 'object') {
-        // محاولة تحويل الـ object إلى مصفوفة إذا كان يحتوي على مفاتيح رقمية
         const possibleArray = Object.values(response.data)
         if (possibleArray.length > 0 && possibleArray.some(item => item.time || item.start_time)) {
           slotsData = possibleArray
@@ -115,9 +115,11 @@ const Booking = () => {
       }
       
       setAvailableSlots(slotsData)
+      return slotsData
     } catch (err) {
       console.error('Error fetching slots:', err)
       setAvailableSlots([])
+      return []
     } finally {
       setLoadingSlots(false)
     }
@@ -150,24 +152,56 @@ const Booking = () => {
     
     setSubmitting(true)
     try {
+      if (paymentMethod === 'card') {
+        toast.info('Card payment integration coming soon! Booking will be confirmed with cash on session for now.')
+      }
+      
       const formattedDate = format(selectedDate, 'yyyy-MM-dd')
-      const response = await api.post('/bookings/create/', {
+
+      const latestSlots = await fetchAvailableSlots()
+      const latestSelectedSlot = Array.isArray(latestSlots)
+        ? latestSlots.find((slot) => (slot.time || slot.start_time) === selectedTime)
+        : null
+
+      if (!latestSelectedSlot || latestSelectedSlot.available === false) {
+        toast.error('This time slot is no longer available. Please choose another one.')
+        setCurrentStep(3)
+        return
+      }
+      
+      const bookingData = {
         course: parseInt(courseId),
         trainer: selectedTrainer.id,
         scheduled_date: formattedDate,
         start_time: selectedTime,
         notes: ''
-      })
-      
-      // Show success alert
-      alert('✓ Booking confirmed successfully!')
-      
-      // Navigate to My Bookings page
-      navigate('/userdashboard')
-      
+      }
+
+      const response = await api.post('/bookings/create/', bookingData)
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success(paymentMethod === 'cash' 
+          ? '✓ Booking confirmed! Please pay cash to the instructor on session day.'
+          : '✓ Booking confirmed!'
+        )
+        navigate('/userdashboard/bookings')
+      }
     } catch (err) {
       console.error('Error creating booking:', err)
-      setError(err.response?.data?.message || 'Failed to create booking')
+      const errorData = err.response?.data
+      const errorMessages = errorData && typeof errorData === 'object'
+        ? (() => {
+            if (errorData.non_field_errors) {
+              return 'This time slot was just taken. Please choose another one.'
+            }
+
+            return Object.entries(errorData)
+              .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+              .join(', ')
+          })()
+        : errorData?.message || 'Failed to create booking'
+
+      toast.error(errorMessages)
     } finally {
       setSubmitting(false)
     }
@@ -440,12 +474,131 @@ const Booking = () => {
                 </div>
               </div>
               
+              {/* Payment Method */}
+              <div className="pb-4 border-b border-gray-700">
+                <h3 className="text-lg font-semibold text-white mb-3">Payment Method</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Card Payment Option */}
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${
+                      paymentMethod === 'card'
+                        ? 'border-[#22d3ee] bg-[#22d3ee]/10'
+                        : 'border-gray-700 bg-[#0f172a] hover:border-gray-600'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="card"
+                      checked={paymentMethod === 'card'}
+                      onChange={() => setPaymentMethod('card')}
+                      className="w-4 h-4 text-[#22d3ee] focus:ring-[#22d3ee]"
+                    />
+                    <CreditCard className={`h-5 w-5 ${paymentMethod === 'card' ? 'text-[#22d3ee]' : 'text-gray-400'}`} />
+                    <div>
+                      <p className={`text-sm font-medium ${paymentMethod === 'card' ? 'text-[#22d3ee]' : 'text-white'}`}>
+                        Card Payment
+                      </p>
+                      <p className="text-xs text-gray-500">Pay online with credit/debit card</p>
+                    </div>
+                  </label>
+                  
+                  {/* Cash on Session Option */}
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${
+                      paymentMethod === 'cash'
+                        ? 'border-[#22d3ee] bg-[#22d3ee]/10'
+                        : 'border-gray-700 bg-[#0f172a] hover:border-gray-600'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cash"
+                      checked={paymentMethod === 'cash'}
+                      onChange={() => setPaymentMethod('cash')}
+                      className="w-4 h-4 text-[#22d3ee] focus:ring-[#22d3ee]"
+                    />
+                    <Wallet className={`h-5 w-5 ${paymentMethod === 'cash' ? 'text-[#22d3ee]' : 'text-gray-400'}`} />
+                    <div>
+                      <p className={`text-sm font-medium ${paymentMethod === 'cash' ? 'text-[#22d3ee]' : 'text-white'}`}>
+                        Cash on Session
+                      </p>
+                      <p className="text-xs text-gray-500">Pay cash to the instructor</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              {/* Card Details Form (only shown when card payment is selected) */}
+              {paymentMethod === 'card' && (
+                <div className="pb-4 border-b border-gray-700">
+                  <h3 className="text-lg font-semibold text-white mb-3">Card Details</h3>
+                  <div className="space-y-3">
+                    {/* Card Number */}
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Card Number</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="1234 5678 9012 3456"
+                          className="w-full px-4 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                        />
+                        <CreditCard className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Expiry Date */}
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-1">Expiry Date</label>
+                        <input
+                          type="text"
+                          placeholder="MM/YY"
+                          className="w-full px-4 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                        />
+                      </div>
+                      
+                      {/* CVV */}
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-1">CVV</label>
+                        <input
+                          type="text"
+                          placeholder="123"
+                          className="w-full px-4 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Cardholder Name */}
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Cardholder Name</label>
+                      <input
+                        type="text"
+                        placeholder="Name on card"
+                        className="w-full px-4 py-2 bg-[#0f172a] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {/* Total */}
               <div className="pt-2">
                 <div className="flex justify-between items-center">
                   <span className="text-white font-semibold">Total Amount</span>
                   <span className="text-2xl font-bold text-[#22d3ee]">{course.price.toLocaleString()} EGP</span>
                 </div>
+                {paymentMethod === 'cash' && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    * Payment will be collected at the beginning of your session
+                  </p>
+                )}
+                {paymentMethod === 'card' && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    * Your card will be charged immediately upon confirmation
+                  </p>
+                )}
               </div>
             </div>
             
@@ -470,7 +623,7 @@ const Booking = () => {
                 ) : (
                   <>
                     <CheckCircle className="h-5 w-5" />
-                    Confirm Booking
+                    {paymentMethod === 'card' ? 'Pay & Confirm' : 'Confirm Booking'}
                   </>
                 )}
               </button>

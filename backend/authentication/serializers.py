@@ -9,10 +9,11 @@ from academy.models import Academy, ContactInfo
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True)
+    phone = serializers.CharField(required=True, allow_blank=False)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'confirm_password']
+        fields = ['username', 'email', 'phone', 'password', 'confirm_password']
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -20,8 +21,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        phone = validated_data.pop('phone')
         validated_data.pop('confirm_password')
-        return User.objects.create_user(role='user', **validated_data)
+
+        user = User.objects.create_user(role='user', **validated_data)
+
+        profile = getattr(user, 'profile', None)
+        if profile is not None:
+            profile.phone = phone
+            profile.save(update_fields=['phone'])
+
+        return user
 
 
 # ================================
@@ -85,4 +95,33 @@ class AcademyRegisterSerializer(serializers.Serializer):
             value=validated_data['phone']
         )
 
+        return user
+
+
+class UserProfileSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=False)
+    phone = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_email(self, value):
+        user = getattr(self, 'instance', None)
+        if User.objects.exclude(pk=user.pk if user else None).filter(email=value).exists():
+            raise serializers.ValidationError('Email already exists.')
+        return value
+
+    def update(self, instance, validated_data):
+        user = instance
+        profile = getattr(user, 'profile', None)
+
+        if 'name' in validated_data:
+            user.username = validated_data['name'].strip() or user.username
+
+        if 'email' in validated_data:
+            user.email = validated_data['email'].strip() or user.email
+
+        if profile and 'phone' in validated_data:
+            profile.phone = validated_data['phone']
+            profile.save(update_fields=['phone'])
+
+        user.save(update_fields=['username', 'email'])
         return user

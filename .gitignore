@@ -1,16 +1,36 @@
-# Database
-db.sqlite3
-
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-.env
 
-# Media files
-media/
-
-# Virtual environment
+# Virtual Environments
 venv/
 env/
+.venv/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.sqlite3
+
+# Environment Variables
+.env
+.env.*
+
+# Node
+node_modules/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,5 +1,5 @@
 import {React, useState} from 'react'
-import { Lock, User, Mail, Building , Car } from 'lucide-react'
+import { Lock, User, Mail, Building , Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {Header} from '../exports/index.js';
 import api from "../exports/Axios.jsx";
@@ -13,6 +13,9 @@ const SignUp = () => {
   const searchParams = new URLSearchParams(location.search)
   const defaultRole = searchParams.get('role') || 'user'
   
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -259,8 +262,15 @@ const SignUp = () => {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className={`h-5 w-5 ${errors.password && touched.password ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     errors.password && touched.password 
                       ? 'border-red-500 focus:ring-red-500' 
@@ -288,8 +298,15 @@ const SignUp = () => {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className={`h-5 w-5 ${errors.confirm_password && touched.confirm_password ? 'text-red-500' : 'text-[#22d3ee]'}`} />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(prev => !prev)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 focus:outline-none"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
                 <input
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   className={`w-full pl-10 pr-4 py-3 bg-[#0f172a] border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     errors.confirm_password && touched.confirm_password 
                       ? 'border-red-500 focus:ring-red-500' 

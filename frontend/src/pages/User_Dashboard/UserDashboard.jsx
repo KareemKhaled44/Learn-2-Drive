@@ -146,14 +146,14 @@ const UserDashboard = () => {
                         {/* Header */}
                         <div className="text-center pt-24 lg:pt-0">
                             <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                                {activeTab === 'profile' ? 'My Profile' : activeTab === 'bookings' ? 'My Bookings' : 'My Ratings'}
-                            </h2>
+                                    {activeTab === 'profile' ? 'My Profile' : activeTab === 'bookings' ? 'My Bookings' : 'Write Review'}
+                                </h2>
                             <p className="text-slate-300 text-xs sm:text-sm mt-1 px-4">
                                 {activeTab === 'profile' 
                                     ? 'View and manage your personal information' 
                                     : activeTab === 'bookings' 
                                     ? 'View and manage all your course bookings'
-                                    : 'View and manage your course reviews and ratings'}
+                                        : 'Create a review and rating for a course, academy, or trainer'}
                             </p>
                         </div>
 

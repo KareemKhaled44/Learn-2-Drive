@@ -1,3 +1,4 @@
+# bookings/urls.py
 from django.urls import path
 from .views import (
     BookingCreateView,
@@ -13,5 +14,4 @@ urlpatterns = [
     path('<int:pk>/', BookingDetailView.as_view(), name='booking-detail'),
     path('<int:pk>/cancel/', BookingCancelView.as_view(), name='booking-cancel'),
     path('availability/', TrainerAvailabilityView.as_view(), name='trainer-availability'),
-
 ]

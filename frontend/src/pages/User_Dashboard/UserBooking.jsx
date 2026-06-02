@@ -163,7 +163,7 @@ const UserBookings = () => {
                 
                 const scheduledDate = booking.scheduled_date || booking.date;
                 const startTime = booking.start_time || booking.time || 'Time not set';
-                const createdAt = booking.created_at || booking.createdAt || booking.booking_date;
+                const createdAt = booking.booked_at || booking.created_at || booking.createdAt || booking.booking_date;
                 const paymentMethod = booking.payment_method || booking.paymentMethod || 'Cash on arrival';
                 const isCancelling = cancellingId === booking.id;
                 

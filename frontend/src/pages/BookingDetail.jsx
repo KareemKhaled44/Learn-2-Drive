@@ -413,11 +413,13 @@ const BookingDetails = () => {
                   {/* Booking Info */}
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2 border-b border-gray-700">
-                      <span className="text-gray-400 text-sm">Booking Date</span>
-                      <span className="text-white text-sm">
-                        {booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy') : 'N/A'}
-                      </span>
-                    </div>
+                        <span className="text-gray-400 text-sm">Booked At</span>
+                        <span className="text-white text-sm">
+                          {booking.booked_at ? format(new Date(booking.booked_at), 'MMM d, yyyy - h:mm a') : (
+                            booking.created_at ? format(new Date(booking.created_at), 'MMM d, yyyy - h:mm a') : 'N/A'
+                          )}
+                        </span>
+                      </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-700">
                       <span className="text-gray-400 text-sm">Booking ID</span>
                       <span className="text-white text-sm font-mono">#{booking.id}</span>

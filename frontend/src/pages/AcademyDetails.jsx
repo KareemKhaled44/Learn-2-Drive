@@ -13,7 +13,7 @@ const AcademyDetails = () => {
   const [activeTab, setActiveTab] = React.useState('courses')
   const [selectedTransmission, setSelectedTransmission] = React.useState('all')
   const [reviews, setReviews] = React.useState([])
-  const [reviewsCount, setReviewsCount] = React.useState(0) // 👈 أضف هذه الحالة
+  const [reviewsCount, setReviewsCount] = React.useState(0) 
   const [reviewsLoading, setReviewsLoading] = React.useState(false)
   const isBestSeller = (course) => course.quantity_sold > 5;
   const isManual = (course) => course.transmission === 'manual';
@@ -25,7 +25,7 @@ const AcademyDetails = () => {
         await new Promise(resolve => setTimeout(resolve, 500));
         setAcademy(response.data)
         setReviews(response.data.reviews || [])
-        setReviewsCount(response.data.reviews?.length || 0) // 👈 أضف هذا السطر
+        setReviewsCount(response.data.reviews?.length || 0) 
         console.log(response.data)
       })
       .catch(error => {

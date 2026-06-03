@@ -98,11 +98,34 @@ const UserRatings = () => {
         setSuccess(null);
 
         try {
-            const response = await api.get(TARGET_TYPES[targetType].endpoint);
-            const normalized = normalizeItems(response.data);
+            if (targetType === 'academy') {
+                // Only fetch academies the user has bookings with
+                const resp = await api.get('/api/bookings/');
+                const bookings = normalizeItems(resp.data);
 
-            setItems(normalized);
-            setSelectedObjectId(normalized[0]?.id ? String(normalized[0].id) : '');
+                const map = new Map();
+                bookings.forEach((b) => {
+                    if (b.academy_id) {
+                        if (!map.has(b.academy_id)) {
+                            map.set(b.academy_id, {
+                                id: b.academy_id,
+                                name: b.academy_name,
+                                address_text: '',
+                            });
+                        }
+                    }
+                });
+
+                const normalized = Array.from(map.values());
+                setItems(normalized);
+                setSelectedObjectId(normalized[0]?.id ? String(normalized[0].id) : '');
+            } else {
+                const response = await api.get(TARGET_TYPES[targetType].endpoint);
+                const normalized = normalizeItems(response.data);
+
+                setItems(normalized);
+                setSelectedObjectId(normalized[0]?.id ? String(normalized[0].id) : '');
+            }
         } catch (err) {
             if (err.response?.status === 401) {
                 setError('Your session has expired. Please login again.');

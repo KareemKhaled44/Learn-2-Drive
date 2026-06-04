@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
-import { Menu, X, Home, Users, BookOpen, Calendar, Settings, LogOut } from 'lucide-react'
+import { Menu, X, Home, Users, BookOpen, Calendar, Settings, LogOut, Star  } from 'lucide-react'
 
 const Dashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -18,6 +18,7 @@ const Dashboard = () => {
         { icon: Users, label: 'Trainers', path: '/dashboard/trainers' },
         { icon: BookOpen, label: 'Courses', path: '/dashboard/courses' },
         { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings' },
+        { icon: Star, label: 'Reviews', path: '/dashboard/academy-reviews' },
         { icon: Settings, label: 'Profile', path: '/dashboard/profile' },
     ]
 

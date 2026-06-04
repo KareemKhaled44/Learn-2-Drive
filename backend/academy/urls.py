@@ -7,6 +7,7 @@ urlpatterns = [
     path('academies/', AcademyListCreateView.as_view(), name='academy-list'),
     path('academies/<int:pk>/', AcademyDetailView.as_view(), name='academy-detail'),
     path("reviews/", ReviewCreateView.as_view(), name="create-review"),
+    path("academy-reviews/<int:academy_id>/", AcademyReviewListView.as_view(), name="academy-reviews"),
     path("home-courses/", HomeCourseListView.as_view(), name="home-courses"),
     path('courses/', CourseListCreateView.as_view(), name='course-list'),
     path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),

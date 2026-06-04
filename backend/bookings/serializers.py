@@ -123,23 +123,25 @@ class BookingCreateSerializer(serializers.ModelSerializer):
 
 class BookingListSerializer(serializers.ModelSerializer):
     course_title = serializers.CharField(source='course.title', read_only=True)
+    course_id = serializers.IntegerField(source='course.id', read_only=True)
+    course_price = serializers.DecimalField(source='course.price', read_only=True, max_digits=10, decimal_places=2)
+    course_sessions = serializers.IntegerField(source='course.sessions', read_only=True)
+    
     trainer_name = serializers.CharField(source='trainer.name', read_only=True)
-    academy_name = serializers.CharField(source='course.academy.name', read_only=True)
+    trainer_id = serializers.IntegerField(source='trainer.id', read_only=True)
+    trainer_location = serializers.CharField(source='trainer.location.name', read_only=True)
+    
     academy_id = serializers.IntegerField(source='course.academy.id', read_only=True)
-
+    academy_name = serializers.CharField(source='course.academy.name', read_only=True)
+    academy_address = serializers.CharField(source='course.academy.address_text', read_only=True)
+    
     class Meta:
         model = Booking
         fields = [
-            'id',
-            'course_title',
-            'trainer_name',
-            'academy_name',
-            'academy_id',
-            'status',
-            'scheduled_date',
-            'start_time',
-            'total_price',
-            'booked_at',
+            'id', 'status', 'scheduled_date', 'start_time', 'booked_at',
+            'course_title', 'course_id', 'course_price', 'course_sessions',
+            'trainer_name', 'trainer_id', 'trainer_location',
+            'academy_id', 'academy_name', 'academy_address'
         ]
 
 

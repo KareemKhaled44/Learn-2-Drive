@@ -22,6 +22,7 @@ import Courses from './pages/dashboard/Courses'
 import CourseForm from './pages/dashboard/CourseForm'
 import Bookings from './pages/dashboard/Bookings'
 import Profile from './pages/dashboard/Profile'
+import AcademyReviews from './pages/dashboard/AcademyReviews'
 import AcademyRoute from './components/AcademyRoute'
 import Booking from './pages/Booking';
 import BookingDetail from './pages/BookingDetail';
@@ -30,6 +31,7 @@ import UserDashboard from "./pages/User_Dashboard/UserDashboard";
 import UserProfile from "./pages/User_Dashboard/UserProfile";
 import UserBookings from "./pages/User_Dashboard/UserBooking";
 import UserRatings from "./pages/User_Dashboard/UserRating";
+import ResetPassword from "./pages/ResetPassword";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 const AppLayout = () => {
@@ -53,6 +55,7 @@ const AppLayout = () => {
             <Route path="courses/edit/:id" element={<CourseForm />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="academy-reviews" element={<AcademyReviews />} />
         </Route>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<SignUp />} />
@@ -69,7 +72,7 @@ const AppLayout = () => {
         <Route path="/courses/:id" element={<CourseDetails/>} />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/academy-details/:id" element={<AcademyDetails />} />
         <Route path="/booking/course/:courseId" element={<Booking />} />
         <Route path="/booking/:id" element={<BookingDetail />} />

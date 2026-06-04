@@ -14,7 +14,7 @@ def send_approval_email(academy):
     if not recipient_email:
         return
 
-    subject = "🎉 Your Academy Has Been Approved — AutoMaster"
+    subject = "🎉 Your Academy Has Been Approved — Learn 2 Drive"
     
     html_content = render_to_string('emails/academy_approved.html', {
         'academy_name': academy.name,
@@ -36,7 +36,7 @@ def send_rejection_email(academy):
     if not recipient_email:
         return
 
-    subject = "AutoMaster — Academy Registration Update"
+    subject = "Learn 2 Drive — Academy Registration Update"
 
     html_content = render_to_string('emails/academy_rejected.html', {
         'academy_name': academy.name,
@@ -57,7 +57,7 @@ def send_trainer_approval_email(trainer):
     if not recipient_email:
         return
 
-    subject = "✅ Your Trainer Has Been Approved — AutoMaster"
+    subject = "✅ Your Trainer Has Been Approved — Learn 2 Drive"
 
     html_content = render_to_string('emails/trainer_approved.html', {
         'academy_name': trainer.academy.name,
@@ -80,7 +80,7 @@ def send_trainer_rejection_email(trainer):
     if not recipient_email:
         return
 
-    subject = "AutoMaster — Trainer Not Approved"
+    subject = "Learn 2 Drive — Trainer Not Approved"
 
     html_content = render_to_string('emails/trainer_rejected.html', {
         'academy_name': trainer.academy.name,
@@ -103,7 +103,7 @@ def send_course_approval_email(course):
     if not recipient_email:
         return
 
-    subject = "✅ Your Course Has Been Approved — AutoMaster"
+    subject = "✅ Your Course Has Been Approved — Learn 2 Drive"
 
     html_content = render_to_string('emails/course_approved.html', {
         'academy_name': course.academy.name,
@@ -126,7 +126,7 @@ def send_course_rejection_email(course):
     if not recipient_email:
         return
 
-    subject = "AutoMaster — Course Not Approved"
+    subject = "Learn 2 Drive — Course Not Approved"
 
     html_content = render_to_string('emails/course_rejected.html', {
         'academy_name': course.academy.name,
@@ -145,12 +145,12 @@ def send_course_rejection_email(course):
 
 
 def send_booking_confirmation_email(booking):
-    subject = "✅ Booking Confirmed — AutoMaster"
+    subject = "✅ Booking Confirmed — Learn 2 Drive"
 
     html_content = render_to_string('emails/booking_confirmed.html', {
         'user_name': booking.user.get_full_name() or booking.user.username,
         'course_title': booking.course.title,
-        'academy_name': booking.course.academy.name if booking.course.academy else 'AutoMaster Academy',
+        'academy_name': booking.course.academy.name if booking.course.academy else 'Learn 2 Drive Academy',
         'trainer_name': booking.trainer.name,
         'scheduled_date': booking.scheduled_date.strftime('%A, %B %d, %Y'),
         'start_time': booking.start_time.strftime('%I:%M %p'),

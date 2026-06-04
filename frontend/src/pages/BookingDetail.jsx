@@ -127,7 +127,7 @@ const BookingDetails = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#  ] flex items-center justify-center">
         <CarLoading />
       </div>
     )

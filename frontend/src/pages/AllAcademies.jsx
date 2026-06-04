@@ -30,12 +30,16 @@ const AllAcademies = () => {
   const getAcademies = useCallback((page = 1) => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (femaleTrainer) params.append('has_female_trainer', 'true');
 
-    api.get(`api/academies/?page=${page}
-      &search=${searchQuery}&ordering=${ordering}&location__city=${city}
-      &location__area=${area}&courses__transmission=${transmissionFilter}
-      &${params.toString()}`)
+    params.set('page', page);
+    if (searchQuery.trim()) params.set('search', searchQuery.trim());
+    if (ordering) params.set('ordering', ordering);
+    if (city.trim()) params.set('location__city', city.trim());
+    if (area.trim()) params.set('location__area', area.trim());
+    if (transmissionFilter.trim()) params.set('courses__transmission', transmissionFilter.trim());
+    if (femaleTrainer) params.set('has_female_trainer', 'true');
+
+    api.get(`api/academies/?${params.toString()}`)
       .then(async response => {
         
         await new Promise(resolve => setTimeout(resolve, 500));

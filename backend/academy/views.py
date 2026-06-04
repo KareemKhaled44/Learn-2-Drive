@@ -161,8 +161,15 @@ class CourseDetailView(generics.RetrieveAPIView):
 
 class HomeTrainerListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
-        return Trainer.objects.filter(status='approved').prefetch_related("courses")[:5]
-    
+        # Return top trainers ordered by average rating (descending), limited to 5
+        return (
+            Trainer.objects
+            .filter(status='approved')
+            .annotate(avg_rating=Avg('ratings__rating'))
+            .order_by('-avg_rating')
+            .prefetch_related('courses')[:5]
+        )
+
     serializer_class = TrainerHomeSerializer
 
 
@@ -243,3 +250,16 @@ class ReviewCreateView(generics.ListCreateAPIView):
         response_serializer = ReviewSerializer(review)
 
         return Response(response_serializer.data, status=201)
+
+class AcademyReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        academy_id = self.kwargs.get('academy_id')
+        return (
+            Review.objects
+            .filter(content_type__model='academy', object_id=academy_id)
+            .select_related('user')
+            .order_by('-created_at')
+        )
+    

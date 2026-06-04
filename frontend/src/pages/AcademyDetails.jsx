@@ -18,6 +18,45 @@ const AcademyDetails = () => {
   const isBestSeller = (course) => course.quantity_sold > 5;
   const isManual = (course) => course.transmission === 'manual';
 
+  const resolveMediaUrl = (value) => {
+    if (!value) return ''
+    if (/^https?:\/\//i.test(value)) return value
+    return `${api.defaults.baseURL}${String(value).replace(/^\//, '')}`
+  }
+
+  const normalizeList = (value) => {
+    if (Array.isArray(value)) return value
+
+    if (value && typeof value === 'object') {
+      if (Array.isArray(value.results)) return value.results
+
+      return Object.values(value).filter((item) => item && typeof item === 'object')
+    }
+
+    return []
+  }
+
+  const academyTrainers = React.useMemo(() => {
+    if (!academy) return []
+
+    const trainerMap = new Map()
+    const addTrainer = (trainer) => {
+      if (trainer?.id && !trainerMap.has(trainer.id)) {
+        trainerMap.set(trainer.id, trainer)
+      }
+    }
+
+    normalizeList(academy.trainers).forEach(addTrainer)
+    normalizeList(academy.courses).forEach((course) => {
+      normalizeList(course.trainers).forEach(addTrainer)
+    })
+
+    return Array.from(trainerMap.values())
+  }, [academy])
+
+  const displayTrainersCount = academyTrainers.length
+  const hasFemaleTrainer = academyTrainers.some((trainer) => trainer.gender === 'female')
+
   const getAcademyDetails = () => {
     setLoading(true)
     api.get(`api/academies/${id}/`)
@@ -25,7 +64,7 @@ const AcademyDetails = () => {
         await new Promise(resolve => setTimeout(resolve, 500));
         setAcademy(response.data)
         setReviews(response.data.reviews || [])
-        setReviewsCount(response.data.reviews?.length || 0) // 👈 أضف هذا السطر
+        setReviewsCount(response.data.reviews?.length || 0)
         console.log(response.data)
       })
       .catch(error => {
@@ -104,7 +143,7 @@ const AcademyDetails = () => {
             <div className="flex-1 text-center md:text-left">
               {/* Badges */}
               <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-4">
-                {academy.has_female_trainer && (
+                {hasFemaleTrainer && (
                   <div className="flex items-center gap-1 bg-pink-500/10 text-pink-400 px-3 py-1.5 rounded-full border border-pink-400/30">
                     <Venus className="h-4 w-4" />
                     <span className="text-sm font-medium">Female Trainers Available</span>
@@ -135,7 +174,7 @@ const AcademyDetails = () => {
                   <div className="text-xs text-gray-400">Total Courses</div>
                 </div>
                 <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700">
-                  <div className="text-2xl font-bold text-[#22d3ee]">{academy.trainers_count}</div>
+                  <div className="text-2xl font-bold text-[#22d3ee]">{displayTrainersCount}</div>
                   <div className="text-xs text-gray-400">Trainers</div>
                 </div>
                 <div className="bg-[#1e293b] rounded-lg p-3 border border-gray-700">
@@ -308,7 +347,7 @@ const AcademyDetails = () => {
                                 overflow-hidden flex-shrink-0 cursor-pointer"
                             >
                               {trainer.image
-                                ? <img src={trainer.image} alt={trainer.name} className="w-full h-full object-cover" />
+                                  ? <img src={resolveMediaUrl(trainer.image)} alt={trainer.name} className="w-full h-full object-cover" />
                                 : trainer.name.slice(0, 2).toUpperCase()
                               }
                             </div>
@@ -403,7 +442,7 @@ const AcademyDetails = () => {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {academy.trainers.map((trainer) => (
+            {academyTrainers.map((trainer) => (
               <div 
                 key={trainer.id}
                 className="group bg-[#1e293b] border border-gray-700 rounded-2xl overflow-hidden hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 hover:-translate-y-2 relative transition-all duration-300"
@@ -416,7 +455,7 @@ const AcademyDetails = () => {
                         <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af] border border-[#22d3ee]/20">
                           {trainer.image ? (
                             <img 
-                              src={trainer.image} 
+                              src={resolveMediaUrl(trainer.image)} 
                               alt={trainer.name}
                               className="w-full h-full object-cover"
                             />
@@ -645,7 +684,7 @@ const AcademyDetails = () => {
                     </li>
                     <li className="flex justify-between text-gray-300">
                       <span>Total Trainers</span>
-                      <span className="text-[#22d3ee] font-bold">{academy.trainers_count}</span>
+                      <span className="text-[#22d3ee] font-bold">{displayTrainersCount}</span>
                     </li>
                     <li className="flex justify-between text-gray-300">
                       <span>Branches</span>
@@ -673,7 +712,7 @@ const AcademyDetails = () => {
               Contact <span className="text-[#22d3ee]">Information</span>
             </h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-8 max-w-3xl">
               {/* Contact Info */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8">
                 <div className="space-y-6">
@@ -764,31 +803,6 @@ const AcademyDetails = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Contact Form */}
-              <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8">
-                <h3 className="text-white font-semibold mb-6">Send a Message</h3>
-                <form className="space-y-4">
-                  <input 
-                    type="text"
-                    placeholder="Your Name"
-                    className="w-full bg-[#0f172a] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-[#22d3ee]"
-                  />
-                  <input 
-                    type="email"
-                    placeholder="Your Email"
-                    className="w-full bg-[#0f172a] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-[#22d3ee]"
-                  />
-                  <textarea 
-                    placeholder="Your Message"
-                    rows="4"
-                    className="w-full bg-[#0f172a] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-[#22d3ee]"
-                  ></textarea>
-                  <button className="w-full px-6 py-3 bg-[#22d3ee] hover:bg-[#1e40af] text-white font-semibold rounded-lg transition-all duration-300">
-                    Send Message
-                  </button>
-                </form>
               </div>
             </div>
           </div>

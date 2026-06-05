@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   MapPin, Phone, Mail, Star, Clock, Award, Car, Calendar,
   Shield, Users, Venus, Mars, CheckCircle, AlertCircle,
-  Briefcase, GraduationCap, Building
+  Briefcase, GraduationCap, Building, MessageCircle, ThumbsUp
 } from 'lucide-react'
 import api from '@/exports/Axios'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -10,12 +10,14 @@ import { toast } from 'react-toastify'
 
 const TrainerProfile = () => {
   const [trainer, setTrainer] = useState(null)
+  const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
+  const [reviewsLoading, setReviewsLoading] = useState(true)
   const { id } = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchTrainer = async () => {
+    const fetchTrainerData = async () => {
       try {
         setLoading(true)
         const response = await api.get(`api/trainer-profile/${id}/`)
@@ -28,10 +30,49 @@ const TrainerProfile = () => {
       }
     }
 
+    const fetchReviews = async () => {
+      try {
+        setReviewsLoading(true)
+        const response = await api.get(`api/trainer-reviews/${id}/`)
+        setReviews(response.data)
+      } catch (error) {
+        console.error('Error fetching reviews:', error)
+        // Don't show toast for reviews error, just log it
+      } finally {
+        setReviewsLoading(false)
+      }
+    }
+
     if (id) {
-      fetchTrainer()
+      fetchTrainerData()
+      fetchReviews()
     }
   }, [id])
+
+  // Helper function to render stars
+  const renderStars = (rating) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating
+                ? 'text-yellow-400 fill-current'
+                : 'text-gray-600'
+            }`}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  // Format date to readable format
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  }
 
   if (loading) {
     return (
@@ -70,6 +111,7 @@ const TrainerProfile = () => {
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b]">
       <div className="py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
+          {/* Trainer Header Card */}
           <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8 mb-8">
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
               <div className="flex-shrink-0 relative">
@@ -123,10 +165,6 @@ const TrainerProfile = () => {
                     <Award className="h-5 w-5 text-[#22d3ee] mr-1" />
                     <span className="text-gray-300">{trainer.experience_years || 0} Years Experience</span>
                   </div>
-                  <div className="flex items-center">
-                    <Users className="h-5 w-5 text-[#22d3ee] mr-1" />
-                    <span className="text-gray-300">{trainer.students_count || 0} Students Trained</span>
-                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -145,12 +183,12 @@ const TrainerProfile = () => {
                   )}
                 </div>
               </div>
-
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
+              {/* About Me Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Briefcase className="h-5 w-5" />
@@ -161,6 +199,7 @@ const TrainerProfile = () => {
                 </p>
               </div>
 
+              {/* Training Vehicle Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Car className="h-5 w-5" />
@@ -175,6 +214,7 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
+              {/* Working Schedule Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -210,6 +250,7 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
+              {/* Certifications Section */}
               {trainer.certifications?.length > 0 && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
@@ -226,9 +267,97 @@ const TrainerProfile = () => {
                   </ul>
                 </div>
               )}
+
+              {/* Reviews Section */}
+              <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
+                <h2 className="text-xl font-bold text-[#22d3ee] mb-6 flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Student Reviews ({reviews.length || trainer.reviews_count || 0})
+                </h2>
+
+                {reviewsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-[#22d3ee] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : reviews.length > 0 ? (
+                  <div className="space-y-6">
+                    {reviews.map((review, index) => (
+                      <div key={review.id || index} className="border-b border-gray-700 pb-6 last:border-0 last:pb-0">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#22d3ee] to-[#1e40af] flex items-center justify-center">
+                                <span className="text-white font-semibold text-sm">
+                                  {review.user_name?.charAt(0) || 'U'}
+                                </span>
+                              </div>
+                              <div>
+                                <h4 className="text-white font-semibold">{review.user_name || 'Anonymous Student'}</h4>
+                                <p className="text-gray-500 text-xs">{formatDate(review.created_at || review.date)}</p>
+                              </div>
+                            </div>
+                            {renderStars(review.rating)}
+                          </div>
+                          {review.is_verified && (
+                            <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Verified
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-300 leading-relaxed mt-3">
+                          {review.comment || review.review_text || 'No comment provided.'}
+                        </p>
+                        
+                        {review.helpful_count !== undefined && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <button className="flex items-center gap-1 text-gray-500 hover:text-[#22d3ee] transition text-sm">
+                              <ThumbsUp className="h-3 w-3" />
+                              <span>Helpful ({review.helpful_count})</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
+                      <Star className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <h3 className="text-white font-semibold mb-2">No Reviews Yet</h3>
+                    <p className="text-gray-400 text-sm">
+                      This trainer hasn't received any reviews yet.
+                    </p>
+                    <p className="text-gray-500 text-xs mt-2">
+                      Be the first to leave a review after your training session!
+                    </p>
+                  </div>
+                )}
+
+                {trainer.avg_rating > 0 && reviews.length > 0 && (
+                  <div className="mt-6 pt-4 border-t border-gray-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                        <span className="text-white font-bold ml-1">{trainer.avg_rating}</span>
+                      </div>
+                      <span className="text-gray-400 text-sm">out of 5</span>
+                    </div>
+                    <button 
+                      onClick={() => navigate(`/add-review/${trainer.id}`)}
+                      className="text-[#22d3ee] text-sm hover:underline transition"
+                    >
+                      Write a Review →
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Right Sidebar */}
             <div className="space-y-8">
+              {/* Quick Stats */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4">Quick Stats</h2>
                 <div className="space-y-4">
@@ -236,13 +365,14 @@ const TrainerProfile = () => {
                     <span className="text-gray-400">Experience</span>
                     <span className="text-white font-semibold">{trainer.experience_years || 0} years</span>
                   </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-700">
-                    <span className="text-gray-400">Students Trained</span>
-                    <span className="text-white font-semibold">{trainer.students_count || 0}+</span>
-                  </div>
+                  {/* تم إزالة Students Trained من هنا */}
                   <div className="flex justify-between items-center pb-2 border-b border-gray-700">
                     <span className="text-gray-400">Rating</span>
                     <span className="text-yellow-400 font-semibold">{trainer.avg_rating || 0} ★</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span className="text-gray-400">Total Reviews</span>
+                    <span className="text-white font-semibold">{reviews.length || trainer.reviews_count || 0}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-gray-700">
                     <span className="text-gray-400">Status</span>
@@ -257,6 +387,7 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
+              {/* Affiliated Academy */}
               {trainer.academy && trainer.academy_name && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
@@ -298,6 +429,7 @@ const TrainerProfile = () => {
                 </div>
               )}
 
+              {/* Independent Instructor */}
               {!trainer.academy && !trainer.academy_name && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">

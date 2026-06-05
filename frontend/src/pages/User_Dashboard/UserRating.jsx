@@ -226,15 +226,6 @@ const UserRatings = () => {
             return;
         }
 
-        if (!text.trim()) {
-            setError('Please write your review text.');
-            return;
-        }
-
-        if (text.trim().length < 10) {
-            setError('Review text must be at least 10 characters long.');
-            return;
-        }
 
         setSubmitting(true);
         setError(null);
@@ -245,7 +236,7 @@ const UserRatings = () => {
                 content_type: contentType,
                 object_id: Number(selectedObjectId),
                 rating: rating,
-                text: text.trim(),
+                text: text.trim(), 
             });
 
             toast.success('Review submitted successfully.');
@@ -405,7 +396,7 @@ const UserRatings = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="review" className="mb-2 block text-sm font-medium text-slate-200">Your review</label>
+                            <label htmlFor="review" className="mb-2 block text-sm font-medium text-slate-200">Your review (optional)</label>
                             <div className="relative">
                                 <MessageCircle className="pointer-events-none absolute left-4 top-4 h-5 w-5 text-slate-500" />
                                 <textarea
@@ -413,23 +404,16 @@ const UserRatings = () => {
                                     rows="6"
                                     value={text}
                                     onChange={(event) => setText(event.target.value)}
-                                    placeholder={`Tell others about your experience with this ${activeTarget.label.toLowerCase()}`}
+                                    placeholder={`Optional: Tell others about your experience with this ${activeTarget.label.toLowerCase()}`}
                                     className="w-full rounded-xl border border-white/10 bg-[#0f172a] pl-12 pr-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-[#22d3ee]"
                                 />
                             </div>
-                            <p className="mt-2 text-xs text-slate-400">
-                                Minimum 10 characters. Be specific and constructive.
-                                {text.trim().length > 0 && text.trim().length < 10 && (
-                                    <span className="text-amber-400 ml-1">
-                                        ({10 - text.trim().length} characters remaining)
-                                    </span>
-                                )}
-                            </p>
+                            
                         </div>
 
                         <button
                             type="submit"
-                            disabled={submitting || itemsLoading || !selectedObjectId || !text.trim() || text.trim().length < 10}
+                            disabled={submitting || itemsLoading || !selectedObjectId}
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#22d3ee] px-5 py-3 font-semibold text-[#0f172a] transition hover:bg-[#1d4ed8] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {submitting ? 'Submitting...' : 'Submit Review'}

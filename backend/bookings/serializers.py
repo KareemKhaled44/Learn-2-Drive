@@ -141,8 +141,11 @@ class BookingListSerializer(serializers.ModelSerializer):
             'id', 'status', 'scheduled_date', 'start_time', 'booked_at',
             'course_title', 'course_id', 'course_price', 'course_sessions',
             'trainer_name', 'trainer_id', 'trainer_location',
-            'academy_id', 'academy_name', 'academy_address'
+            'academy_id', 'academy_name', 'academy_address', 'total_price',
         ]
+    
+    def get_total_price(self, obj):
+        return obj.total_price if obj.total_price is not None else obj.course.price
 
 
 class BookingDetailSerializer(serializers.ModelSerializer):

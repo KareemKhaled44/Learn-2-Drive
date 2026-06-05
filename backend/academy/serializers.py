@@ -131,6 +131,7 @@ class TrainerHomeSerializer(serializers.ModelSerializer):
         return obj.ratings.count()
     
 class TrainerProfileSerializer(serializers.ModelSerializer):
+    reviews = serializers.SerializerMethodField()
     avg_rating = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     students_count = serializers.SerializerMethodField()
@@ -150,7 +151,7 @@ class TrainerProfileSerializer(serializers.ModelSerializer):
             'session_end_time', 'max_bookings_per_day', 'is_active', 'status',
             'avg_rating', 'reviews_count', 'students_count',
             'academy_name', 'academy_id', 'academy_logo',
-            'courses',
+            'courses', 'reviews',  # Added 'reviews' here
             'contact_info'
         ]
     
@@ -158,6 +159,36 @@ class TrainerProfileSerializer(serializers.ModelSerializer):
         result = obj.ratings.aggregate(avg=Avg('rating'))
         return round(result['avg'] or 0, 1)
     
+    def get_reviews(self, obj):
+        from django.contrib.contenttypes.models import ContentType
+        from academy.models import Review, Rating
+        
+        content_type = ContentType.objects.get_for_model(Trainer)
+        reviews = Review.objects.filter(
+            content_type=content_type,
+            object_id=obj.id
+        ).select_related('user').order_by('-created_at')[:5]
+        
+        # Create a list of review data with ratings
+        reviews_data = []
+        for review in reviews:
+            rating = Rating.objects.filter(
+                user=review.user,
+                content_type=content_type,
+                object_id=obj.id
+            ).first()
+            
+            reviews_data.append({
+                'id': review.id,
+                'user_name': review.user.username,
+                'text': review.text,
+                'rating': rating.rating if rating else 0,
+                'created_at': review.created_at,
+                'is_verified': True
+            })
+        
+        return reviews_data
+
     def get_reviews_count(self, obj):
         return obj.ratings.count()
     
@@ -348,7 +379,7 @@ class ReviewCreateSerializer(serializers.Serializer):
     content_type = serializers.CharField()
     object_id = serializers.IntegerField()
     rating = serializers.IntegerField(min_value=1, max_value=5)
-    text = serializers.CharField()
+    text = serializers.CharField(required=False, allow_blank=True, default='')
 
     def create(self, validated_data):
 
@@ -366,11 +397,14 @@ class ReviewCreateSerializer(serializers.Serializer):
 
         content_type = ContentType.objects.get_for_model(model)
 
+        # Get text with default empty string if not provided
+        review_text = validated_data.get('text', '')
+
         review, created = Review.objects.update_or_create(
             user=user,
             content_type=content_type,
             object_id=obj.id,
-            defaults={"text": validated_data["text"]}
+            defaults={"text": review_text}
         )
 
         Rating.objects.update_or_create(

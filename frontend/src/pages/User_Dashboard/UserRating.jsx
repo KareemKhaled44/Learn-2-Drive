@@ -226,13 +226,9 @@ const UserRatings = () => {
             return;
         }
 
-        if (!text.trim()) {
-            setError('Please write your review text.');
-            return;
-        }
-
-        if (text.trim().length < 10) {
-            setError('Review text must be at least 10 characters long.');
+        // Review text is now optional
+        if (text.trim() && text.trim().length < 3) {
+            setError('Review text must be at least 3 characters if provided.');
             return;
         }
 
@@ -241,15 +237,22 @@ const UserRatings = () => {
         setSuccess(null);
 
         try {
-            await api.post('api/reviews/', {
+            // Prepare payload - only include text if it's provided
+            const payload = {
                 content_type: contentType,
                 object_id: Number(selectedObjectId),
                 rating: rating,
-                text: text.trim(),
-            });
+            };
+            
+            // Only add text if it's not empty
+            if (text.trim()) {
+                payload.text = text.trim();
+            }
 
-            toast.success('Review submitted successfully.');
-            setSuccess('Your review has been submitted successfully.');
+            await api.post('api/reviews/', payload);
+
+            toast.success('Rating submitted successfully!');
+            setSuccess('Your rating has been submitted successfully.');
             setText('');
             setRating(5);
             
@@ -271,13 +274,13 @@ const UserRatings = () => {
                         setError(errorData[0]);
                     } else {
                         const errorMessage = Object.values(errorData).flat()[0];
-                        setError(errorMessage || 'Invalid review data. Please check your input.');
+                        setError(errorMessage || 'Invalid rating data. Please check your input.');
                     }
                 } else {
-                    setError('Invalid review data. Please check your input.');
+                    setError('Invalid rating data. Please check your input.');
                 }
             } else if (err.response?.status === 403) {
-                setError('You can only review items you have actually booked.');
+                setError('You can only rate items you have actually booked.');
             } else {
                 setError(getErrorMessage(err));
             }
@@ -291,14 +294,14 @@ const UserRatings = () => {
             <div className="dash-card p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                     <div>
-                        <h3 className="text-white font-bold text-xl sm:text-2xl">Write a Review</h3>
+                        <h3 className="text-white font-bold text-xl sm:text-2xl">Rate Your Experience</h3>
                         <p className="text-slate-400 text-sm sm:text-base mt-1">
-                            Share a rating and review for a course, academy, or trainer you've booked.
+                            Share your rating and optionally leave a review for a course, academy, or trainer you've booked.
                         </p>
                     </div>
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs sm:text-sm text-slate-300">
                         <ThumbsUp className="h-4 w-4 text-[#22d3ee]" />
-                        Public feedback helps other users choose better.
+                        Your feedback helps others choose better.
                     </div>
                 </div>
 
@@ -383,7 +386,7 @@ const UserRatings = () => {
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-slate-200">Your rating</label>
+                            <label className="mb-2 block text-sm font-medium text-slate-200">Your Rating *</label>
                             <div className="flex flex-wrap items-center gap-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -402,37 +405,43 @@ const UserRatings = () => {
                                 ))}
                                 <span className="ml-2 text-sm text-slate-300">{rating}/5</span>
                             </div>
+                            <p className="text-xs text-slate-500 mt-1">Required: Select a rating from 1 to 5 stars</p>
                         </div>
 
                         <div>
-                            <label htmlFor="review" className="mb-2 block text-sm font-medium text-slate-200">Your review</label>
+                            <label htmlFor="review" className="mb-2 block text-sm font-medium text-slate-200">
+                                Your Review <span className="text-slate-500 text-xs">(Optional)</span>
+                            </label>
                             <div className="relative">
                                 <MessageCircle className="pointer-events-none absolute left-4 top-4 h-5 w-5 text-slate-500" />
                                 <textarea
                                     id="review"
-                                    rows="6"
+                                    rows="4"
                                     value={text}
                                     onChange={(event) => setText(event.target.value)}
-                                    placeholder={`Tell others about your experience with this ${activeTarget.label.toLowerCase()}`}
+                                    placeholder={`Optional: Tell others about your experience with this ${activeTarget.label.toLowerCase()}`}
                                     className="w-full rounded-xl border border-white/10 bg-[#0f172a] pl-12 pr-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-[#22d3ee]"
                                 />
                             </div>
                             <p className="mt-2 text-xs text-slate-400">
-                                Minimum 10 characters. Be specific and constructive.
-                                {text.trim().length > 0 && text.trim().length < 10 && (
-                                    <span className="text-amber-400 ml-1">
-                                        ({10 - text.trim().length} characters remaining)
-                                    </span>
+                                {text.trim().length > 0 ? (
+                                    text.trim().length < 3 ? (
+                                        <span className="text-amber-400">Minimum 3 characters if provided ({3 - text.trim().length} more)</span>
+                                    ) : (
+                                        <span className="text-green-400">✓ Review length is good</span>
+                                    )
+                                ) : (
+                                    "Optional: Add written feedback to help others (minimum 3 characters)"
                                 )}
                             </p>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={submitting || itemsLoading || !selectedObjectId || !text.trim() || text.trim().length < 10}
+                            disabled={submitting || itemsLoading || !selectedObjectId}
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#22d3ee] px-5 py-3 font-semibold text-[#0f172a] transition hover:bg-[#1d4ed8] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            {submitting ? 'Submitting...' : 'Submit Review'}
+                            {submitting ? 'Submitting...' : 'Submit Rating'}
                             <Send className="h-4 w-4" />
                         </button>
                     </div>
@@ -443,15 +452,15 @@ const UserRatings = () => {
                                 <Star className="h-5 w-5 fill-current" />
                             </div>
                             <div>
-                                <p className="text-white font-semibold">Review Tips</p>
-                                <p className="text-xs text-slate-400">Short and specific works best</p>
+                                <p className="text-white font-semibold">Rating Tips</p>
+                                <p className="text-xs text-slate-400">Your feedback matters</p>
                             </div>
                         </div>
 
                         <div className="space-y-3 text-sm text-slate-300">
                             <p>1. Pick the exact course, academy, or trainer you used.</p>
-                            <p>2. Rate the experience honestly from 1 to 5 stars.</p>
-                            <p>3. Mention what stood out so the feedback is useful.</p>
+                            <p>2. Rate your experience honestly from 1 to 5 stars.</p>
+                            <p>3. Optionally add written feedback to help others.</p>
                             <p>4. Focus on the quality of instruction, facilities, and overall experience.</p>
                             <p>5. Be respectful and constructive in your feedback.</p>
                         </div>
@@ -460,7 +469,7 @@ const UserRatings = () => {
                             <p className="text-xs uppercase tracking-[0.3em] text-slate-500 mb-2">Current target</p>
                             <p className="text-white font-semibold">{activeTarget.label}</p>
                             <p className="text-sm text-slate-400 mt-1">
-                                {itemsLoading ? 'Loading your booked items...' : `${items.length} item${items.length === 1 ? '' : 's'} available to review`}
+                                {itemsLoading ? 'Loading your booked items...' : `${items.length} item${items.length === 1 ? '' : 's'} available to rate`}
                             </p>
                             {items.length > 0 && (
                                 <p className="text-xs text-[#22d3ee] mt-2">

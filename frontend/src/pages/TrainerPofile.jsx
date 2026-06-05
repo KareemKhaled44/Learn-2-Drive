@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import {
   MapPin, Phone, Mail, Star, Clock, Award, Car, Calendar,
-  Shield, Users, Venus, Mars, CheckCircle, AlertCircle,
-  Briefcase, GraduationCap, Building
+  Shield, User, Venus, Mars, CheckCircle, AlertCircle,
+  Briefcase, GraduationCap, Building, MessageCircle, ThumbsUp,
+  StarHalf
 } from 'lucide-react'
 import api from '@/exports/Axios'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -14,24 +15,65 @@ const TrainerProfile = () => {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchTrainer = async () => {
-      try {
-        setLoading(true)
-        const response = await api.get(`api/trainer-profile/${id}/`)
+  const getTrainerDetails = React.useCallback(() => {
+    setLoading(true)
+    api.get(`api/trainer-profile/${id}/`)
+      .then(response => {
         setTrainer(response.data)
-      } catch (error) {
-        console.error('Error fetching trainer data:', error)
-        toast.error('Failed to load trainer profile')
-      } finally {
+        console.log('Trainer details:', response.data)
+      })
+      .catch(error => {
+        console.error("Error fetching trainer details:", error)
+        toast.error(error.response?.data?.message || "Failed to load trainer profile")
+      })
+      .finally(() => {
         setLoading(false)
+      })
+  }, [id])
+
+  useEffect(() => {
+    if (id) {
+      getTrainerDetails()
+    }
+  }, [id, getTrainerDetails])
+
+  // Helper function to render stars
+  const renderStars = (rating) => {
+    if (!rating || rating === 0) {
+      return Array(5).fill(0).map((_, i) => (
+        <Star key={i} className="h-4 w-4 text-gray-600" />
+      ))
+    }
+    
+    const stars = []
+    const fullStars = Math.floor(rating)
+    const hasHalfStar = rating % 1 !== 0
+    
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push(<Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />)
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push(<StarHalf key={i} className="h-4 w-4 text-yellow-400 fill-current" />)
+      } else {
+        stars.push(<Star key={i} className="h-4 w-4 text-gray-600" />)
       }
     }
+    return stars
+  }
 
-    if (id) {
-      fetchTrainer()
-    }
-  }, [id])
+  // Format date to readable format
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  }
+
+  // Get latest 5 reviews from trainer data (just like course details)
+  const latestReviews = trainer?.reviews?.slice(0, 5) || []
 
   if (loading) {
     return (
@@ -70,6 +112,7 @@ const TrainerProfile = () => {
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b]">
       <div className="py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
+          {/* Trainer Header Card */}
           <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-8 mb-8">
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
               <div className="flex-shrink-0 relative">
@@ -123,10 +166,6 @@ const TrainerProfile = () => {
                     <Award className="h-5 w-5 text-[#22d3ee] mr-1" />
                     <span className="text-gray-300">{trainer.experience_years || 0} Years Experience</span>
                   </div>
-                  <div className="flex items-center">
-                    <Users className="h-5 w-5 text-[#22d3ee] mr-1" />
-                    <span className="text-gray-300">{trainer.students_count || 0} Students Trained</span>
-                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -145,12 +184,12 @@ const TrainerProfile = () => {
                   )}
                 </div>
               </div>
-
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
+              {/* About Me Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Briefcase className="h-5 w-5" />
@@ -161,6 +200,7 @@ const TrainerProfile = () => {
                 </p>
               </div>
 
+              {/* Training Vehicle Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Car className="h-5 w-5" />
@@ -175,6 +215,7 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
+              {/* Working Schedule Section */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -210,6 +251,7 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
+              {/* Certifications Section */}
               {trainer.certifications?.length > 0 && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
@@ -226,9 +268,80 @@ const TrainerProfile = () => {
                   </ul>
                 </div>
               )}
+
+              {/* Reviews Section - Same logic as CourseDetails */}
+              <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
+                <h2 className="text-xl font-bold text-[#22d3ee] mb-6 flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Student Reviews 
+                  <span className="text-sm text-gray-400 ml-2">(Latest {latestReviews.length})</span>
+                </h2>
+
+                {latestReviews.length > 0 ? (
+                  <div className="space-y-6">
+                    {latestReviews.map((review) => (
+                      <div 
+                        key={review.id}
+                        className="border-b border-gray-700 pb-6 last:border-0 last:pb-0"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-[#22d3ee] to-[#1e40af] flex items-center justify-center">
+                              <User className="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="text-white font-semibold">{review.user_name || review.user?.username || 'Anonymous'}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="flex items-center gap-1">
+                                  {renderStars(review.rating)}
+                                </div>
+                                <span className="text-gray-500 text-xs">
+                                  {formatDate(review.created_at)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {review.is_verified !== false && (
+                            <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Verified
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-300 leading-relaxed">
+                          {review.text || review.comment || 'No comment provided.'}
+                        </p>
+                        {review.helpful_count !== undefined && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <button className="flex items-center gap-1 text-gray-500 hover:text-[#22d3ee] transition text-sm">
+                              <ThumbsUp className="h-3 w-3" />
+                              <span>Helpful ({review.helpful_count})</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
+                      <Star className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <h3 className="text-white font-semibold mb-2">No Reviews Yet</h3>
+                    <p className="text-gray-400 text-sm">
+                      This trainer hasn't received any reviews yet.
+                    </p>
+                    <p className="text-gray-500 text-xs mt-2">
+                      Be the first to leave a review after your training session!
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Right Sidebar */}
             <div className="space-y-8">
+              {/* Quick Stats */}
               <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                 <h2 className="text-xl font-bold text-[#22d3ee] mb-4">Quick Stats</h2>
                 <div className="space-y-4">
@@ -237,12 +350,12 @@ const TrainerProfile = () => {
                     <span className="text-white font-semibold">{trainer.experience_years || 0} years</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-gray-700">
-                    <span className="text-gray-400">Students Trained</span>
-                    <span className="text-white font-semibold">{trainer.students_count || 0}+</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-700">
                     <span className="text-gray-400">Rating</span>
                     <span className="text-yellow-400 font-semibold">{trainer.avg_rating || 0} ★</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-700">
+                    <span className="text-gray-400">Total Reviews</span>
+                    <span className="text-white font-semibold">{trainer.reviews_count || 0}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-gray-700">
                     <span className="text-gray-400">Status</span>
@@ -257,7 +370,8 @@ const TrainerProfile = () => {
                 </div>
               </div>
 
-              {trainer.academy && trainer.academy_name && (
+              {/* Affiliated Academy */}
+              {trainer.academy_name && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                     <Building className="h-5 w-5" />
@@ -298,7 +412,8 @@ const TrainerProfile = () => {
                 </div>
               )}
 
-              {!trainer.academy && !trainer.academy_name && (
+              {/* Independent Instructor */}
+              {!trainer.academy_name && (
                 <div className="bg-[#1e293b] border border-gray-700 rounded-xl p-6">
                   <h2 className="text-xl font-bold text-[#22d3ee] mb-4 flex items-center gap-2">
                     <Building className="h-5 w-5" />

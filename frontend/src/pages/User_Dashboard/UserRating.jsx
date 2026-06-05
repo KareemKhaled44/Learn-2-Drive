@@ -18,36 +18,21 @@ const TARGET_TYPES = {
     course: {
         label: 'Course',
         icon: BookOpen,
-        endpoint: '/api/courses/',
         titleKey: 'title',
-        subtitle: (item) => `${item.sessions ?? 0} sessions · ${item.price ?? 'N/A'} price`,
+        subtitle: (item) => `${item.sessions ?? 0} sessions · ${item.price ?? 'N/A'} EGP`,
     },
     academy: {
         label: 'Academy',
         icon: Building2,
-        endpoint: '/api/academies/',
         titleKey: 'name',
         subtitle: (item) => item.address_text || item.location?.join?.(', ') || 'Academy',
     },
     trainer: {
         label: 'Trainer',
         icon: CarFront,
-        endpoint: '/api/trainers/',
         titleKey: 'name',
         subtitle: (item) => item.location || 'Trainer',
     },
-};
-
-const normalizeItems = (responseData) => {
-    if (responseData?.results && Array.isArray(responseData.results)) {
-        return responseData.results;
-    }
-
-    if (Array.isArray(responseData)) {
-        return responseData;
-    }
-
-    return [];
 };
 
 const getErrorMessage = (error) => {
@@ -80,7 +65,6 @@ const UserRatings = () => {
     const [selectedObjectId, setSelectedObjectId] = useState('');
     const [rating, setRating] = useState(5);
     const [text, setText] = useState('');
-    const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [itemsLoading, setItemsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -92,46 +76,142 @@ const UserRatings = () => {
         fetchItems(contentType);
     }, [contentType]);
 
+    // Fetch user's bookings to get IDs of items they've booked
+    const fetchUserBookings = async () => {
+        try {
+            const response = await api.get('bookings/');
+            
+            // Handle different response structures
+            let bookings = [];
+            if (response.data?.results && Array.isArray(response.data.results)) {
+                bookings = response.data.results;
+            } else if (Array.isArray(response.data)) {
+                bookings = response.data;
+            } else if (response.data && typeof response.data === 'object') {
+                bookings = [response.data];
+            }
+            
+            console.log('Bookings fetched:', bookings);
+            return bookings;
+        } catch (err) {
+            console.error('Error fetching bookings:', err);
+            if (err.response?.status === 404) {
+                console.log('Bookings endpoint not found, using fallback');
+            }
+            return [];
+        }
+    };
+
     const fetchItems = async (targetType) => {
         setItemsLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
-            if (targetType === 'academy') {
-                // Only fetch academies the user has bookings with
-                const resp = await api.get('/api/bookings/');
-                const bookings = normalizeItems(resp.data);
+            // First, get user's bookings
+            const bookings = await fetchUserBookings();
+            
+            if (!bookings || bookings.length === 0) {
+                setItems([]);
+                setSelectedObjectId('');
+                setError(`You haven't booked any ${targetType}s yet. Book a ${targetType} first to leave a review.`);
+                setItemsLoading(false);
+                return;
+            }
 
-                const map = new Map();
-                bookings.forEach((b) => {
-                    if (b.academy_id) {
-                        if (!map.has(b.academy_id)) {
-                            map.set(b.academy_id, {
-                                id: b.academy_id,
-                                name: b.academy_name,
-                                address_text: '',
+            if (targetType === 'academy') {
+                // For academies, get unique academy IDs from bookings
+                const academyMap = new Map();
+                bookings.forEach((booking) => {
+                    // Try different possible field names from your API
+                    const academyId = booking.academy?.id || booking.academy_id || booking.course?.academy?.id;
+                    const academyName = booking.academy?.name || booking.academy_name || booking.course?.academy?.name;
+                    const academyAddress = booking.academy?.address_text || booking.academy_address || booking.course?.academy?.address_text;
+                    
+                    if (academyId && academyName) {
+                        if (!academyMap.has(academyId)) {
+                            academyMap.set(academyId, {
+                                id: academyId,
+                                name: academyName,
+                                address_text: academyAddress || '',
                             });
                         }
                     }
                 });
-
-                const normalized = Array.from(map.values());
-                setItems(normalized);
-                setSelectedObjectId(normalized[0]?.id ? String(normalized[0].id) : '');
-            } else {
-                const response = await api.get(TARGET_TYPES[targetType].endpoint);
-                const normalized = normalizeItems(response.data);
-
-                setItems(normalized);
-                setSelectedObjectId(normalized[0]?.id ? String(normalized[0].id) : '');
+                
+                const academyItems = Array.from(academyMap.values());
+                setItems(academyItems);
+                setSelectedObjectId(academyItems[0]?.id ? String(academyItems[0].id) : '');
+                
+                if (academyItems.length === 0) {
+                    setError(`You haven't booked any ${targetType}s yet. Book a ${targetType} first to leave a review.`);
+                }
+            } 
+            else if (targetType === 'course') {
+                // For courses, get unique course IDs from bookings
+                const courseMap = new Map();
+                bookings.forEach((booking) => {
+                    // Try different possible field names from your API
+                    const courseId = booking.course?.id || booking.course_id;
+                    const courseTitle = booking.course?.title || booking.course_title;
+                    const courseSessions = booking.course?.sessions || booking.sessions;
+                    const coursePrice = booking.course?.price || booking.price;
+                    
+                    if (courseId && courseTitle) {
+                        if (!courseMap.has(courseId)) {
+                            courseMap.set(courseId, {
+                                id: courseId,
+                                title: courseTitle,
+                                sessions: courseSessions || 0,
+                                price: coursePrice || 'N/A',
+                            });
+                        }
+                    }
+                });
+                
+                const courseItems = Array.from(courseMap.values());
+                setItems(courseItems);
+                setSelectedObjectId(courseItems[0]?.id ? String(courseItems[0].id) : '');
+                
+                if (courseItems.length === 0) {
+                    setError(`You haven't booked any ${targetType}s yet. Book a ${targetType} first to leave a review.`);
+                }
+            } 
+            else if (targetType === 'trainer') {
+                // For trainers, get unique trainer IDs from bookings
+                const trainerMap = new Map();
+                bookings.forEach((booking) => {
+                    // Try different possible field names from your API
+                    const trainerId = booking.trainer?.id || booking.trainer_id;
+                    const trainerName = booking.trainer?.name || booking.trainer_name;
+                    const trainerLocation = booking.trainer?.location || booking.location;
+                    
+                    if (trainerId && trainerName) {
+                        if (!trainerMap.has(trainerId)) {
+                            trainerMap.set(trainerId, {
+                                id: trainerId,
+                                name: trainerName,
+                                location: trainerLocation || '',
+                            });
+                        }
+                    }
+                });
+                
+                const trainerItems = Array.from(trainerMap.values());
+                setItems(trainerItems);
+                setSelectedObjectId(trainerItems[0]?.id ? String(trainerItems[0].id) : '');
+                
+                if (trainerItems.length === 0) {
+                    setError(`You haven't booked any ${targetType}s yet. Book a ${targetType} first to leave a review.`);
+                }
             }
         } catch (err) {
+            console.error('Error fetching items:', err);
             if (err.response?.status === 401) {
                 setError('Your session has expired. Please login again.');
                 setTimeout(() => navigate('/signin'), 2000);
             } else {
-                setError('Failed to load items for this review type.');
+                setError(`Failed to load ${targetType}s. Please try again later.`);
             }
         } finally {
             setItemsLoading(false);
@@ -151,15 +231,20 @@ const UserRatings = () => {
             return;
         }
 
+        if (text.trim().length < 10) {
+            setError('Review text must be at least 10 characters long.');
+            return;
+        }
+
         setSubmitting(true);
         setError(null);
         setSuccess(null);
 
         try {
-            await api.post('/api/reviews/', {
+            await api.post('api/reviews/', {
                 content_type: contentType,
                 object_id: Number(selectedObjectId),
-                rating,
+                rating: rating,
                 text: text.trim(),
             });
 
@@ -167,10 +252,32 @@ const UserRatings = () => {
             setSuccess('Your review has been submitted successfully.');
             setText('');
             setRating(5);
+            
+            // Refresh the items list
+            setTimeout(() => {
+                fetchItems(contentType);
+            }, 1000);
         } catch (err) {
+            console.error('Error submitting review:', err);
             if (err.response?.status === 401) {
                 setError('Your session has expired. Please login again.');
                 setTimeout(() => navigate('/signin'), 2000);
+            } else if (err.response?.status === 400) {
+                // Handle specific validation errors from your backend
+                const errorData = err.response?.data;
+                if (errorData && typeof errorData === 'object') {
+                    // Check for the validation error from your serializer
+                    if (Array.isArray(errorData) && errorData[0]) {
+                        setError(errorData[0]);
+                    } else {
+                        const errorMessage = Object.values(errorData).flat()[0];
+                        setError(errorMessage || 'Invalid review data. Please check your input.');
+                    }
+                } else {
+                    setError('Invalid review data. Please check your input.');
+                }
+            } else if (err.response?.status === 403) {
+                setError('You can only review items you have actually booked.');
             } else {
                 setError(getErrorMessage(err));
             }
@@ -186,7 +293,7 @@ const UserRatings = () => {
                     <div>
                         <h3 className="text-white font-bold text-xl sm:text-2xl">Write a Review</h3>
                         <p className="text-slate-400 text-sm sm:text-base mt-1">
-                            Share a rating and review for a course, academy, or trainer.
+                            Share a rating and review for a course, academy, or trainer you've booked.
                         </p>
                     </div>
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs sm:text-sm text-slate-300">
@@ -255,9 +362,22 @@ const UserRatings = () => {
                                 ))}
                             </select>
 
-                            {items.length > 0 && (
+                            {items.length > 0 && selectedObjectId && (
                                 <p className="mt-2 text-xs text-slate-400">
                                     {activeTarget.subtitle(items.find((item) => String(item.id) === String(selectedObjectId)) || items[0])}
+                                </p>
+                            )}
+                            
+                            {items.length === 0 && !itemsLoading && (
+                                <p className="mt-2 text-xs text-amber-400">
+                                    You haven't booked any {contentType}s yet. 
+                                    <button 
+                                        type="button"
+                                        onClick={() => navigate('/courses')}
+                                        className="ml-1 text-[#22d3ee] hover:underline"
+                                    >
+                                        Browse courses →
+                                    </button>
                                 </p>
                             )}
                         </div>
@@ -297,11 +417,19 @@ const UserRatings = () => {
                                     className="w-full rounded-xl border border-white/10 bg-[#0f172a] pl-12 pr-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-[#22d3ee]"
                                 />
                             </div>
+                            <p className="mt-2 text-xs text-slate-400">
+                                Minimum 10 characters. Be specific and constructive.
+                                {text.trim().length > 0 && text.trim().length < 10 && (
+                                    <span className="text-amber-400 ml-1">
+                                        ({10 - text.trim().length} characters remaining)
+                                    </span>
+                                )}
+                            </p>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={submitting || itemsLoading || !selectedObjectId}
+                            disabled={submitting || itemsLoading || !selectedObjectId || !text.trim() || text.trim().length < 10}
                             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#22d3ee] px-5 py-3 font-semibold text-[#0f172a] transition hover:bg-[#1d4ed8] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {submitting ? 'Submitting...' : 'Submit Review'}
@@ -324,14 +452,21 @@ const UserRatings = () => {
                             <p>1. Pick the exact course, academy, or trainer you used.</p>
                             <p>2. Rate the experience honestly from 1 to 5 stars.</p>
                             <p>3. Mention what stood out so the feedback is useful.</p>
+                            <p>4. Focus on the quality of instruction, facilities, and overall experience.</p>
+                            <p>5. Be respectful and constructive in your feedback.</p>
                         </div>
 
                         <div className="mt-6 rounded-xl border border-white/10 bg-[#0f172a] p-4">
                             <p className="text-xs uppercase tracking-[0.3em] text-slate-500 mb-2">Current target</p>
                             <p className="text-white font-semibold">{activeTarget.label}</p>
                             <p className="text-sm text-slate-400 mt-1">
-                                {itemsLoading ? 'Loading available items...' : `${items.length} item${items.length === 1 ? '' : 's'} available`}
+                                {itemsLoading ? 'Loading your booked items...' : `${items.length} item${items.length === 1 ? '' : 's'} available to review`}
                             </p>
+                            {items.length > 0 && (
+                                <p className="text-xs text-[#22d3ee] mt-2">
+                                    Only showing {contentType}s you've actually booked
+                                </p>
+                            )}
                         </div>
                     </div>
                 </form>

@@ -116,16 +116,13 @@ class MeView(APIView):
 
     def get(self, request):
         user = request.user
-        profile = getattr(user, 'profile', None)
         data = {
             "id": user.id,
             "username": user.username,
             "email": user.email,
             "role": user.role,
-            "phone": profile.phone if profile else "",
+            "phone": user.profile.phone if hasattr(user, 'profile') else None,
         }
-
-        # add academy info if user is an academy
         if user.role == 'academy':
             try:
                 academy = user.academy_profile
@@ -136,25 +133,38 @@ class MeView(APIView):
                 data['academy_id'] = None
                 data['academy_name'] = None
                 data['academy_status'] = None
-
         return Response(data, status=status.HTTP_200_OK)
 
     def patch(self, request):
-        serializer = UserProfileSerializer(instance=request.user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user = request.user
+        data = request.data
 
-        profile = getattr(user, 'profile', None)
-        return Response(
-            {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "role": user.role,
-                "phone": profile.phone if profile else "",
-            },
-            status=status.HTTP_200_OK,
-        )
+        # update username
+        if 'name' in data:
+            user.username = data['name']
+
+        # update email
+        if 'email' in data:
+            # check email not taken by another user
+            if User.objects.exclude(pk=user.pk).filter(email=data['email']).exists():
+                return Response(
+                    {"email": "This email is already in use."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user.email = data['email']
+
+        user.save()
+
+        # update phone in UserProfile
+        if 'phone' in data and hasattr(user, 'profile'):
+            user.profile.phone = data['phone']
+            user.profile.save()
+
+        return Response({
+            "username": user.username,
+            "email": user.email,
+            "phone": user.profile.phone if hasattr(user, 'profile') else None,
+        }, status=status.HTTP_200_OK)
 
 
 class PasswordResetRequestView(APIView):

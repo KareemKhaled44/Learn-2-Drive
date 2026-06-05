@@ -7,6 +7,7 @@ import {
   Car, Gauge, AlertCircle, CheckCircle, XCircle, UserCheck
 } from 'lucide-react'
 import api from '../exports/Axios.jsx'
+import { toast } from 'react-toastify'
 
 const CourseDetails = () => {
   const { id } = useParams()
@@ -39,7 +40,41 @@ const CourseDetails = () => {
     }
   }, [id, getCourseDetails])
 
+  // Check if user is authenticated
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('access') // Changed from 'access_token' to 'access'
+    if (!token) return false
+    
+    try {
+      // Check if token is expired
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const expirationTime = payload.exp * 1000
+      const currentTime = Date.now()
+      
+      return expirationTime > currentTime + 60000 // Token valid if not expired and has at least 1 minute left
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      return false
+    }
+  }
+
   const handleBookNow = () => {
+    // Check if user is logged in
+    if (!isAuthenticated()) {
+      // Show toast message
+      toast.error('Please log in to enroll in this course', {
+        position: "top-center",
+        autoClose: 3000,
+      })
+      
+      // Redirect to login page with return URL
+      setTimeout(() => {
+        navigate('/signin', { state: { from: `/booking/course/${id}` } })
+      }, 1500)
+      return
+    }
+    
+    // If logged in, proceed to booking
     navigate(`/booking/course/${id}`)
   }
 
@@ -224,24 +259,30 @@ const CourseDetails = () => {
                 </div>
               </div>
 
-              {/* Enroll Button - 👈 تم التعديل هنا */}
+              {/* Enroll Button with Authentication Check */}
               <button 
                 onClick={handleBookNow}
                 disabled={!isActive}
                 className={`w-full md:w-auto px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#22d3ee] hover:bg-[#1e40af] text-white shadow-lg hover:shadow-xl cursor-pointer'
+                    ? 'bg-[#22d3ee] hover:bg-[#1e40af] text-white shadow-lg hover:shadow-xl cursor-pointer transform hover:scale-105'
                     : 'bg-gray-600 cursor-not-allowed text-gray-300'
                 }`}
               >
                 {isActive ? 'Enroll Now' : 'Course Full / Inactive'}
               </button>
+              
+              {/* Helper text for logged out users */}
+              {isActive && (
+                <p className="text-xs text-gray-500 mt-3 text-center md:text-left">
+                  *Please log in to enroll in this course
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* باقي الكود كما هو دون تغيير */}
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Academy Section */}

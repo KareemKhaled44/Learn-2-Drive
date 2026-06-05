@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../../exports/Axios'
 import { toast } from 'react-toastify'
+import { Phone, Mail, Globe, Plus } from 'lucide-react'
 
 const contactTypes = [
     { value: 'phone', label: 'Phone' },
@@ -172,30 +173,84 @@ const Profile = () => {
             </form>
 
             <div className="dash-card p-6 space-y-4">
-                <h3 className="text-white font-medium">Contacts</h3>
+                <div className="flex items-center justify-between">
+                    <h3 className="text-white font-medium text-lg">Contact Information</h3>
+                    <span className="text-xs text-slate-400">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
+                </div>
 
                 <div className="space-y-3">
                     {contacts.length === 0 ? (
-                        <div className="text-slate-300 text-sm">No contacts added yet.</div>
-                    ) : contacts.map(c => (
-                        <div key={c.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-3">
-                            <div>
-                                <div className="text-sm text-white font-medium">{c.type}</div>
-                                <div className="text-slate-300 text-sm">{c.value}</div>
-                            </div>
-                            <div>
-                                <button onClick={() => deleteContact(c.id)} className="px-3 py-1.5 rounded-lg bg-red-500/80 text-xs text-white">Delete</button>
-                            </div>
+                        <div className="text-center py-8 rounded-xl border border-white/10 bg-white/5">
+                            <div className="text-slate-400 text-sm mb-2">No contacts added yet</div>
+                            <p className="text-slate-500 text-xs">Add phone numbers, emails, or websites below</p>
                         </div>
-                    ))}
+                    ) : (
+                        contacts.map(c => (
+                            <div key={c.id} className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 hover:border-[#22d3ee]/50 hover:bg-white/10 transition-all duration-300">
+                                <div className="flex items-center gap-3 flex-1">
+                                    {/* Icon based on contact type */}
+                                    <div className={`p-2 rounded-lg ${
+                                        c.type === 'phone' ? 'bg-green-500/10 text-green-400' :
+                                        c.type === 'email' ? 'bg-blue-500/10 text-blue-400' :
+                                        'bg-purple-500/10 text-purple-400'
+                                    }`}>
+                                        {c.type === 'phone' && <Phone className="h-4 w-4" />}
+                                        {c.type === 'email' && <Mail className="h-4 w-4" />}
+                                        {c.type === 'website' && <Globe className="h-4 w-4" />}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">{c.type}</div>
+                                        <div className="text-white text-sm font-medium break-all">{c.value}</div>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => deleteContact(c.id)} 
+                                    className="opacity-0 group-hover:opacity-100 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white text-xs font-medium transition-all duration-300"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        ))
+                    )}
                 </div>
 
-                <form onSubmit={addContact} className="mt-4 flex items-center gap-3">
-                    <select name="type" value={newContact.type} onChange={handleNewContactChange} className="dash-select">
-                        {contactTypes.map(ct => <option key={ct.value} value={ct.value}>{ct.label}</option>)}
-                    </select>
-                    <input name="value" value={newContact.value} onChange={handleNewContactChange} placeholder="Contact value" className="flex-1 dash-input" />
-                    <button type="submit" className="dash-btn">Add</button>
+                <form onSubmit={addContact} className="mt-6 pt-4 border-t border-white/10">
+                    <div className="space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <select 
+                                name="type" 
+                                value={newContact.type} 
+                                onChange={handleNewContactChange} 
+                                className="dash-select text-sm"
+                                required
+                            >
+                                {contactTypes.map(ct => (
+                                    <option key={ct.value} value={ct.value}>
+                                        {ct.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <input 
+                                name="value" 
+                                value={newContact.value} 
+                                onChange={handleNewContactChange} 
+                                placeholder={
+                                    newContact.type === 'phone' ? '+20 123 456 7890' :
+                                    newContact.type === 'email' ? 'contact@example.com' :
+                                    'https://example.com'
+                                } 
+                                className="flex-1 dash-input sm:col-span-2 text-sm" 
+                                required
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            className="w-full dash-btn flex items-center justify-center gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Contact
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

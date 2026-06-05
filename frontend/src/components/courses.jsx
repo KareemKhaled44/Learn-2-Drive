@@ -1,16 +1,16 @@
 import {React, useState, useEffect} from 'react'
 import { Clock, Users, Star, Settings, Zap, Venus  } from 'lucide-react'
-import { useNavigate } from 'react-router-dom' // 👈 أضف هذا الاستيراد
+import { useNavigate } from 'react-router-dom' 
 import api from '../exports/Axios.jsx'
 
 const Courses = () => {
   const [courses, setCourses] = useState([])
-  const navigate = useNavigate() // 👈 أضف هذا الـ hook
+  const navigate = useNavigate() 
   
   const isManual = (course) => course.transmission === 'manual';
   const isBestSeller = (course) => course.quantity_sold > 5;
 
-  // 👈 أضف هذه الدالة للتنقل إلى تفاصيل الكورس
+  
   const handleViewCourse = (courseId) => {
     navigate(`/courses/${courseId}`)
   }

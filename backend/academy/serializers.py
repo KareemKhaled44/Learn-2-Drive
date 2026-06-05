@@ -428,6 +428,13 @@ class ReviewCreateSerializer(serializers.Serializer):
 
         return data
 
+class AcademyReviewSerializer(ReviewSerializer):
+    class Meta(ReviewSerializer.Meta):
+        fields = ReviewSerializer.Meta.fields + ['academy_name']
+        read_only_fields = ['academy_name']
+    academy_name = serializers.CharField(source='content_object.name', read_only=True)
+    
+
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage

@@ -1,38 +1,51 @@
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import './App.css'
-import { Header, Footer} from './exports';
-import Home from './pages/home'
-import SignUp from './pages/SignUp'
-import SignIn from './pages/SignIn'
-import AllAcademies from './pages/AllAcademies'
-import AllCourses from './pages/AllCourses'
-import ContactUs from './pages/ContactUs'
-import TrainerProfile from './pages/TrainerPofile'
-import AcademyDetails from './pages/AcademyDetails';
-import CourseDetails from './pages/CourseDetails.jsx';
-import ForgotPassword from './pages/ForgotPassword';
-import PendingApproval from './pages/PendingApproval';
-import AcademyRegister from './pages/AcademyRegister';
-import Dashboard from './pages/dashboard/index'
-import Overview from './pages/dashboard/Overview'
-import Trainers from './pages/dashboard/Trainers'
-import TrainerForm from './pages/dashboard/TrainerForm'
-import Courses from './pages/dashboard/Courses'
-import CourseForm from './pages/dashboard/CourseForm'
-import Bookings from './pages/dashboard/Bookings'
-import Profile from './pages/dashboard/Profile'
-import AcademyReviews from './pages/dashboard/AcademyReviews'
-import AcademyRoute from './components/AcademyRoute'
-import Booking from './pages/Booking';
-import BookingDetail from './pages/BookingDetail';
-import MyBookings from './pages/MyBookings';
+
+import "./App.css";
+
+// Shared Components
+import { Header, Footer } from "./exports";
+
+// Main Pages
+import Home from "./pages/Home";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import AllAcademies from "./pages/AllAcademies";
+import AllCourses from "./pages/AllCourses";
+import ContactUs from "./pages/ContactUs";
+import TrainerProfile from "./pages/TrainerProfile";
+import AcademyDetails from "./pages/AcademyDetails";
+import CourseDetails from "./pages/CourseDetails";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import PendingApproval from "./pages/PendingApproval";
+import AcademyRegister from "./pages/AcademyRegister";
+
+// Booking Pages
+import Booking from "./pages/Booking";
+import BookingDetail from "./pages/BookingDetail";
+import MyBookings from "./pages/MyBookings";
+
+// Academy Dashboard
+import Dashboard from "./pages/dashboard/index";
+import Overview from "./pages/dashboard/Overview";
+import Trainers from "./pages/dashboard/Trainers";
+import TrainerForm from "./pages/dashboard/TrainerForm";
+import Courses from "./pages/dashboard/Courses";
+import CourseForm from "./pages/dashboard/CourseForm";
+import Bookings from "./pages/dashboard/Bookings";
+import Profile from "./pages/dashboard/Profile";
+import AcademyReviews from "./pages/dashboard/AcademyReviews";
+
+// User Dashboard
 import UserDashboard from "./pages/User_Dashboard/UserDashboard";
 import UserProfile from "./pages/User_Dashboard/UserProfile";
 import UserBookings from "./pages/User_Dashboard/UserBooking";
 import UserRatings from "./pages/User_Dashboard/UserRating";
-import ResetPassword from "./pages/ResetPassword";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+
+// Protected Routes
+import AcademyRoute from "./components/AcademyRoute";
 
 const AppLayout = () => {
   const location = useLocation();

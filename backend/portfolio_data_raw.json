@@ -1,0 +1,626 @@
+﻿[
+{
+  "model": "academy.location",
+  "pk": 1,
+  "fields": {
+    "city": "giza",
+    "area": "faisel"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 2,
+  "fields": {
+    "city": "alexandria",
+    "area": "elsouf"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 4,
+  "fields": {
+    "city": "cairo",
+    "area": "haram"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 5,
+  "fields": {
+    "city": "cairo",
+    "area": "shoubra"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 6,
+  "fields": {
+    "city": "fayoum",
+    "area": "wady elryan"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 7,
+  "fields": {
+    "city": "cairo",
+    "area": "mokatem"
+  }
+},
+{
+  "model": "academy.location",
+  "pk": 8,
+  "fields": {
+    "city": "tanta",
+    "area": null
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 1,
+  "fields": {
+    "name": "Egycar",
+    "user": null,
+    "description": "a professional academy for learning how to drive",
+    "logo": "academies/Egy-Car.png",
+    "address_text": "225 ╪┤╪º╪▒╪╣ ╪º┘ä┘à┘ä┘â ┘ü┘è╪╡┘ä╪î ┘â┘ü╪▒ ╪╖┘ç╪▒┘à╪│ / ╪¿╪î ╪º┘ä┘ç╪▒┘à╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä╪¼┘è╪▓╪⌐ 3556014",
+    "google_maps_url": "https://maps.app.goo.gl/GZeTCNekBZNGMNg49",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "location": [
+      1
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 2,
+  "fields": {
+    "name": "kholosy car",
+    "user": null,
+    "description": "a professional academy for learning how to drive",
+    "logo": "academies/kholosy.jpg",
+    "address_text": "36HX+5XG╪î ╪º┘ä╪¬╪▒╪╣╪⌐ ╪º┘ä╪¿┘ê┘ä╪º┘é┘è╪⌐╪î ╪┤╪¿╪▒╪º╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä┘é╪º┘ç╪▒╪⌐ΓÇ¼ 4343304",
+    "google_maps_url": "https://maps.app.goo.gl/mLeGqA4NM9Yzrcm59?g_st=ic",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "location": [
+      5
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 3,
+  "fields": {
+    "name": "master car",
+    "user": null,
+    "description": "a professional academy for learning how to drive",
+    "logo": "academies/master.png",
+    "address_text": "╪º┘ä┘à╪º┘à┘ê┘å ╪│┘è╪» ╪▓┘â┘è╪î ┘â┘ü╪▒ ╪╖┘ç╪▒┘à╪│╪î ╪¿┘ê┘ä╪º┘é ╪º┘ä╪»┘â╪▒┘ê╪▒╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä╪¼┘è╪▓╪⌐ 3710484",
+    "google_maps_url": "https://maps.app.goo.gl/zfU8TbYgTCVV2AXv8",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "location": [
+      6
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 5,
+  "fields": {
+    "name": "A & M driving centre",
+    "user": null,
+    "description": "┘è┘Å╪╣╪» A & M driving centre ┘à╪▒┘â╪▓┘ï╪º ┘à╪¡┘ä┘è┘ï╪º ┘ä╪¬╪╣┘ä┘è┘à ┘é┘è╪º╪»╪⌐ ╪º┘ä╪│┘è╪º╪▒╪º╪¬ ┘ü┘è ╪º┘ä┘é╪º┘ç╪▒╪⌐╪î ┘à╪╡╪▒╪î ┘ê┘è┘é╪╣ ┘ü┘è 7594 ╪┤╪º╪▒╪╣ ╪º┘ä╪¼╪º┘à╪╣╪⌐ ╪º┘ä╪¡╪»┘è╪½╪⌐╪î ╪º┘ä╪ú╪¿╪º╪¼┘è╪⌐╪î ┘é╪│┘à ╪º┘ä╪«┘ä┘è┘ü╪⌐╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä┘é╪º┘ç╪▒╪⌐. ┘è┘é╪»┘æ┘à ╪º┘ä┘à╪▒┘â╪▓ ╪«╪»┘à╪º╪¬ ╪¬╪»╪▒┘è╪¿ ╪╣┘à┘ä┘è ┘ê┘å╪╕╪▒┘è ┘ä┘ä╪│╪º╪ª┘é┘è┘å ╪º┘ä╪¼╪»╪»╪î ┘ê┘è┘Å╪╣╪» ┘à┘å ╪¿┘è┘å ╪º┘ä┘à╪ñ╪│╪│╪º╪¬ ╪º┘ä┘å╪┤╪╖╪⌐ ┘ü┘è ┘à┘å╪╖┘é╪⌐ ╪º┘ä┘à┘é╪╖┘à ╪╢┘à┘å ┘ü╪ª╪⌐ ┘à╪»╪º╪▒╪│ ╪¬╪╣┘ä┘è┘à ╪º┘ä┘é┘è╪º╪»╪⌐.",
+    "logo": "academies/A__M_driving_centre.png",
+    "address_text": "7594 Al Gamea Al Haditha St, Al Abageyah, ┘é╪│┘à ╪º┘ä╪«┘ä┘è┘ü╪⌐╪î╪î Cairo Governorate 4411701, Egypt",
+    "google_maps_url": "https://maps.app.goo.gl/XGg8YxwJidjQPwCA8",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "location": [
+      7
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 6,
+  "fields": {
+    "name": "ALDeep Driving Academy",
+    "user": null,
+    "description": "╪º┘ä╪»┘è╪¿ ┘ä╪¬╪╣┘ä┘è┘à ┘é┘è╪º╪»╪⌐ ╪º┘ä╪│┘è╪º╪▒╪º╪¬ (╪º┘ä┘ü╪▒┘è╪»╪⌐ ╪│╪º╪¿┘é╪º)\r\nΓÇô ┘à╪º┘å┘è┘ê╪º┘ä & ╪ú┘ê╪¬┘ê┘à╪º╪¬┘è┘â\r\n≡ƒæ⌐ΓÇì≡ƒª░≡ƒæ¿ΓÇì≡ƒª▒ ┘à╪»╪▒╪¿┘è┘å & ┘à╪»╪▒╪¿╪º╪¬",
+    "logo": "academies/eldeep.jpg",
+    "address_text": "18 ╪│┘à┘è╪▒ ╪╣╪¿╪» ╪º┘ä╪▒╪ñ┘ê┘ü╪î ╪º┘ä┘à┘å╪╖┘é╪⌐ ╪º┘ä╪½╪º┘à┘å╪⌐╪î ┘à╪»┘è┘å╪⌐ ┘å╪╡╪▒╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä┘é╪º┘ç╪▒╪⌐ΓÇ¼ 4441560",
+    "google_maps_url": "https://maps.app.goo.gl/HCaLW8ycWXkMV3oM6",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "location": [
+      2
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 7,
+  "fields": {
+    "name": "El ostaz",
+    "user": null,
+    "description": "┘à╪¬╪«╪╡╪╡┘è┘å ┘ü┘è ┘à╪¼╪º┘ä ╪¬╪╣┘ä┘è┘à ╪º┘ä┘é┘è╪º╪»╪⌐ ┘ä╪¼┘à┘è╪╣ ╪º┘å┘ê╪º╪╣ ╪º┘ä╪│┘è╪º╪▒╪º╪¬ ╪º┘ä┘à╪º┘å┘è┘ê╪º┘ä ┘ê ╪º┘ä╪º┘ê╪¬┘ê┘à╪º╪¬┘è┘â\r\n┘à╪¬╪º╪¡ ╪│┘è╪º╪▒╪º╪¬ ╪«╪º╪╡╪⌐ ╪¿╪º┘ä┘à╪▒┘â╪▓ ┘ê ╪º┘ä╪¬╪╣┘ä┘è┘à ╪╣┘ä┘è ╪│┘è╪º╪▒╪⌐ ╪º┘ä╪╣┘à┘è┘ä ≡ƒæî≡ƒÜÿ≡ƒñ╖≡ƒÅ╝ΓÇìΓÖé∩╕Å",
+    "logo": "academies/elostaz.jpg",
+    "address_text": "╪º┘ä╪¿╪▒┘ê┘ü ╪╣┘ä╪º╪í ╪╣╪¿╪» ╪º┘ä╪║┘å┘è╪î QXRJ+4WP, Moustafa Sadek Al Rafei╪î ╪╖┘å╪╖╪º (┘é╪│┘à 2)╪î ┘à╪▒┘â╪▓ ╪╖┘å╪╖╪º╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä╪║╪▒╪¿┘è╪⌐ 6623040",
+    "google_maps_url": "https://maps.app.goo.gl/q8jSn3WFD29hJNwg6",
+    "created_at": "2026-02-18T22:54:12.912Z",
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": "2026-05-30T21:27:51.128Z",
+    "approved_by": null,
+    "location": [
+      8
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 11,
+  "fields": {
+    "name": "motaz academy",
+    "user": 11,
+    "description": "We offer a wide range of courses in various fields including programming, design, marketing, and more. Our experienced instructors and comprehensive curriculum ensure that you gain the skills needed to succeed in your career.",
+    "logo": "academies/unnamed.png",
+    "address_text": "49 ╪│┘è╪»┘è ┘à╪º┘ä┘â╪î ╪ú╪¿┘ê ╪º┘ä╪│╪╣┘ê╪» ╪º┘ä┘à╪»╪º╪¿╪║╪î ┘é╪│┘à ┘à╪╡╪▒ ╪º┘ä┘é╪»┘è┘à╪⌐╪î ┘à╪¡╪º┘ü╪╕╪⌐ ╪º┘ä┘é╪º┘ç╪▒╪⌐ΓÇ¼ 11111",
+    "google_maps_url": "https://maps.app.goo.gl/uiM8oznMLfqKm2Vn9",
+    "created_at": "2026-04-09T22:42:46.258Z",
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": "2026-05-30T21:31:45.861Z",
+    "approved_by": null,
+    "location": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 20,
+  "fields": {
+    "name": "Porter Leon",
+    "user": 26,
+    "description": "Veritatis ea atque d",
+    "logo": "",
+    "address_text": null,
+    "google_maps_url": null,
+    "created_at": "2026-05-05T20:32:19.268Z",
+    "status": "pending",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "location": []
+  }
+},
+{
+  "model": "academy.academy",
+  "pk": 22,
+  "fields": {
+    "name": "testAcademy",
+    "user": 32,
+    "description": "your choice",
+    "logo": "",
+    "address_text": null,
+    "google_maps_url": null,
+    "created_at": "2026-06-04T14:23:56.922Z",
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": "2026-06-04T14:40:45.103Z",
+    "approved_by": null,
+    "location": []
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 4,
+  "fields": {
+    "name": "ali ahmaed",
+    "gender": "male",
+    "bio": "I am a Honda Specialist",
+    "car_model": "Honda Specialist",
+    "image": "trainers/WhatsApp_Image_2026-05-25_at_9.15.04_PM.jpeg",
+    "academy": 11,
+    "experience_years": 7,
+    "working_days": [
+      "saturday",
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday"
+    ],
+    "session_start_time": "12:00:00",
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 5,
+  "fields": {
+    "name": "Felo",
+    "gender": "male",
+    "bio": "i am a BMW Specialist",
+    "car_model": "BMW Specialist",
+    "image": "trainers/WhatsApp_Image_2026-05-25_at_9_w6lGx9v.09.41_PM.jpeg",
+    "academy": 11,
+    "experience_years": 10,
+    "working_days": [
+      "saturday",
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday"
+    ],
+    "session_start_time": "00:00:00",
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 6,
+  "fields": {
+    "name": "karim",
+    "gender": "male",
+    "bio": "perfect trainer",
+    "car_model": "scooter specialist",
+    "image": "trainers/trainer5.JPG",
+    "academy": 1,
+    "experience_years": 4,
+    "working_days": [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday"
+    ],
+    "session_start_time": "10:00:00",
+    "session_end_time": "17:00:00",
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 7,
+  "fields": {
+    "name": "Mohanned",
+    "gender": "male",
+    "bio": "",
+    "car_model": "vehicles specailist",
+    "image": "trainers/image_4.png",
+    "academy": 11,
+    "experience_years": 3,
+    "working_days": [
+      "saturday",
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday"
+    ],
+    "session_start_time": "06:00:00",
+    "session_end_time": "17:00:00",
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 8,
+  "fields": {
+    "name": "mai",
+    "gender": "female",
+    "bio": "professional female trainer",
+    "car_model": "Toyota Specialist",
+    "image": "trainers/images.jfif",
+    "academy": 6,
+    "experience_years": 5,
+    "working_days": [],
+    "session_start_time": null,
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 30,
+  "fields": {
+    "name": "aa",
+    "gender": "male",
+    "bio": "aa",
+    "car_model": "aa",
+    "image": "",
+    "academy": 7,
+    "experience_years": 1,
+    "working_days": [
+      "saturday"
+    ],
+    "session_start_time": null,
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "pending",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 31,
+  "fields": {
+    "name": "aa",
+    "gender": "male",
+    "bio": "aa",
+    "car_model": "aa",
+    "image": "",
+    "academy": 3,
+    "experience_years": 0,
+    "working_days": [
+      "saturday"
+    ],
+    "session_start_time": null,
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "pending",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.trainer",
+  "pk": 32,
+  "fields": {
+    "name": "Ali Sayed",
+    "gender": "male",
+    "bio": "vehicles Specialist",
+    "car_model": "vehicles specailist",
+    "image": "trainers/WhatsApp_Image_2026-05-25_at_9_HZXBR1d.40.16_PM.jpeg",
+    "academy": 1,
+    "experience_years": 4,
+    "working_days": [
+      "saturday",
+      "sunday",
+      "monday"
+    ],
+    "session_start_time": "09:00:00",
+    "session_end_time": null,
+    "max_bookings_per_day": 3,
+    "is_active": true,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 1,
+  "fields": {
+    "title": "Premium",
+    "description": "Advanced defensive driving techniques with professional instructors and luxury vehicles.",
+    "image": "courses/Course1_Brh2RoR.jpg",
+    "price": "3000.00",
+    "sessions": 10,
+    "duration": 50,
+    "quantity": 12,
+    "quantity_sold": 10,
+    "created_at": "2025-08-20T20:46:20.484Z",
+    "is_active": true,
+    "transmission": "manual",
+    "academy": 1,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      6,
+      32
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 3,
+  "fields": {
+    "title": "Gold",
+    "description": "Standard driving course perfect for beginners looking to master the fundamentals.",
+    "image": "courses/course4.png",
+    "price": "2000.00",
+    "sessions": 8,
+    "duration": 50,
+    "quantity": 10,
+    "quantity_sold": 2,
+    "created_at": "2025-08-20T20:50:10.397Z",
+    "is_active": false,
+    "transmission": "auto",
+    "academy": 2,
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 4,
+  "fields": {
+    "title": "License Course",
+    "description": "Comprehensive training for obtaining a driver's license.",
+    "image": "courses/course3_zXYdBmq.jpg",
+    "price": "1500.00",
+    "sessions": 6,
+    "duration": 50,
+    "quantity": 10,
+    "quantity_sold": 3,
+    "created_at": "2025-08-26T14:04:00.650Z",
+    "is_active": true,
+    "transmission": "manual",
+    "academy": 11,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      5
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 5,
+  "fields": {
+    "title": "Commercial",
+    "description": "Specialized training for commercial vehicle operators and truck drivers.",
+    "image": "courses/course5.jpg",
+    "price": "1400.00",
+    "sessions": 15,
+    "duration": 120,
+    "quantity": 10,
+    "quantity_sold": 4,
+    "created_at": "2025-08-26T14:12:00.134Z",
+    "is_active": true,
+    "transmission": "manual",
+    "academy": 11,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      7
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 14,
+  "fields": {
+    "title": "PremiumPlus",
+    "description": "Comprehensive driving course covering all aspects of defensive driving and vehicle control.",
+    "image": "courses/course2_ntVZtdh.jpg",
+    "price": "4000.00",
+    "sessions": 15,
+    "duration": 120,
+    "quantity": 3,
+    "quantity_sold": 2,
+    "created_at": "2026-03-07T22:29:13.143Z",
+    "is_active": true,
+    "transmission": null,
+    "academy": 6,
+    "status": "approved",
+    "rejected_reason": null,
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      8
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 15,
+  "fields": {
+    "title": "Scooter Course",
+    "description": "Professional scooter training focusing on safety protocols, defensive riding techniques, \r\nand urban traffic navigation.",
+    "image": "courses/course6_zHWeCR1.jpg",
+    "price": "800.00",
+    "sessions": 21,
+    "duration": 50,
+    "quantity": 10,
+    "quantity_sold": 10,
+    "created_at": "2026-03-07T22:34:40.398Z",
+    "is_active": true,
+    "transmission": "auto",
+    "academy": 1,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": null,
+    "approved_by": null,
+    "trainers": [
+      6
+    ]
+  }
+},
+{
+  "model": "academy.course",
+  "pk": 17,
+  "fields": {
+    "title": "mega Course",
+    "description": "Learn manual driving",
+    "image": "courses/images.png",
+    "price": "299.00",
+    "sessions": 10,
+    "duration": 60,
+    "quantity": 20,
+    "quantity_sold": 0,
+    "created_at": "2026-04-25T20:03:44.576Z",
+    "is_active": true,
+    "transmission": "manual",
+    "academy": 11,
+    "status": "approved",
+    "rejected_reason": "",
+    "approved_at": "2026-04-25T20:50:36Z",
+    "approved_by": null,
+    "trainers": [
+      4
+    ]
+  }
+}
+]

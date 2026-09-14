@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Calendar, Star, Menu, XCircle } from 'lucide-react';
-import ProfileTab from './userProfile';
-import BookingsTab from './userBooking';
-import RatingsTab from './userRating';
+import ProfileTab from './UserProfile';
+import BookingsTab from './UserBooking';
+import RatingsTab from './UserRating';
 
 const UserDashboard = () => {
     const navigate = useNavigate();

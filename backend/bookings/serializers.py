@@ -116,6 +116,7 @@ class BookingCreateSerializer(serializers.ModelSerializer):
 
             booking = Booking.objects.create(**validated_data)
 
+            transaction.on_commit(lambda: send_booking_confirmation_email(booking))
 
         return booking
 

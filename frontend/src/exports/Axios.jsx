@@ -1,7 +1,8 @@
 // frontend/src/exports/Axios.jsx
 import axios from "axios";
 
-const baseURL =  import.meta.env.VITE_API_URL || "http://localhost:8000/api/";
+const configuredApiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const baseURL = `${configuredApiUrl.replace(/\/api\/?$/, "").replace(/\/+$/, "")}/`;
 const api = axios.create({
   baseURL,
   headers: {
@@ -38,12 +39,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refresh = localStorage.getItem("refresh");
-        const res = await axios.post("http://127.0.0.1:8000/auth/refresh/", {
+        const res = await axios.post(`${baseURL}auth/refresh/`, {
           refresh: refresh,
         });
 

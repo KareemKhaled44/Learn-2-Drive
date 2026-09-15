@@ -168,4 +168,4 @@ def send_booking_confirmation_email(booking):
         to=[booking.user.email],
     )
     email.attach_alternative(html_content, "text/html")
-    email.send(fail_silently=True)
+    email.send(fail_silently=False)
